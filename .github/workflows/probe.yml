@@ -1,0 +1,33 @@
+# Measures how long one frame takes on GitHub's CPU-only runners, at a few quality settings (run by hand).
+name: probe
+on:
+  workflow_dispatch:
+    inputs:
+      production:
+        description: 'Production folder'
+        default: 'productions/2026-10-28-lighthouse-fox'
+env:
+  LEMO_COMMIT: 413a6bd6d78ebd3bdd5abaec9538a26867f890df
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Lemo-Opuscar library (pinned)
+        run: |
+          git clone -q https://github.com/lemomo-ai/lemo-opuscar.git ~/lemo-opuscar
+          cd ~/lemo-opuscar && git checkout -q "$LEMO_COMMIT" && npm ci --no-audit --no-fund
+          sed -i 's/^\(\s*const page = await browser.newPage(.*);\)/\1 page.setDefaultTimeout(90000);/' core/render/page.mjs
+      - name: Time a few frames
+        env:
+          PLAYWRIGHT_CHROME: /usr/bin/google-chrome
+        run: |
+          nproc
+          for Q in 'ssaa=1&dof=16' 'ssaa=1&dof=24' 'ssaa=1.5&dof=40'; do
+            echo "== $Q"
+            Q="$Q" sh tools/stills.sh "${{ inputs.production }}" /tmp/probe 3 3.03 3.07 3.1 20 20.03 40 40.03
+          done
