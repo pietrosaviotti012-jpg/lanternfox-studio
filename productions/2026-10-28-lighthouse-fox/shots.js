@@ -183,7 +183,7 @@ export function SHOTS(C, DUR) {
             { name: 'fg', z: -.02, trans: .04, draw: bank(-.205, 6, [-.2, -.03]) },
           ],
           glows: { hill: [[0, 1]], fox: [[0, 1]] }, flicker: ['fox'],
-          beams: [{ x: .08, y: .157, z: -.064, len: .42, width: .07, rot: sweep(.5, .7), k: .5 }],
+          beams: [{ x: .08, y: .157, z: -.064, len: .42, width: .07, rot: sweep(.5, .7), k: t => .5 * (1 - .8 * ss(seg(t, titleAt - .5, titleAt + .8))) }],   // the beam steps back for the title
           update: (t, L) => { const k = ss(seg(t, titleAt, titleAt + 1.4)); L.title.visible = k > 0; L.title.material.color.setScalar(k); L.title.position.y = L.title.userData.p0.y - .006 * (1 - k); },
           cam: [[0, [.03, -.02, .5, .03, -.02, -.07]], [E.cueEnd('L13'), [.02, .0, .62, .02, .01, -.07]], [E.dur, [0, .03, .72, 0, .04, -.07]]],
           focus: [[0, -.058], [titleAt, -.058], [titleAt + 1.5, -.08]], aper: 14,
