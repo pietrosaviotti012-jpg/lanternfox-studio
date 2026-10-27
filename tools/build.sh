@@ -21,7 +21,12 @@ node core/render/events.mjs "$P" --size 1080x1920 --out "$P/events.json"
 office '{"dept":"musica","status":"working","task":"Compongo il carillon sulle scene"}'
 $PY "$STUDIO/tools/score.py" "$P"
 office '{"dept":"musica","status":"done","task":"Carillon pronto"}' '{"dept":"animazione","status":"working","task":"Disegno i fotogrammi del film"}'
-node core/render/video.mjs "$P" --fps 30 --workers "$WORKERS" --size 1080x1920 --q "$Q" --out "$P/out/video.mp4"
+if [ -n "$SEGMENTS" ]; then   # slices already rendered elsewhere (tools/segment.mjs): join them losslessly
+  ls "$SEGMENTS"/seg_*.mp4 | sort -V | sed "s/.*/file '&'/" > "$P/out/segments.txt"
+  ffmpeg -v error -y -f concat -safe 0 -i "$P/out/segments.txt" -c copy "$P/out/video.mp4"
+else
+  node core/render/video.mjs "$P" --fps 30 --workers "$WORKERS" --size 1080x1920 --q "$Q" --out "$P/out/video.mp4"
+fi
 office '{"dept":"animazione","status":"done","task":"Fotogrammi pronti"}' '{"dept":"montaggio","status":"working","task":"Mixo voce, musica e suoni; sottotitoli"}'
 $PY "$STUDIO/tools/mix.py" "$P"
 $PY "$STUDIO/tools/subs.py" "$P"
