@@ -1,0 +1,112 @@
+# Renders a production in the cloud: voice → picture → music → mix → film, then puts it in a GitHub release
+# (a public link Instagram and TikTok can fetch) and sends it to the Office for approval.
+# Starts when a production gets its READY file, or by hand (Actions → render → Run workflow).
+name: render
+
+on:
+  push:
+    branches: [main]
+    paths: ['productions/**/READY']
+  workflow_dispatch:
+    inputs:
+      production:
+        description: 'Production folder, e.g. productions/2026-10-28-lighthouse-fox'
+        required: true
+
+concurrency:
+  group: render
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+env:
+  LEMO_COMMIT: 413a6bd6d78ebd3bdd5abaec9538a26867f890df
+  OFFICE_URL: ${{ secrets.OFFICE_URL }}
+  STUDIO_SECRET: ${{ secrets.STUDIO_SECRET }}
+  HF_HOME: /home/runner/.cache/huggingface
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Which production
+        id: which
+        run: |
+          if [ -n "${{ inputs.production }}" ]; then P="${{ inputs.production }}"; else
+            P=$(git diff --name-only HEAD^ HEAD | grep '^productions/.*/READY$' | head -1 | xargs dirname); fi
+          [ -f "$P/script.json" ] || { echo "no script.json in '$P'"; exit 1; }
+          echo "dir=$P" >> "$GITHUB_OUTPUT"
+          echo "id=$(basename "$P")" >> "$GITHUB_OUTPUT"
+          echo "Production: $P"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: tools/requirements.txt
+
+      - name: System tools
+        run: sudo apt-get update -q && sudo apt-get install -y -q ffmpeg
+
+      - name: Lemo-Opuscar library (pinned)
+        run: |
+          git clone -q https://github.com/lemomo-ai/lemo-opuscar.git ~/lemo-opuscar
+          cd ~/lemo-opuscar && git checkout -q "$LEMO_COMMIT" && npm ci --no-audit --no-fund
+          node node_modules/playwright-core/cli.js install --with-deps chromium-headless-shell
+
+      - name: Python packages (CPU)
+        run: pip install --extra-index-url https://download.pytorch.org/whl/cpu -r tools/requirements.txt
+
+      - name: Voice models cache
+        uses: actions/cache@v4
+        with:
+          path: /home/runner/.cache/huggingface
+          key: hf-chatterbox-whisper-v1
+
+      - name: Voce
+        run: |
+          node tools/office.mjs '{"dept":"voce","status":"working","task":"Registro il narratore riga per riga"}'
+          python tools/voice.py "${{ steps.which.outputs.dir }}" || { node tools/office.mjs '{"dept":"voce","status":"error","task":"Una riga non si capisce: va riscritta"}'; exit 1; }
+          node tools/office.mjs '{"dept":"voce","status":"done","task":"Narrazione pronta e controllata"}'
+
+      - name: Film
+        env:
+          Q: 'ssaa=1.5&dof=40'
+          WORKERS: '4'
+          PY: python
+        run: sh tools/build.sh "${{ steps.which.outputs.dir }}"
+
+      - name: Release (public link for the platforms)
+        id: release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          P: ${{ steps.which.outputs.dir }}
+          ID: ${{ steps.which.outputs.id }}
+        run: |
+          TITLE=$(node -e "console.log(require('./$P/meta.json').title)")
+          gh release delete "film-$ID" --yes --cleanup-tag 2>/dev/null || true
+          gh release create "film-$ID" "$P/out/film.mp4" "$P/out/poster.jpg" "$P/out/sheet.jpg" "$P/out/film.srt" --title "$TITLE" --notes "Lantern Fox Tales · $ID"
+          echo "base=https://github.com/${{ github.repository }}/releases/download/film-$ID" >> "$GITHUB_OUTPUT"
+
+      - name: To the Office for approval
+        env:
+          P: ${{ steps.which.outputs.dir }}
+          ID: ${{ steps.which.outputs.id }}
+          BASE: ${{ steps.release.outputs.base }}
+        run: |
+          node -e "
+            const m = require('./' + process.env.P + '/meta.json');
+            const caption = m.caption + '\n\n' + (m.hashtags || []).join(' ');
+            console.log(JSON.stringify({ queue: { id: process.env.ID, title: m.title, caption, platforms: ['Instagram', 'YouTube', 'TikTok'],
+              preview_url: process.env.BASE + '/film.mp4', cover_url: process.env.BASE + '/poster.jpg' } }));
+          " > queue.json
+          node tools/office.mjs "$(cat queue.json)" '{"dept":"revisione","status":"waiting","task":"Il video è pronto: guardalo e scegli"}'

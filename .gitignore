@@ -6,3 +6,9 @@ node_modules/
 out/
 .pytest_tmp/
 __pycache__/
+productions/*/engine/
+productions/*/index.html
+productions/*/vo/
+productions/*/out/
+productions/*/stills/
+productions/*/events.json
