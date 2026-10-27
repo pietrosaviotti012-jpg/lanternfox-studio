@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0a1330">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Ufficio">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<title>Lantern Fox Office</title>
+<style>
+  :root { --night:#0a1330; --hill:#3f5a92; --mist:#6a86c2; --ink:#0e1532; --lamp:#ffb862; --fox:#e8743b; --paper:#f3e6cf; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body { min-height: 100dvh; display: grid; place-items: center; padding: 24px 16px;
+    background: radial-gradient(120% 80% at 50% 110%, #1b2a5c 0%, var(--night) 60%); color: var(--paper);
+    font: 17px/1.5 "Atkinson Hyperlegible", system-ui, sans-serif; }
+  main { width: min(380px, 100%); text-align: center; }
+  .lamp { width: 132px; height: 132px; margin: 0 auto 8px; border-radius: 50%;
+    background: url("/apple-touch-icon.png") center/cover; box-shadow: 0 0 0 6px var(--ink), 0 0 60px 6px rgba(255,184,98,.35); }
+  h1 { font: 600 2rem/1.15 "Fraunces", Georgia, serif; margin: 22px 0 6px; letter-spacing: -.01em; }
+  p.sub { margin: 0 0 28px; color: var(--mist); }
+  form { display: grid; gap: 12px; }
+  label { text-align: left; font-size: .95rem; color: var(--mist); }
+  input { width: 100%; padding: 15px 16px; font: inherit; color: var(--paper); background: var(--ink);
+    border: 1px solid #2a3a6a; border-radius: 14px; }
+  input:focus-visible { outline: 3px solid var(--lamp); outline-offset: 2px; }
+  button { padding: 15px; font: 700 1rem "Atkinson Hyperlegible", sans-serif; color: var(--ink); background: var(--lamp);
+    border: 0; border-radius: 14px; cursor: pointer; box-shadow: 0 6px 24px rgba(255,184,98,.25); }
+  button:focus-visible { outline: 3px solid var(--paper); outline-offset: 3px; }
+  .error { color: #ffb4a0; margin: 4px 0 0; }
+</style>
+</head>
+<body>
+<main>
+  <div class="lamp" role="img" aria-label="La volpe con la lanterna"></div>
+  <h1>Lantern Fox Office</h1>
+  <p class="sub">Accendi la lanterna per entrare in ufficio.</p>
+  <form method="post" action="/login">
+    <label for="password">Password</label>
+    <input id="password" name="password" type="password" autocomplete="current-password" required autofocus>
+    <!--ERRORE-->
+    <button type="submit">Entra</button>
+  </form>
+</main>
+</body>
+</html>

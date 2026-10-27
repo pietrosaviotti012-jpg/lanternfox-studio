@@ -1,0 +1,108 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1080" width="1080" height="1080">
+  <defs>
+    <!-- paper finish: grain + soft cast shadow onto the layer behind -->
+    <filter id="paper" x="-10%" y="-10%" width="120%" height="130%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="4" result="n"/>
+      <feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.10 0" result="grain"/>
+      <feComposite in="grain" in2="SourceGraphic" operator="in" result="g"/>
+      <feMerge result="tex"><feMergeNode in="SourceGraphic"/><feMergeNode in="g"/></feMerge>
+      <feDropShadow in="tex" dx="0" dy="10" stdDeviation="9" flood-color="#02040c" flood-opacity="0.7"/>
+    </filter>
+    <filter id="glow" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur stdDeviation="28"/>
+    </filter>
+    <filter id="soft" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="6"/>
+    </filter>
+    <radialGradient id="sky" cx="0.5" cy="0.62" r="0.7">
+      <stop offset="0" stop-color="#1b2a5c"/>
+      <stop offset="1" stop-color="#0a1330"/>
+    </radialGradient>
+    <radialGradient id="lamp" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#ffe9c2"/>
+      <stop offset="0.45" stop-color="#ffb862"/>
+      <stop offset="1" stop-color="#e07a2c"/>
+    </radialGradient>
+    <radialGradient id="spill" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#ffb862" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#ffb862" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="moon" cx="0.45" cy="0.45" r="0.55">
+      <stop offset="0" stop-color="#fff4dc"/>
+      <stop offset="1" stop-color="#ffd79a"/>
+    </radialGradient>
+  </defs>
+
+  <!-- back sheet: sky -->
+  <rect width="1080" height="1080" fill="url(#sky)"/>
+  <!-- moon burning through a hole -->
+  <circle cx="300" cy="300" r="150" fill="#ffd79a" opacity="0.35" filter="url(#glow)"/>
+  <circle cx="300" cy="300" r="92" fill="url(#moon)"/>
+  <!-- stars: pin holes -->
+  <g fill="#ffe3b0">
+    <circle cx="560" cy="190" r="4"/><circle cx="700" cy="260" r="3"/><circle cx="820" cy="170" r="5"/>
+    <circle cx="900" cy="330" r="3"/><circle cx="470" cy="330" r="3"/><circle cx="180" cy="470" r="3"/>
+    <circle cx="640" cy="120" r="3"/><circle cx="760" cy="390" r="2.5"/>
+  </g>
+
+  <!-- far hills (lightest, coolest) -->
+  <path filter="url(#paper)" fill="#6a86c2" d="M0 640 C120 560 220 560 320 610 C420 520 560 500 660 580 C760 520 900 520 1080 600 L1080 1080 L0 1080 Z"/>
+  <!-- mid hills with lit cottage windows -->
+  <path filter="url(#paper)" fill="#3f5a92" d="M0 760 C140 690 260 700 360 740 C470 690 560 700 640 750 C760 680 900 690 1080 740 L1080 1080 L0 1080 Z"/>
+  <g filter="url(#paper)">
+    <path fill="#34497a" d="M150 735 L150 700 L178 676 L206 700 L206 735 Z"/>
+    <path fill="#34497a" d="M860 722 L860 688 L890 662 L920 688 L920 722 Z"/>
+  </g>
+  <g fill="#ffb862">
+    <rect x="171" y="707" width="14" height="14"/>
+    <rect x="882" y="694" width="14" height="14"/>
+  </g>
+
+  <!-- warm spill from the lantern onto the stack -->
+  <circle cx="820" cy="580" r="330" fill="url(#spill)"/>
+
+  <!-- front sheet: the hill the fox sits on (darkest) -->
+  <path filter="url(#paper)" fill="#0e1532" d="M0 880 C200 840 380 830 540 850 C700 830 880 840 1080 880 L1080 1080 L0 1080 Z"/>
+
+  <!-- the fox: accent layer -->
+  <g filter="url(#paper)">
+    <!-- tail curled round the front -->
+    <path fill="#e8743b" d="M470 868 C360 880 290 820 300 740 C305 700 335 678 365 690 C350 740 370 800 430 820 C470 832 520 834 560 830 Z"/>
+    <path fill="#f6e3c8" d="M300 740 C305 700 335 678 365 690 C352 712 348 736 352 760 C330 760 312 752 300 740 Z"/>
+    <!-- body -->
+    <path fill="#e8743b" d="M440 872 C405 790 425 660 510 615 C575 590 625 640 628 720 C632 800 616 856 596 874 Z"/>
+    <!-- head, ears, snout -->
+    <path fill="#e8743b" d="M498 610 C486 568 500 528 528 508 L534 432 L568 496 C584 492 598 494 610 500 L646 440 L640 516 C660 530 680 546 716 560 C706 578 674 594 640 604 C604 620 540 632 498 610 Z"/>
+    <!-- inner ears -->
+    <path fill="#a8461f" d="M538 462 L541 505 L559 500 Z"/>
+    <path fill="#a8461f" d="M638 472 L631 510 L614 503 Z"/>
+    <!-- chest and muzzle -->
+    <path fill="#f6e3c8" d="M552 618 C600 626 622 668 606 736 C594 700 572 660 538 636 Z"/>
+    <path fill="#f6e3c8" d="M640 604 C674 594 706 578 716 560 C690 576 660 584 628 586 Z"/>
+  </g>
+  <!-- nose and eye: holes cut through to the dark -->
+  <circle cx="714" cy="560" r="8" fill="#0e1532"/>
+  <path fill="#0e1532" d="M590 548 C600 540 614 540 622 548 C612 552 600 552 590 548 Z"/>
+
+  <!-- stick (front, near-black card) -->
+  <path filter="url(#paper)" fill="#1a1410" d="M632 752 L642 760 L842 470 L832 462 Z"/>
+  <!-- paw over the stick -->
+  <path filter="url(#paper)" fill="#e8743b" transform="translate(44,8)" d="M572 742 C584 724 610 718 624 730 C630 744 616 760 596 762 C582 762 570 754 572 742 Z"/>
+
+  <!-- the lantern: a glowing window in the paper -->
+  <g transform="translate(47,-20)">
+  <circle cx="790" cy="590" r="120" fill="#ffb862" opacity="0.65" filter="url(#glow)"/>
+  <path fill="#1a1410" d="M786 494 L794 494 L794 520 L786 520 Z"/>
+  <path filter="url(#paper)" fill="#2a1d14" d="M752 518 L828 518 L822 534 L758 534 Z"/>
+  <path fill="url(#lamp)" d="M760 534 C730 560 730 630 760 656 L820 656 C850 630 850 560 820 534 Z"/>
+  <g stroke="#c4602a" stroke-width="3" fill="none" opacity="0.7">
+    <path d="M790 534 L790 656"/>
+    <path d="M770 536 C756 570 756 620 770 654"/>
+    <path d="M810 536 C824 570 824 620 810 654"/>
+  </g>
+  <path filter="url(#paper)" fill="#2a1d14" d="M758 656 L822 656 L828 670 L752 670 Z"/>
+  <path fill="#c4602a" d="M788 670 L792 670 L796 700 L784 700 Z"/>
+  </g>
+  <!-- warm rim light on the fox's face from the lantern -->
+  <path fill="#ffd08a" opacity="0.55" filter="url(#soft)" d="M700 566 C680 584 652 596 628 602 C660 600 694 586 712 566 Z"/>
+</svg>

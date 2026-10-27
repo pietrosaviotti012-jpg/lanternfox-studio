@@ -1,0 +1,8 @@
+.env
+prova-voci/
+node_modules/
+*.wav
+*.mp4
+out/
+.pytest_tmp/
+__pycache__/

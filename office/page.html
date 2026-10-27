@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0a1330">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Ufficio">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<title>Lantern Fox Office</title>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+<style>
+  :root {
+    --night: #0a1330; --deep: #121d45; --hill: #3f5a92; --mist: #6a86c2; --ink: #0e1532;
+    --lamp: #ffb862; --lamp-soft: rgba(255, 184, 98, .16); --fox: #e8743b; --paper: #f3e6cf; --muted: #9fb0d6;
+    --alarm: #ff8f73; --ok: #9fd9a8;
+    --serif: "Fraunces", Georgia, serif; --sans: "Atkinson Hyperlegible", system-ui, sans-serif;
+    --gutter: 16px; --panel: 420px;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--night); color: var(--paper); }
+  body { font: 16px/1.5 var(--sans); -webkit-font-smoothing: antialiased; }
+  button, input, textarea { font: inherit; color: inherit; }
+  :focus-visible { outline: 3px solid var(--lamp); outline-offset: 2px; border-radius: 8px; }
+
+  /* ---------------------------------------------------------------- il villaggio */
+  .stage { position: relative; height: 62dvh; min-height: 380px; overflow: hidden;
+    background: radial-gradient(110% 90% at 50% 100%, #1b2a5c 0%, var(--night) 62%); touch-action: none; }
+  .stage canvas { display: block; width: 100%; height: 100%; }
+  .top { position: absolute; inset: 0 0 auto 0; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+    padding: max(14px, env(safe-area-inset-top)) var(--gutter) 0; pointer-events: none; }
+  .top > * { pointer-events: auto; }
+  .brand h1 { margin: 0; font: 600 1.35rem/1.1 var(--serif); letter-spacing: -.01em; }
+  .brand p { margin: 4px 0 0; color: var(--muted); font-size: .92rem; max-width: 30ch; }
+  .tools { display: flex; gap: 8px; }
+  .round { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 50%; border: 1px solid #2a3a6a;
+    background: rgba(14, 21, 50, .72); backdrop-filter: blur(6px); cursor: pointer; position: relative; }
+  .round svg { width: 20px; height: 20px; }
+  .round .dot { position: absolute; top: 9px; right: 10px; width: 8px; height: 8px; border-radius: 50%; background: var(--lamp); box-shadow: 0 0 8px var(--lamp); }
+
+  .labels { position: absolute; inset: 0; pointer-events: none; }
+  @media (max-width: 560px) { .tag { font-size: .74rem; } }
+  .tag { position: absolute; left: 0; top: 0; transform: translate(-50%, -100%); pointer-events: auto; cursor: pointer;
+    display: flex; align-items: center; gap: 6px; padding: 4px 9px 4px 7px; border-radius: 999px; white-space: nowrap;
+    font-size: .78rem; line-height: 1.2; background: rgba(14, 21, 50, .78); border: 1px solid #2a3a6a; color: var(--paper);
+    transition: opacity .2s; }
+  .tag .st { width: 7px; height: 7px; border-radius: 50%; background: #45557f; flex: none; }
+  .tag[data-status="working"] { border-color: rgba(255,184,98,.6); }
+  .tag[data-status="working"] .st { background: var(--lamp); box-shadow: 0 0 8px var(--lamp); }
+  .tag[data-status="done"] .st { background: var(--ok); }
+  .tag[data-status="waiting"] { border-color: var(--fox); }
+  .tag[data-status="waiting"] .st { background: var(--fox); box-shadow: 0 0 8px var(--fox); }
+  .tag[data-status="error"] .st { background: var(--alarm); }
+  .tag[aria-pressed="true"] { background: var(--lamp); color: var(--ink); border-color: var(--lamp); }
+  .tag.far { opacity: .0; pointer-events: none; }
+  .hint { position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); margin: 0; padding: 6px 12px; border-radius: 999px;
+    font-size: .82rem; color: var(--muted); background: rgba(14, 21, 50, .6); pointer-events: none; white-space: nowrap; }
+
+  /* ---------------------------------------------------------------- il pannello */
+  .panel { padding: 18px var(--gutter) calc(32px + env(safe-area-inset-bottom)); max-width: 720px; margin: 0 auto; }
+  .tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; padding: 4px; border-radius: 14px; background: var(--ink);
+    border: 1px solid #1f2c58; position: sticky; top: 8px; z-index: 2; }
+  .tabs button { border: 0; background: transparent; padding: 9px 4px; border-radius: 10px; cursor: pointer; color: var(--muted);
+    font-size: .9rem; position: relative; }
+  .tabs button[aria-selected="true"] { background: var(--deep); color: var(--paper); box-shadow: inset 0 0 0 1px #2a3a6a; }
+  .tabs .count { display: inline-grid; place-items: center; min-width: 18px; height: 18px; padding: 0 5px; margin-left: 4px; border-radius: 9px;
+    background: var(--fox); color: var(--ink); font-size: .72rem; font-weight: 700; }
+  .tabs .count[hidden] { display: none; }
+  section[role="tabpanel"] { padding-top: 22px; }
+  h2 { margin: 0 0 4px; font: 600 1.45rem/1.2 var(--serif); letter-spacing: -.01em; }
+  h3 { margin: 26px 0 10px; font: 600 1.05rem/1.3 var(--serif); }
+  .lead { margin: 0 0 18px; color: var(--muted); max-width: 52ch; }
+
+  /* il filo di lanterne: il video di oggi passa da un reparto all'altro, in ordine */
+  .string { list-style: none; margin: 0; padding: 18px 0 4px; display: grid; grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); gap: 18px 6px;
+    position: relative; }
+  .string li { display: grid; justify-items: center; gap: 6px; text-align: center; }
+  .string button { border: 0; background: none; padding: 0; cursor: pointer; display: grid; justify-items: center; gap: 6px; color: var(--muted); font-size: .76rem; }
+  .lantern { width: 30px; height: 40px; position: relative; }
+  .lantern::before { content: ""; position: absolute; left: 50%; top: -12px; width: 1px; height: 12px; background: #3a4a7a; }
+  .lantern i { position: absolute; inset: 4px 0; border-radius: 45% 45% 40% 40%; background: #1a2550; border: 1px solid #33447a; }
+  .lantern i::before, .lantern i::after { content: ""; position: absolute; left: 3px; right: 3px; height: 4px; background: #2a1d14; border-radius: 2px; }
+  .lantern i::before { top: -4px; } .lantern i::after { bottom: -4px; }
+  [data-status="done"] .lantern i { background: radial-gradient(circle at 50% 45%, #ffe9c2, var(--lamp) 55%, #c4602a); border-color: #c4602a;
+    box-shadow: 0 0 14px rgba(255,184,98,.45); }
+  [data-status="working"] .lantern i { background: radial-gradient(circle at 50% 45%, #fff2d8, var(--lamp) 50%, #c4602a); border-color: #c4602a;
+    animation: flicker 1.6s ease-in-out infinite; }
+  [data-status="waiting"] .lantern i { background: radial-gradient(circle at 50% 45%, #ffd2b8, var(--fox) 60%, #a8461f); border-color: #a8461f;
+    animation: breathe 2.4s ease-in-out infinite; }
+  [data-status="error"] .lantern i { background: #3a1820; border-color: var(--alarm); }
+  [data-status="working"] button, [data-status="waiting"] button, [data-status="done"] button { color: var(--paper); }
+  @keyframes flicker { 0%, 100% { box-shadow: 0 0 10px rgba(255,184,98,.4); } 50% { box-shadow: 0 0 26px rgba(255,184,98,.85); } }
+  @keyframes breathe { 0%, 100% { box-shadow: 0 0 6px rgba(232,116,59,.3); } 50% { box-shadow: 0 0 22px rgba(232,116,59,.8); } }
+
+  .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .btn { border: 1px solid #2a3a6a; background: var(--deep); padding: 11px 16px; border-radius: 12px; cursor: pointer; }
+  .btn.primary { background: var(--lamp); color: var(--ink); border-color: var(--lamp); font-weight: 700; }
+  .btn.quiet { background: transparent; }
+  .btn[disabled] { opacity: .5; cursor: default; }
+
+  .diary { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+  .diary li { display: grid; grid-template-columns: 52px 28px 1fr; gap: 8px; align-items: start; padding: 9px 0; border-bottom: 1px solid #172452; }
+  .diary time { color: var(--muted); font-size: .85rem; font-variant-numeric: tabular-nums; padding-top: 2px; }
+  .diary img { width: 28px; height: 28px; }
+  .empty { padding: 22px 18px; border: 1px dashed #2a3a6a; border-radius: 16px; color: var(--muted); }
+  .empty strong { display: block; color: var(--paper); font: 600 1.05rem var(--serif); margin-bottom: 4px; }
+
+  /* coda di approvazione */
+  .review { display: grid; grid-template-columns: minmax(140px, 200px) 1fr; gap: 16px; padding: 16px; border-radius: 18px;
+    background: linear-gradient(180deg, #13204a, #0e1838); border: 1px solid #22336a; margin-bottom: 14px; }
+  .review video, .review .ph { width: 100%; aspect-ratio: 9 / 16; border-radius: 12px; background: var(--ink); object-fit: cover; display: block; }
+  .review .ph { display: grid; place-items: center; color: var(--muted); font-size: .85rem; text-align: center; padding: 10px; }
+  .review h4 { margin: 0 0 6px; font: 600 1.15rem/1.25 var(--serif); }
+  .review .cap { white-space: pre-wrap; color: #d8cbb2; font-size: .92rem; max-height: 9.5em; overflow: auto; margin: 0 0 12px; }
+  .review textarea { width: 100%; min-height: 70px; resize: vertical; padding: 10px 12px; border-radius: 12px; background: var(--ink); border: 1px solid #2a3a6a; margin: 4px 0 10px; }
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; margin: 0 0 12px; padding: 0; list-style: none; }
+  .chips li { font-size: .78rem; padding: 3px 9px; border-radius: 999px; background: #1a2756; color: var(--muted); }
+  .decided { color: var(--muted); font-size: .9rem; }
+  @media (max-width: 520px) { .review { grid-template-columns: 1fr; } .review video, .review .ph { max-width: 220px; margin: 0 auto; } }
+
+  /* calendario */
+  .days { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+  .days li { display: grid; grid-template-columns: 64px 1fr auto; gap: 12px; align-items: center; padding: 12px 14px; border-radius: 14px; background: #101b40; }
+  .days .d { font: 600 1rem var(--serif); line-height: 1.1; }
+  .days .d small { display: block; font: 400 .78rem var(--sans); color: var(--muted); }
+  .pill { font-size: .78rem; padding: 3px 10px; border-radius: 999px; background: #1a2756; color: var(--muted); }
+  .pill.published { background: rgba(159,217,168,.15); color: var(--ok); }
+  .pill.made { background: var(--lamp-soft); color: var(--lamp); }
+  .days li.today { box-shadow: inset 0 0 0 1px var(--lamp); }
+
+  /* numeri */
+  .nums { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .num { padding: 14px; border-radius: 16px; background: #101b40; }
+  .num b { display: block; font: 600 1.6rem/1.1 var(--serif); font-variant-numeric: tabular-nums; }
+  .num span { color: var(--muted); font-size: .85rem; }
+
+  /* scheda del reparto */
+  .sheet { position: fixed; inset: auto 0 0 0; z-index: 10; max-height: 78dvh; overflow: auto; padding: 10px var(--gutter) calc(24px + env(safe-area-inset-bottom));
+    background: #0f1a3e; border-top: 1px solid #2a3a6a; border-radius: 22px 22px 0 0; box-shadow: 0 -20px 60px rgba(0,0,0,.45);
+    transform: translateY(105%); transition: transform .32s cubic-bezier(.2,.8,.2,1); }
+  .sheet.open { transform: none; }
+  .sheet .grab { width: 40px; height: 5px; border-radius: 3px; background: #33447a; margin: 0 auto 12px; }
+  .sheet header { display: grid; grid-template-columns: 72px 1fr 44px; gap: 14px; align-items: center; }
+  .sheet header img { width: 72px; height: 72px; border-radius: 18px; background: #16224d; }
+  .sheet header h2 { font-size: 1.3rem; }
+  .sheet header p { margin: 2px 0 0; color: var(--muted); font-size: .92rem; }
+  .sheet .now { margin: 16px 0 0; padding: 14px; border-radius: 14px; background: var(--ink); }
+  .sheet .now b { display: block; font-size: .85rem; color: var(--muted); font-weight: 400; margin-bottom: 4px; }
+  .sheet .out { white-space: pre-wrap; font-size: .92rem; color: #d8cbb2; }
+  .scrim { position: fixed; inset: 0; z-index: 9; background: rgba(5, 9, 24, .45); opacity: 0; pointer-events: none; transition: opacity .3s; }
+  .scrim.open { opacity: 1; pointer-events: auto; }
+
+  .settings { display: grid; gap: 10px; }
+  .note { color: var(--muted); font-size: .9rem; margin: 0; }
+  .toast { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom)); transform: translate(-50%, 20px); z-index: 20; opacity: 0;
+    padding: 10px 16px; border-radius: 12px; background: var(--paper); color: var(--ink); font-weight: 700; transition: .25s; pointer-events: none; max-width: 90vw; }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+  .demo-flag { display: none; margin: 0 0 14px; padding: 9px 12px; border-radius: 12px; background: var(--lamp-soft); color: var(--lamp); font-size: .9rem; }
+  body.demo .demo-flag { display: block; }
+
+  @media (min-width: 980px) {
+    body { display: grid; grid-template-columns: 1fr var(--panel); height: 100dvh; overflow: hidden; }
+    .stage { height: 100dvh; }
+    .panel { height: 100dvh; overflow: auto; max-width: none; border-left: 1px solid #1a2756; background: #0b1536; padding-top: 22px; }
+    .sheet { left: auto; right: calc(var(--panel) + 24px); bottom: 24px; width: 400px; border-radius: 22px; border: 1px solid #2a3a6a; transform: translateY(calc(100% + 40px)); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+  <div class="labels" id="labels"></div>
+  <div class="top">
+    <div class="brand">
+      <h1>Lantern Fox Office</h1>
+      <p id="headline">Il villaggio dorme: nessuna storia in lavorazione.</p>
+    </div>
+    <div class="tools">
+      <button class="round" id="openSettings" aria-label="Notifiche e impostazioni">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 9a6 6 0 1 1 12 0c0 5 2 6.5 2 6.5H4S6 14 6 9Z"/><path d="M10 19a2 2 0 0 0 4 0"/></svg>
+        <span class="dot" id="bellDot" hidden></span>
+      </button>
+    </div>
+  </div>
+  <p class="hint" id="hint">Tocca una casetta per vedere chi ci lavora</p>
+</div>
+
+<main class="panel">
+  <div class="tabs" role="tablist" aria-label="Sezioni">
+    <button role="tab" id="t-oggi" aria-controls="p-oggi" aria-selected="true">Oggi</button>
+    <button role="tab" id="t-approva" aria-controls="p-approva" aria-selected="false">Approva<span class="count" id="queueCount" hidden></span></button>
+    <button role="tab" id="t-calendario" aria-controls="p-calendario" aria-selected="false">Calendario</button>
+    <button role="tab" id="t-numeri" aria-controls="p-numeri" aria-selected="false">Numeri</button>
+  </div>
+
+  <section role="tabpanel" id="p-oggi" aria-labelledby="t-oggi">
+    <p class="demo-flag">Questa è una prova: si muove solo sul tuo schermo, nessun video viene creato o pubblicato.</p>
+    <h2 id="videoTitle">Nessuna storia oggi, per ora</h2>
+    <p class="lead" id="videoLead">Ogni mattina la sveglia accende la prima lanterna e la storia passa di reparto in reparto fino alla tua scrivania.</p>
+    <ol class="string" id="string" aria-label="Il percorso del video di oggi"></ol>
+    <div class="row" style="margin-top:18px">
+      <button class="btn" id="demoBtn">Guarda una giornata di prova</button>
+    </div>
+    <h3>Diario</h3>
+    <ul class="diary" id="diary"></ul>
+  </section>
+
+  <section role="tabpanel" id="p-approva" aria-labelledby="t-approva" hidden>
+    <h2>Da approvare</h2>
+    <p class="lead">Qui arrivano le storie finite. Le pubblico solo quando dici tu.</p>
+    <div id="queue"></div>
+  </section>
+
+  <section role="tabpanel" id="p-calendario" aria-labelledby="t-calendario" hidden>
+    <h2>Calendario</h2>
+    <p class="lead">Una storia al giorno: quelle in programma, quelle fatte e quelle già uscite.</p>
+    <ul class="days" id="days"></ul>
+  </section>
+
+  <section role="tabpanel" id="p-numeri" aria-labelledby="t-numeri" hidden>
+    <h2>Numeri</h2>
+    <p class="lead">Come vanno i profili. Si aggiornano ogni sera.</p>
+    <div id="stats"></div>
+  </section>
+</main>
+
+<div class="scrim" id="scrim"></div>
+<aside class="sheet" id="sheet" aria-modal="true" role="dialog" aria-labelledby="sheetTitle" hidden>
+  <div class="grab"></div>
+  <div id="sheetBody"></div>
+</aside>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script type="module">
+__SCRIPT__
+</script>
+</body>
+</html>
