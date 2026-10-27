@@ -183,3 +183,58 @@ export function window_(x, o, g) {
     if (bars) { x.fillStyle = col || '#1a1020'; x.fillRect(cx - r, cy - r * .03, r * 2, r * .06); x.fillRect(cx - r * .03, cy - r, r * .06, r * 2); } }
   if (g) { g.fillStyle = '#fff'; g.beginPath(); g.arc(cx, cy, r, 0, TAU); g.fill(); }
 }
+
+// —— Added after the first episode's review: richer cliffs, a moon trail, a foreground that is never a flat slab ——
+
+// Cliff with carved strata and grass tufts on its rim (same shape as cliff()); strata in a slightly lighter tone
+export function cliffRich(x, o) {
+  const { x0, x1, base, top, side = -1, seed = 3, strata = '#26356a', grass = 18 } = o, R = mulberry(seed + 50);
+  const col = x.fillStyle;
+  cliff(x, o);
+  x.save(); x.globalCompositeOperation = 'source-atop'; x.strokeStyle = strata; x.lineCap = 'round';
+  for (let i = 0; i < 9; i++) {
+    const y = top - .012 - i * (top - base) * .1 - R() * .006;
+    x.lineWidth = .0012 + R() * .0012; x.beginPath();
+    for (let u = x0; u <= x1; u += .004) x.lineTo(u, y + Math.sin(u * 40 + i * 1.7) * .0018 + (side > 0 ? (u - x0) : (x1 - u)) * .04);
+    x.stroke();
+  }
+  x.restore();
+  // grass on the rim
+  x.fillStyle = col; x.strokeStyle = col; x.lineCap = 'round';
+  for (let i = 0; i < grass; i++) {
+    const u = R(), px = lerp(x0, x1, u), k = side < 0 ? 1 - u : u, rise = Math.pow(Math.min(1, k * 1.6), .55), py = base + (top - base) * rise;
+    if (rise < .35) continue;
+    for (let j = 0; j < 5; j++) { const a = -.6 + j * .3 + (R() - .5) * .3, l = .006 + R() * .01; x.lineWidth = .0011;
+      x.beginPath(); x.moveTo(px, py - .001); x.quadraticCurveTo(px + Math.sin(a) * l * .4, py + l * .6, px + Math.sin(a) * l, py + l); x.stroke(); }
+  }
+}
+
+// Moon trail on the water: broken ellipses under the moon; draw it in the paper colour on x and in white on g (it glows)
+export function moonTrail(x, o) {
+  const { cx, top, n = 26, w = .018, col = '#c9b48a', seed = 21 } = o, R = mulberry(seed);
+  x.fillStyle = col;
+  for (let i = 0; i < n; i++) {
+    const y = top - i * .0024 - R() * .001, ww = (w - i * w / n * .6) * (.25 + R() * .9), c = cx + (R() - .5) * .012;
+    x.beginPath(); x.ellipse(c, y, ww / 2, .00035 + R() * .00045, 0, 0, TAU); x.fill();
+  }
+}
+
+// Foreground bank: a low ridge with stones and reeds, so the bottom of the frame always has texture
+export function foreground(x, o) {
+  const { x0 = -.25, x1 = .25, base, amp = .008, seed = 3, stones = 7, reedsN = 30, reedsAt = [-.2, -.05] } = o, R = mulberry(seed);
+  const col = x.fillStyle;
+  x.beginPath(); x.moveTo(x0, base - 1);
+  for (let u = x0; u <= x1 + .002; u += .002) x.lineTo(u, base + amp * (Math.sin(u * 18 + seed) * .6 + Math.sin(u * 47 + seed * 2) * .25));
+  x.lineTo(x1, base - 1); x.closePath(); x.fill();
+  for (let i = 0; i < stones; i++) {
+    const px = lerp(x0, x1, R()), r = .006 + R() * .012;
+    x.beginPath(); x.ellipse(px, base + r * .35, r * 1.3, r * .8, (R() - .5) * .4, 0, TAU); x.fill();
+  }
+  x.strokeStyle = col; x.lineCap = 'round';
+  for (let i = 0; i < reedsN; i++) {
+    const px = lerp(reedsAt[0], reedsAt[1], R()), hh = .03 + R() * .045, lean = (R() - .5) * .25;
+    x.lineWidth = .0011 + R() * .0006; x.beginPath(); x.moveTo(px, base - .002);
+    x.quadraticCurveTo(px + lean * hh * .3, base + hh * .6, px + lean * hh, base + hh); x.stroke();
+    if (R() < .4) { x.beginPath(); x.ellipse(px + lean * hh, base + hh + .004, .0016, .006, lean, 0, TAU); x.fill(); }
+  }
+}

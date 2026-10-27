@@ -42,7 +42,7 @@ window.EV = [
 const canvas = document.getElementById('c');
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, powerPreference: 'high-performance', preserveDrawingBuffer: true });
 renderer.setPixelRatio(SSAA); renderer.setSize(W, H, false);
-renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.VSMShadowMap;
+renderer.shadowMap.enabled = Q.get('shadows') !== '0'; renderer.shadowMap.type = Q.get('shadows') === 'pcf' ? THREE.PCFSoftShadowMap : THREE.VSMShadowMap;
 renderer.toneMapping = THREE.NoToneMapping; renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 const pipe = new Pipe(renderer, W, H, SSAA);
 pipe.fin.material.uniforms.aspect.value = W / H;
@@ -89,7 +89,7 @@ window.render = async (t) => {
   } else {
     g = await drawShot(i, t, pipe.rtA); gc([i]);
   }
-  pipe.final({ ...g, mixB, mode: tr.type === 'iris' ? 1 : 0, center: tr.center, time: t, fade: (g.fade ?? 1) * ss(clamp(t / .5)) * ss(clamp((DUR - t) / 1.2)) });
+  pipe.final({ ...g, mixB, mode: tr.type === 'iris' ? 1 : 0, center: tr.center, time: t, fade: (g.fade ?? 1) * ss(clamp((DUR - t) / 1.2))   /* no fade-in: frame 0 is the hook */ });
   let txt = '', a = 0;
   for (const L of Object.values(C)) if (L.sub && t > L.at - .15 && t < L.end + .3) { txt = L.text; a = Math.min(ss(seg(t, L.at - .15, L.at + .05)), 1 - ss(seg(t, L.end + .1, L.end + .3))); }
   sub.textContent = txt ? lines(txt) : ''; sub.style.opacity = a;

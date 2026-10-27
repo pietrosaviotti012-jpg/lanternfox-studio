@@ -4,7 +4,7 @@
   "voice": {
     "engine": "chatterbox"
   },
-  "lead": 1.6,
+  "lead": 0.6,
   "tail": 3.4,
   "lines": [
     {
@@ -13,8 +13,8 @@
       "gap": 0.5,
       "act": {
         "intensity": 0.45,
-        "pace": 0.45,
-        "speed": 0.9
+        "pace": 0.32,
+        "speed": 0.98
       }
     },
     {
@@ -23,8 +23,8 @@
       "gap": 0.35,
       "act": {
         "intensity": 0.5,
-        "pace": 0.4,
-        "speed": 0.88
+        "pace": 0.32,
+        "speed": 0.96
       }
     },
     {
@@ -33,8 +33,8 @@
       "gap": 0.9,
       "act": {
         "intensity": 0.4,
-        "pace": 0.45,
-        "speed": 0.88
+        "pace": 0.32,
+        "speed": 0.96
       }
     },
     {
@@ -43,8 +43,8 @@
       "gap": 0.2,
       "act": {
         "intensity": 0.5,
-        "pace": 0.4,
-        "speed": 0.9
+        "pace": 0.32,
+        "speed": 0.98
       }
     },
     {
@@ -53,8 +53,8 @@
       "gap": 1.2,
       "act": {
         "intensity": 0.45,
-        "pace": 0.4,
-        "speed": 0.86,
+        "pace": 0.32,
+        "speed": 0.95,
         "gain_db": -1
       }
     },
@@ -64,8 +64,8 @@
       "gap": 0.4,
       "act": {
         "intensity": 0.7,
-        "pace": 0.35,
-        "speed": 0.92,
+        "pace": 0.32,
+        "speed": 1,
         "gain_db": 1
       }
     },
@@ -75,8 +75,8 @@
       "gap": 1.1,
       "act": {
         "intensity": 0.75,
-        "pace": 0.35,
-        "speed": 0.94,
+        "pace": 0.32,
+        "speed": 1,
         "gain_db": 1.5
       }
     },
@@ -86,8 +86,8 @@
       "gap": 1.3,
       "act": {
         "intensity": 0.35,
-        "pace": 0.5,
-        "speed": 0.84,
+        "pace": 0.32,
+        "speed": 0.95,
         "gain_db": -1.5
       }
     },
@@ -97,8 +97,8 @@
       "gap": 0.35,
       "act": {
         "intensity": 0.3,
-        "pace": 0.5,
-        "speed": 0.86,
+        "pace": 0.32,
+        "speed": 0.95,
         "gain_db": -4
       }
     },
@@ -108,8 +108,8 @@
       "gap": 0.45,
       "act": {
         "intensity": 0.45,
-        "pace": 0.45,
-        "speed": 0.86,
+        "pace": 0.32,
+        "speed": 0.95,
         "gain_db": -2
       }
     },
@@ -119,8 +119,8 @@
       "gap": 1.3,
       "act": {
         "intensity": 0.6,
-        "pace": 0.4,
-        "speed": 0.88
+        "pace": 0.32,
+        "speed": 0.96
       }
     },
     {
@@ -129,8 +129,8 @@
       "gap": 0.3,
       "act": {
         "intensity": 0.5,
-        "pace": 0.4,
-        "speed": 0.88
+        "pace": 0.32,
+        "speed": 0.96
       }
     },
     {
@@ -139,8 +139,8 @@
       "gap": 0.2,
       "act": {
         "intensity": 0.55,
-        "pace": 0.45,
-        "speed": 0.84,
+        "pace": 0.32,
+        "speed": 0.95,
         "gain_db": -1
       }
     }

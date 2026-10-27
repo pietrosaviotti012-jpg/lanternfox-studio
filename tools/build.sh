@@ -2,14 +2,14 @@
 # Build a production's film: sh tools/build.sh <production folder>
 # Needs the narration already made (tools/voice.py), the Lemo-Opuscar library in $LIB (default ~/lemo-opuscar)
 # and a Python with numpy, scipy and soundfile in $PY (default python3).
-# Quality knobs: Q (page query, default "ssaa=2&dof=64"; in the cloud without a GPU "ssaa=1.5&dof=40"), WORKERS (default 3).
+# Quality knobs: Q (page query; the default looks the same as full quality at a quarter of the cost without a GPU), WORKERS (default 3).
 # Output in <production>/out: film.mp4 (1080×1920, 30 fps, −14 LUFS), poster.jpg, sheet.jpg (contact sheet), film.srt.
 set -e
 STUDIO=$(cd "$(dirname "$0")/.." && pwd)
 P=$(cd "$1" && pwd)
 LIB=${LIB:-$HOME/lemo-opuscar}; export LIB
 PY=${PY:-python3}
-Q=${Q:-ssaa=2&dof=64}; WORKERS=${WORKERS:-3}
+Q=${Q:-ssaa=1&dof=12&msaa=0&shadowmap=512&bloomres=.5}; WORKERS=${WORKERS:-3}
 office() { node "$STUDIO/tools/office.mjs" "$@" || true; }
 
 [ -f "$P/vo/dur.json" ] || { echo "build: no narration yet, run tools/voice.py first"; exit 1; }

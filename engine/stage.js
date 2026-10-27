@@ -12,7 +12,8 @@ export function stage(o = {}) {
   // Top LED: shines from above the front of the box toward the lower back, so shadows fall on the paper layers behind
   const key = new THREE.SpotLight(o.keyCol || '#ffeedd', o.key ?? 2.2, 0, o.keyAngle ?? .75, 1, 0);
   key.position.set(...(o.keyPos || [0, .34, .3])); key.target.position.set(...(o.keyTarget || [0, -.04, -.08]));
-  key.castShadow = true; key.shadow.mapSize.set(2048, 2048); key.shadow.bias = -.0008; key.shadow.normalBias = 0;
+  const SM = +(new URLSearchParams(location.search).get('shadowmap') || 2048);
+  key.castShadow = true; key.shadow.mapSize.set(SM, SM); key.shadow.bias = -.0008; key.shadow.normalBias = 0;
   key.shadow.radius = o.shadowR ?? 10; key.shadow.blurSamples = 20; key.shadow.camera.near = .05; key.shadow.camera.far = 3;
   scene.add(key, key.target);
   const amb = new THREE.AmbientLight(o.ambCol || '#9fb0d8', o.amb ?? .5); scene.add(amb);

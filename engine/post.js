@@ -4,7 +4,11 @@ import { FullScreenQuad } from 'three/addons/postprocessing/Pass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 
 // Lantern Fox: quality knobs from the page URL (?dof=48), so cloud renders without a GPU stay fast
-const DOF_N = Math.max(8, Math.min(96, +(new URLSearchParams(location.search).get('dof') || 64)));
+const QP = new URLSearchParams(location.search);
+const DOF_N = Math.max(8, Math.min(96, +(QP.get('dof') || 64)));
+const MSAA = +(QP.get('msaa') ?? 4);          // multisampling of the scene pass (0 = off)
+const BLOOM = QP.get('bloom') !== '0';
+const BLOOM_RES = +(QP.get('bloomres') || 1);   // bloom computed at a fraction of the frame size (0.5 = a quarter of the pixels)
 
 const VS = `varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0., 1.); }`;
 const cocShader = {
@@ -82,14 +86,14 @@ export class Pipe {
   constructor(renderer, w, h, s = 2) {
     this.r = renderer; this.W = w * s; this.H = h * s; this.s = s;
     const W = this.W, H = this.H, hf = { type: THREE.HalfFloatType };
-    this.rtS = new THREE.WebGLRenderTarget(W, H, { samples: 4, type: THREE.HalfFloatType, depthTexture: new THREE.DepthTexture(W, H, THREE.FloatType) });
+    this.rtS = new THREE.WebGLRenderTarget(W, H, { samples: MSAA, type: THREE.HalfFloatType, depthTexture: new THREE.DepthTexture(W, H, THREE.FloatType) });
     this.rtC = new THREE.WebGLRenderTarget(W, H, hf);
     this.rtA = new THREE.WebGLRenderTarget(W, H, hf);
     this.rtB = new THREE.WebGLRenderTarget(W, H, hf);
     this.coc = new FullScreenQuad(new THREE.ShaderMaterial(cocShader));
     this.gat = new FullScreenQuad(new THREE.ShaderMaterial(gatherShader)); this.gat.material.uniforms.res.value.set(W, H);
     this.fin = new FullScreenQuad(new THREE.ShaderMaterial(finalShader));
-    this.bloom = new UnrealBloomPass(new THREE.Vector2(W, H), .35, .6, 1.1);
+    this.bloom = new UnrealBloomPass(new THREE.Vector2(W * BLOOM_RES, H * BLOOM_RES), .35, .6, 1.1);
   }
   // p: { focus, aper, maxCoc, bloom:{strength,radius,threshold} }
   shot(scene, cam, p, target) {
@@ -103,7 +107,7 @@ export class Pipe {
     r.setRenderTarget(target); this.gat.render(r);
     const b = p.bloom || {};
     this.bloom.strength = b.strength ?? .35; this.bloom.radius = b.radius ?? .6; this.bloom.threshold = b.threshold ?? 1.1;
-    if (this.bloom.strength > 0) this.bloom.render(r, null, target, 0, false);
+    if (BLOOM && this.bloom.strength > 0) this.bloom.render(r, null, target, 0, false);
   }
   final(o) {
     const u = this.fin.material.uniforms;

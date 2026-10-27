@@ -85,7 +85,7 @@ jobs:
 
       - name: Film
         env:
-          Q: ${{ vars.RENDER_Q || 'ssaa=1&dof=24' }}
+          Q: ${{ vars.RENDER_Q || 'ssaa=1&dof=12&msaa=0&shadowmap=512&bloomres=.5' }}
           WORKERS: ${{ vars.RENDER_WORKERS || '2' }}
           PY: python
         run: sh tools/build.sh "${{ steps.which.outputs.dir }}"

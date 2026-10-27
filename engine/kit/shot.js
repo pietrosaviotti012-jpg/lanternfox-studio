@@ -39,6 +39,22 @@ export async function layered(E, spec) {
     m.userData.trans0 = o.trans ?? .3; m.userData.p0 = m.position.clone();
     L[o.name || `l${order.length}`] = m; order.push(m);
   }
+  // Light beams (a lighthouse, a torch): additive cones, analytic falloff, no texture edges
+  const beams = (spec.beams || []).map(b => {
+    const len = b.len ?? .5, wid = b.width ?? .1;
+    const geo = new THREE.PlaneGeometry(len, wid * 2.2); geo.translate(len / 2, 0, 0);
+    const m = new THREE.Mesh(geo, new THREE.ShaderMaterial({
+      uniforms: { col: { value: new THREE.Color(b.col || '#ffd9a0') }, k: { value: 0 }, spread: { value: wid / len } },
+      transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+      vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.); }',
+      fragmentShader: `varying vec2 vUv; uniform vec3 col; uniform float k, spread;
+        void main(){ float u = vUv.x; float v = (vUv.y - .5) * 2.2 / (u * 2. + .04);
+          float a = pow(1. - u, 1.6) * exp(-v * v * 2.5) * smoothstep(0., .03, u);
+          gl_FragColor = vec4(col * a * k, 1.); }`,
+    }));
+    m.position.set(b.x, b.y, b.z ?? -.06); m.renderOrder = 10; S.scene.add(m);
+    return { m, b };
+  });
   const glowK = Object.fromEntries(Object.entries(spec.glows || {}).map(([k, keys]) => [k, monotone(keys)]));
   const moveK = Object.fromEntries(Object.entries(spec.move || {}).map(([k, keys]) => [k, track(keys)]));
   const camK = spec.cam ? track(spec.cam) : () => CAM0;
@@ -69,6 +85,10 @@ export async function layered(E, spec) {
       for (const tf of spec.flash || []) if (t >= tf) flash = Math.max(flash, Math.exp(-(t - tf) * 7) + .5 * Math.exp(-Math.max(0, t - tf - .12) * 9) * (t > tf + .12 ? 1 : 0));
       S.key.intensity = S.base.key * (on ? ss(seg(t, on.at + 1.2, on.at + 3)) : 1) * (1 + 3 * flash);
       S.amb.intensity = S.base.amb * (on ? ss(seg(t, on.at + .6, on.at + 2.6)) : 1) * (1 + 2 * flash);
+      for (const { m, b } of beams) {
+        m.rotation.z = typeof b.rot === 'function' ? b.rot(t) : (b.rot ?? 0);
+        m.material.uniforms.k.value = (typeof b.k === 'function' ? b.k(t) : (b.k ?? 1)) * (on ? ss(seg(t, on.at + 2.4, on.at + 3.6)) : 1);
+      }
       aim(S.cam, camK(t), t + E.T0, { hand: .0005 });
       spec.update?.(t, L, S);
     },
