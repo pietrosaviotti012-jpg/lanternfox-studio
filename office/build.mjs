@@ -18,7 +18,7 @@ export function assets() {
 }
 
 export function page() {
-  return put(read("page.html"), "__SCRIPT__", read("app.js") + "\n" + read("scene.js"));
+  return put(read("page.html"), "__SCRIPT__", read("app.js") + "\n" + read("interiors.js") + "\n" + read("scene.js"));
 }
 
 export function buildWorker() {

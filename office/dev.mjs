@@ -11,6 +11,7 @@ const sample = JSON.parse(readFileSync(join(HERE, "sample-state.json"), "utf8"))
 createServer((req, res) => {
   const url = new URL(req.url, "http://x");
   const files = assets();
+  if (url.pathname === "/favicon.ico") url.pathname = "/favicon.png";
   if (files[url.pathname]) {
     res.writeHead(200, { "Content-Type": files[url.pathname][0] });
     return res.end(Buffer.from(files[url.pathname][1], "base64"));

@@ -320,7 +320,8 @@ export default {
 
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
-    const asset = ASSETS[url.pathname];
+    // /favicon.ico: i browser lo chiedono da soli; rispondiamo con la lanterna in PNG
+    const asset = ASSETS[url.pathname === "/favicon.ico" ? "/favicon" + ".png" : url.pathname];
     if (asset) {
       const bytes = Uint8Array.from(atob(asset[1]), (c) => c.charCodeAt(0));
       return new Response(bytes, { headers: { ...SECURITY, "Content-Type": asset[0], "Cache-Control": "public, max-age=604800, immutable" } });

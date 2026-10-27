@@ -19,13 +19,14 @@ const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.dampingFactor = 0.08;
 controls.screenSpacePanning = true;
-controls.minZoom = 0.75; controls.maxZoom = 3.2;
+controls.minZoom = 0.75; controls.maxZoom = 6;
 controls.minPolarAngle = 0.62; controls.maxPolarAngle = 1.08;
 controls.minAzimuthAngle = Math.PI / 4 - 0.7; controls.maxAzimuthAngle = Math.PI / 4 + 0.7;
 const HOME = new THREE.Vector3(0, 2.5, 0);
 controls.target.copy(HOME);
 
-scene.add(new THREE.HemisphereLight(0x8fa6dc, 0x0e1532, 1.15));
+const hemi = new THREE.HemisphereLight(0x8fa6dc, 0x0e1532, 1.15);
+scene.add(hemi);
 const moonLight = new THREE.DirectionalLight(0xc8d6ff, 0.9);
 moonLight.position.set(-18, 30, 8);
 scene.add(moonLight);
@@ -107,22 +108,26 @@ const redGlow = glowTexture("rgba(255,120,100,.9)", "rgba(255,120,100,0)");
   scene.add(stones);
 }
 
-// alberi di carta sparsi
+// alberi di carta sparsi (diventano trasparenti quando si entra in una casetta)
+const treeMats = [];
 {
   const treeGeo = new THREE.ConeGeometry(0.8, 2.2, 5); treeGeo.translate(0, 1.45, 0);
   const trunkGeo = new THREE.BoxGeometry(0.2, 0.5, 0.2); trunkGeo.translate(0, 0.45, 0);
   const spots = [[-13, -8.5], [-12.6, 3.8], [-12, 8.4], [-2, 2.6], [3.4, 2.4], [12.6, -7.8], [12.8, 0.6], [12.4, 8.2], [-1.6, -9.4], [8.6, -9.2], [2.4, 9], [-9.6, 8.6]];
   for (const [x, z] of spots) {
     const t = new THREE.Group();
-    t.add(new THREE.Mesh(trunkGeo, paper(0x2a1d14)));
-    const crown = new THREE.Mesh(treeGeo, paper(Math.random() > .5 ? 0x22356c : 0x2c4580));
+    const trunkMat = paper(0x2a1d14, { transparent: true }), crownMat = paper(Math.random() > .5 ? 0x22356c : 0x2c4580, { transparent: true });
+    treeMats.push(trunkMat, crownMat);
+    t.add(new THREE.Mesh(trunkGeo, trunkMat));
+    const crown = new THREE.Mesh(treeGeo, crownMat);
     crown.scale.setScalar(0.8 + Math.random() * 0.5); t.add(crown);
     t.position.set(x, 0.35, z); t.rotation.y = Math.random() * 3;
     scene.add(t);
   }
 }
 
-// le casette
+// le casette: quattro pareti e un tetto. Le due pareti verso la telecamera (+z e +x) svaniscono
+// quando la casetta si apre, il tetto si alza, e dentro si vede il reparto al lavoro.
 const houses = {};
 const clickable = [];
 const wallColors = [0xd9cbb4, 0xe6d8bd, 0xcfc0a6];
@@ -130,18 +135,30 @@ for (const [i, d] of DEPTS.entries()) {
   const g = new THREE.Group();
   const k = d.big ? 1.3 : 1;
   const w = 2.6 * k, h = 1.9 * k, dep = 2.3 * k;
-  const body = new THREE.Mesh(new THREE.BoxGeometry(w, h, dep), paper(wallColors[i % 3]));
-  body.position.y = h / 2 + 0.35;
-  const roof = new THREE.Mesh(new THREE.ConeGeometry(Math.max(w, dep) * 0.82, 1.3 * k, 4), paper(i % 2 ? 0x23325f : 0x2b3c70));
-  roof.position.y = h + 0.35 + 0.65 * k; roof.rotation.y = Math.PI / 4;
-  const chimney = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.8, 0.35), paper(0x23325f));
+  const fade = (c) => paper(c, { transparent: true, opacity: 1 });
+  // pareti di fondo, viste dall'interno
+  const inner = paper(0xe6d2ad);
+  const backZ = new THREE.Mesh(new THREE.PlaneGeometry(w, h), inner); backZ.position.set(0, h / 2 + 0.35, -dep / 2);
+  const backX = new THREE.Mesh(new THREE.PlaneGeometry(dep, h), inner); backX.position.set(-w / 2, h / 2 + 0.35, 0); backX.rotation.y = Math.PI / 2;
+  const skirt = paper(0x8a6a4a);
+  const skirtZ = new THREE.Mesh(new THREE.PlaneGeometry(w, 0.3), skirt); skirtZ.position.set(0, 0.5, -dep / 2 + 0.005);
+  const skirtX = new THREE.Mesh(new THREE.PlaneGeometry(dep, 0.3), skirt); skirtX.position.set(-w / 2 + 0.005, 0.5, 0); skirtX.rotation.y = Math.PI / 2;
+  // pareti davanti, viste da fuori: si aprono
+  const outer = fade(wallColors[i % 3]);
+  const frontZ = new THREE.Mesh(new THREE.PlaneGeometry(w, h), outer); frontZ.position.set(0, h / 2 + 0.35, dep / 2);
+  const frontX = new THREE.Mesh(new THREE.PlaneGeometry(dep, h), outer); frontX.position.set(w / 2, h / 2 + 0.35, 0); frontX.rotation.y = Math.PI / 2;
+  const roofMat = fade(i % 2 ? 0x23325f : 0x2b3c70);
+  const roof = new THREE.Mesh(new THREE.ConeGeometry(Math.max(w, dep) * 0.82, 1.3 * k, 4), roofMat);
+  const roofY = h + 0.35 + 0.65 * k;
+  roof.position.y = roofY; roof.rotation.y = Math.PI / 4;
+  const chimney = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.8, 0.35), fade(0x23325f));
   chimney.position.set(-w * 0.25, h + 0.9 * k, -dep * 0.15);
-  const winMat = new THREE.MeshBasicMaterial({ color: 0x1c2752 });
+  const winMat = new THREE.MeshBasicMaterial({ color: 0x1c2752, transparent: true });
   const win = new THREE.Mesh(new THREE.PlaneGeometry(0.9 * k, 0.7 * k), winMat);
   win.position.set(-w * 0.15, h * 0.62 + 0.35, dep / 2 + 0.01);
   const win2 = new THREE.Mesh(new THREE.PlaneGeometry(0.8 * k, 0.7 * k), winMat);
   win2.position.set(w / 2 + 0.01, h * 0.62 + 0.35, -dep * 0.1); win2.rotation.y = Math.PI / 2;
-  const door = new THREE.Mesh(new THREE.PlaneGeometry(0.62 * k, 1.05 * k), paper(0x2a1d14));
+  const door = new THREE.Mesh(new THREE.PlaneGeometry(0.62 * k, 1.05 * k), fade(0x2a1d14));
   door.position.set(w * 0.25, 0.35 + 0.53 * k, dep / 2 + 0.012);
   const glow = new THREE.Sprite(new THREE.SpriteMaterial({ map: warmGlow, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0 }));
   glow.scale.set(5 * k, 5 * k, 1); glow.position.set(0.2, h * 0.6 + 0.35, dep / 2 + 0.6);
@@ -153,13 +170,39 @@ for (const [i, d] of DEPTS.entries()) {
   const critter = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true }));
   const cs = d.big ? 2.6 : 2.3;
   critter.scale.set(cs, cs, 1);
-  critter.position.set(w / 2 + 0.55, 0.35 + cs / 2, dep / 2 + 0.75);
-  g.add(body, roof, chimney, win, win2, door, glow, light, ring, critter);
+  const outside = new THREE.Vector3(w / 2 + 0.55, 0.35 + cs / 2, dep / 2 + 0.75);
+  critter.position.copy(outside);
+  // l'interno, alla stessa scala della casetta
+  const room = buildInterior(d.id);
+  room.group.scale.setScalar(k); room.group.position.y = 0.36; room.group.visible = false;
+  const seatSize = 1.05 * k;
+  const inside = new THREE.Vector3(room.seat[0] * k, 0.36 + seatSize / 2, room.seat[1] * k);
+  g.add(backZ, backX, skirtZ, skirtX, frontZ, frontX, roof, chimney, win, win2, door, glow, light, ring, critter, room.group);
   g.position.set(d.at[0], 0, d.at[1]);
   g.rotation.y = d.big ? 0 : (i % 2 ? -0.12 : 0.1);
-  for (const m of [body, roof, door, critter]) { m.userData.dept = d.id; clickable.push(m); }
+  for (const m of [frontZ, frontX, roof, door, critter]) { m.userData.dept = d.id; clickable.push(m); }
   scene.add(g);
-  houses[d.id] = { g, winMat, glow, light, ring, critter, baseY: critter.position.y, status: "idle", phase: i * 0.7, labelAt: new THREE.Vector3(d.at[0], h + 2.4 * k, d.at[1]) };
+  houses[d.id] = { g, winMat, glow, light, ring, critter, room, roof, roofY, chimney, chimneyY: chimney.position.y,
+    fronts: [frontZ, frontX, win, win2, door], fadeMats: [outer, roofMat, chimney.material, door.material, winMat],
+    outside, inside, cs, seatSize, open: 0, baseY: outside.y, status: "idle", phase: i * 0.7,
+    labelAt: new THREE.Vector3(d.at[0], h + 2.4 * k, d.at[1]) };
+}
+
+// apre (o chiude) una casetta: o va da 0 (chiusa) a 1 (aperta)
+function applyOpen(hs, o, t) {
+  hs.roof.position.y = hs.roofY + o * 2.6;
+  hs.chimney.position.y = hs.chimneyY + o * 2.6;
+  for (const m of hs.fadeMats) { m.opacity = 1 - o; m.depthWrite = o < 0.5; }
+  for (const m of hs.fronts) m.visible = o < 0.98;
+  hs.roof.visible = hs.chimney.visible = o < 0.98;
+  hs.room.group.visible = o > 0.01;
+  hs.room.light.intensity = o * 6;
+  hs.glow.visible = o < 0.5;
+  const size = I.lerp(hs.cs, hs.seatSize, o);
+  hs.critter.scale.set(size, size, 1);
+  hs.critter.position.lerpVectors(hs.outside, hs.inside, o);
+  hs.baseY = hs.critter.position.y;
+  if (o > 0.01) hs.room.tick(t, hs.status);
 }
 
 // lucciole
@@ -203,7 +246,7 @@ function placeLabels() {
     const x = (v.x * .5 + .5) * rect.width, y = (-v.y * .5 + .5) * rect.height;
     const tag = tags[d.id];
     tag.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) translate(-50%, -100%)`;
-    const quiet = crowded && ["idle", "done"].includes(houses[d.id].status) && selected !== d.id;
+    const quiet = (selected && selected !== d.id) || (crowded && ["idle", "done"].includes(houses[d.id].status) && selected !== d.id);
     tag.classList.toggle("far", quiet || x < -40 || x > rect.width + 40 || y < 30 || y > rect.height + 10);
   }
 }
@@ -242,16 +285,24 @@ function flyTo(x, z, zoom, y = 0) {
 }
 
 // porta la casetta al centro della parte di villaggio che la scheda lascia scoperta
-function flyToHouse(id, zoom) {
+function flyToHouse(id) {
   const d = BY_ID[id];
   const r = stage.getBoundingClientRect();
+  const wide0 = innerWidth >= 980;
+  // spazio libero accanto (desktop) o sopra (telefono) la scheda; la casetta aperta ne occupa circa metà
+  const freeW = wide0 ? r.width - 424 : r.width;
+  // quanto la scheda (già riempita) copre il villaggio dal basso
+  const cover = wide0 || sheet.hidden ? 0 : Math.max(0, r.bottom - (innerHeight - sheet.offsetHeight));
+  const freeH = r.height - cover;
+  const houseSpan = 4.6 * (d.big ? 1.3 : 1);
+  const zoom = Math.min(controls.maxZoom, Math.max(1.6, (0.9 * Math.min(freeW, freeH * 1.3)) / houseSpan * (camera.right - camera.left) / r.width));
   const perUnit = r.width / ((camera.right - camera.left) / zoom);
   const right = new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld, 0);
   const up = new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld, 1);
   const wide = innerWidth >= 980;
   const shiftX = wide ? (400 + 24) / 2 / perUnit : 0;
-  const shiftY = wide ? 0 : Math.min(innerHeight * 0.62, r.height * 0.6) / 2 / perUnit;
-  const t = new THREE.Vector3(d.at[0], 1.2, d.at[1]).addScaledVector(right, shiftX).addScaledVector(up, -shiftY);
+  const shiftY = wide ? 0 : cover / 2 / perUnit;
+  const t = new THREE.Vector3(d.at[0], 0.9, d.at[1]).addScaledVector(right, shiftX).addScaledVector(up, -shiftY);
   flyTo(t.x, t.z, zoom, t.y);
 }
 
@@ -270,12 +321,20 @@ function loop() {
     if (k === 1) flight = null;
   }
   controls.update();
+  // riflettore: quando una casetta è aperta, il resto del villaggio si abbassa
+  const focus = Math.max(...DEPTS.map((d) => houses[d.id].open));
+  hemi.intensity = 1.15 - 0.7 * focus; moonLight.intensity = 0.9 - 0.6 * focus;
+  for (const m of treeMats) { m.opacity = 1 - 0.85 * focus; m.depthWrite = focus < 0.5; }
   for (const d of DEPTS) {
     const h = houses[d.id];
+    h.open += ((selected === d.id ? 1 : 0) - h.open) * (reduceMotion ? 1 : 0.1);
+    if (h.open < 0.002) h.open = 0;
+    if (h.open > 0 || h.wasOpen) { applyOpen(h, h.open, t); h.wasOpen = h.open > 0; }
+    h.critter.material.opacity = 1 - 0.8 * Math.max(0, focus - h.open);
     if (!reduceMotion) {
       if (h.status === "working") { h.critter.position.y = h.baseY + Math.abs(Math.sin(t * 5 + h.phase)) * 0.18; h.critter.material.rotation = Math.sin(t * 2.6 + h.phase) * 0.06; }
       else if (h.status === "waiting") { h.critter.position.y = h.baseY + Math.abs(Math.sin(t * 2.4)) * 0.45; h.critter.material.rotation = Math.sin(t * 4.8) * 0.12; }
-      else { h.critter.position.y = h.baseY + Math.sin(t * 0.8 + h.phase) * 0.03; h.critter.material.rotation = 0; }
+      else { h.critter.position.y = h.baseY + Math.sin(t * 0.8 + h.phase) * 0.03; h.critter.material.rotation = h.status === "idle" ? h.open * 0.35 : 0; }
       if (h.status === "working") h.light.intensity = 12 + Math.sin(t * 7.3) * Math.sin(t * 3.1) * 3;
     }
     h.ring.material.opacity += ((selected === d.id ? 0.9 : 0) - h.ring.material.opacity) * 0.15;
@@ -392,10 +451,10 @@ let lastFocus = null;
 function openDept(id) {
   selected = id;
   for (const d of DEPTS) tags[d.id].setAttribute("aria-pressed", String(d.id === id));
-  flyToHouse(id, 1.7);
   fillSheet(id);
   lastFocus = document.activeElement;
   sheet.hidden = false;
+  flyToHouse(id);
   requestAnimationFrame(() => { sheet.classList.add("open"); scrim.classList.add("open"); sheet.querySelector("[data-close]")?.focus(); });
 }
 function closeSheet() {
@@ -414,6 +473,7 @@ function fillSheet(id) {
   $("sheetBody").innerHTML = `<header><img alt="" src="${ICONS[id]}"><div><h2 id="sheetTitle">${esc(d.name)}</h2><p>${esc(d.who)} · ${STATUS_TEXT[info.status] || info.status}</p></div>
       <button class="round" data-close aria-label="Chiudi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button></header>
     <p style="margin:16px 0 0">${esc(d.does)}</p>
+    <p class="note" style="margin:8px 0 0">Dentro: ${esc(INSIDE[id])}${info.status === "idle" ? " Adesso però dorme." : ""}</p>
     <div class="now"><b>${info.status === "idle" ? "Ultimo lavoro" : "Adesso"}</b>${info.task ? esc(info.task) : `<span class="note">Niente da fare, per ora.</span>`}
       ${info.output ? `<p class="out">${esc(info.output)}</p>` : ""}${info.updated_at ? `<p class="note" style="margin-top:6px">Aggiornato alle ${fmtTime(info.updated_at)}</p>` : ""}</div>
     ${isDesk ? `<div class="row" style="margin-top:14px"><button class="btn primary" data-goto="approva">${pending ? `Guarda ${pending === 1 ? "il video" : `i ${pending} video`} da approvare` : "Apri la coda di approvazione"}</button></div>` : ""}
