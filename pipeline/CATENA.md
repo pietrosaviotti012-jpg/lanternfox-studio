@@ -103,6 +103,12 @@ La routine **"Lantern Fox · Produzione"** gira due volte al giorno, alle 5 e al
 - Voce, Animazione, Musica, Montaggio e la copertina li fa GitHub Actions (`render.yml`);
 - il video arriva nell'ufficio da approvare.
 
+Appena il Soggetto ha scelto la storia, si annuncia il video all'ufficio:
+```json
+[{"reset": true, "video": {"id": "<cartella>", "title": "...", "series": "..."}}]
+```
+L'ufficio lo numera tra quelli di oggi ("Video 1 di oggi", "Video 2 di oggi"), e da lì partono la barra e l'orario previsto di ogni casetta.
+
 Prima di ogni push, e di nuovo dopo un `git pull --rebase`: `sh tools/check.sh productions/<id>`. Controlla motore, kit, scene e JSON come moduli veri; un file rotto blocca il render di tutti. Se un altro giro ha toccato `engine/kit/motifs.js` nello stesso momento, l'unione automatica può rompere una funzione.
 
 Da cloud l'ufficio non si raggiunge con `tools/office.mjs`: gli eventi dei reparti 1-4 vanno mandati dal banco di lavoro di Composio, come per la pubblicazione.

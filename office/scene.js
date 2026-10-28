@@ -192,17 +192,27 @@ const ends = (() => {
   // fine: piazzetta con cartello, panchina e lampione
   const b = walkPath.getPointAt(1), db = walkPath.getTangentAt(1);
   plaza(b);
-  // sul bordo della piazzetta verso il davanti dell'isola, lontano dall'orso delle Statistiche
-  const sx = b.x + db.x * 0.6 + db.z * 1.0, sz = b.z + db.z * 0.6 + db.x * 1.0;
-  const pole = new THREE.Mesh(new THREE.BoxGeometry(0.16, 2.2, 0.16), wood); pole.position.set(sx, 0.37 + 1.1, sz); scene.add(pole);
-  const endSign = board("Fine", 2.6, 0.95); endSign.position.set(sx, 0.37 + 2.25, sz); scene.add(endSign);
+  // il cartello sta oltre la piazzetta, verso il bordo dell'isola: davanti non c'è niente (né alberi né case).
+  // Due pali ai lati che finiscono sotto la tavola, e la tavola disegnata per ultima, sopra lucciole e bagliori.
+  const sx = b.x + 0.8, sz = b.z - 0.9, signW = 1.9, signH = 0.78, signY = 0.37 + 1.75;   // a destra dell'orso, sullo schermo
+  const along = new THREE.Vector3(Math.cos(Math.PI / 4), 0, -Math.sin(Math.PI / 4));   // la direzione della tavola, girata come board()
+  for (const s of [-1, 1]) {
+    const post = new THREE.Mesh(new THREE.BoxGeometry(0.14, signY - signH / 2 - 0.37 + 0.05, 0.14), wood);
+    post.position.set(sx + along.x * s * (signW / 2 - 0.25), 0.37 + (signY - signH / 2 - 0.37) / 2, sz + along.z * s * (signW / 2 - 0.25));
+    scene.add(post);
+  }
+  const endSign = board("Fine", signW, signH); endSign.position.set(sx, signY, sz);
+  // trasparente solo per finire nell'ultimo passaggio, dopo gli animali (che sono figure trasparenti); niente lo copre
+  endSign.material.transparent = true; endSign.material.depthTest = false; endSign.renderOrder = 10;
+  scene.add(endSign);
   const bench = new THREE.Group();
   const seat = new THREE.Mesh(new THREE.BoxGeometry(1.1, 0.08, 0.36), wood); seat.position.y = 0.42; bench.add(seat);
   const back = new THREE.Mesh(new THREE.BoxGeometry(1.1, 0.34, 0.06), wood); back.position.set(0, 0.62, -0.16); bench.add(back);
   for (const x of [-0.45, 0.45]) { const leg = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.4, 0.3), dark); leg.position.set(x, 0.2, 0); bench.add(leg); }
   bench.position.set(b.x - db.x * 0.55 + db.z * 1.05, 0.37, b.z - db.z * 0.55 + db.x * 1.05); bench.rotation.y = Math.atan2(db.x, db.z) + Math.PI / 2;
   scene.add(bench);
-  const lamp = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.07, 1.7, 6), dark); lamp.position.set(b.x + db.x * 0.9 + db.z * 0.7, 0.37 + 0.85, b.z + db.z * 0.9 - db.x * 0.7); scene.add(lamp);
+  // il lampione dietro la piazzetta (verso le case), così la sua luce non cade sul cartello
+  const lamp = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.07, 1.7, 6), dark); lamp.position.set(b.x - 0.9, 0.37 + 0.85, b.z + 1.0); scene.add(lamp);
   const endGlow = lanternGlow(lamp.position.x, 0.37 + 1.85, lamp.position.z);
   return { glows: [startGlow, endGlow] };
 })();
@@ -212,7 +222,7 @@ const treeMats = [];
 {
   const treeGeo = new THREE.ConeGeometry(0.8, 2.2, 5); treeGeo.translate(0, 1.45, 0);
   const trunkGeo = new THREE.BoxGeometry(0.2, 0.5, 0.2); trunkGeo.translate(0, 0.45, 0);
-  const spots = [[-13, -8.8], [-7.5, -9.3], [2.6, -9.4], [12.9, -9], [-0.1, -3.2], [6.7, -3.1], [-6.7, -3], [-13.2, -1.3], [13.2, 2.8], [0, 3], [6.7, 3.2], [-6.7, 2.6], [-13.1, 9.2], [13.1, 9.2], [0, 9.4]];
+  const spots = [[-13, -8.8], [-7.5, -9.3], [2.6, -9.4], [12.9, -9], [-0.1, -3.2], [6.7, -3.1], [-6.7, -3], [-13.2, -1.3], [13.2, 2.8], [0, 3], [6.7, 3.2], [-6.7, 2.6], [-13.1, 9.2], [0, 9.4]];
   for (const [x, z] of spots) {
     const t = new THREE.Group();
     const trunkMat = paper(0x2a1d14, { transparent: true }), crownMat = paper(Math.random() > .5 ? 0x22356c : 0x2c4580, { transparent: true });
@@ -464,7 +474,7 @@ const tags = {};
 for (const [i, d] of DEPTS.entries()) {
   const b = document.createElement("button");
   b.className = "tag"; b.type = "button"; b.dataset.status = "idle"; b.setAttribute("aria-pressed", "false");
-  b.innerHTML = `<span class="st"></span><span class="n">${i + 1}</span><span>${esc(d.name)}</span>`;
+  b.innerHTML = `<span class="st"></span><span class="n">${i + 1}</span><span>${esc(d.name)}</span><i class="bar" hidden><b></b></i>`;
   b.addEventListener("click", () => openDept(d.id));
   labels.append(b); tags[d.id] = b;
 }
@@ -607,6 +617,26 @@ const PHASES = [
     text: "Alle 23:00, o subito con Pubblica adesso, esce su Instagram e YouTube (TikTok a mano); poi risposte ai commenti e numeri della sera." },
 ];
 
+// how long each house usually works on one video (minutes, from the real runs): the bar and the "verso le…" come from here
+const TYPICAL = { ricerca: 5, soggetto: 3, copione: 4, regia: 8, voce: 8, animazione: 11, musica: 1, montaggio: 3, qualita: 1,
+  revisione: 0, pubblicazione: 3, community: 1, statistiche: 2 };
+const CHAIN_TO_DESK = ["ricerca", "soggetto", "copione", "regia", "voce", "animazione", "musica", "montaggio", "qualita"];
+function progress(id, info) {
+  if (!info || info.status !== "working" || !info.updated_at || !TYPICAL[id]) return null;
+  const start = Date.parse(info.updated_at), dur = TYPICAL[id] * 60000, now = Date.now();
+  return { k: Math.min(.96, Math.max(.03, (now - start) / dur)), end: new Date(start + dur), left: Math.max(0, Math.round((start + dur - now) / 60000)) };
+}
+const etaText = (p) => p.left > 0 ? `finisce verso le ${fmtTime(p.end.toISOString())} (circa ${p.left} min)` : "sta per finire";
+// when the video in the chain should reach the desk: the current house's end plus the usual time of the houses after it
+function readyAt(deps) {
+  const i = CHAIN_TO_DESK.findIndex((id) => (deps[id] || {}).status === "working");
+  if (i < 0) return null;
+  const p = progress(CHAIN_TO_DESK[i], deps[CHAIN_TO_DESK[i]]);
+  const rest = CHAIN_TO_DESK.slice(i + 1).filter((id) => (deps[id] || {}).status !== "done").reduce((m, id) => m + TYPICAL[id], 0);
+  return new Date((p ? p.end.getTime() : Date.now()) + rest * 60000);
+}
+const videoBadge = (v) => v?.n ? `Video ${v.n} di oggi` : "";
+
 function render() {
   if (!state) return;
   const deps = state.departments || {};
@@ -614,18 +644,23 @@ function render() {
     const s = (deps[d.id] || {}).status || "idle";
     setHouse(d.id, s);
     tags[d.id].dataset.status = s;
+    const p = progress(d.id, deps[d.id]);
+    tags[d.id].querySelector(".bar").hidden = !p;
+    if (p) tags[d.id].querySelector(".bar b").style.width = Math.round(p.k * 100) + "%";
   }
   const working = DEPTS.filter((d) => (deps[d.id] || {}).status === "working");
   const waiting = DEPTS.filter((d) => (deps[d.id] || {}).status === "waiting");
-  const head = $("headline");
+  const head = $("headline"), ready = readyAt(deps);
+  const which = state.video?.n ? `${videoBadge(state.video)}: ` : "";
   if (waiting.length) head.textContent = `${waiting[0].name} aspetta te.`;
-  else if (working.length) head.textContent = `${working.map((d) => d.who.split(",")[0]).join(" e ")} ${working.length > 1 ? "sono" : "è"} al lavoro.`;
+  else if (working.length) head.textContent = `${which}${working.map((d) => d.who.split(",")[0]).join(" e ")} ${working.length > 1 ? "sono" : "è"} al lavoro${ready ? `, pronto verso le ${fmtTime(ready.toISOString())}` : ""}.`;
   else if (state.video) head.textContent = "Tutte le lanterne di oggi sono accese.";
   else head.textContent = "Il villaggio dorme: nessuna storia in lavorazione.";
 
+  $("videoNo").hidden = !state.video?.n; $("videoNo").textContent = videoBadge(state.video);
   $("videoTitle").textContent = state.video ? state.video.title : "Nessuna storia oggi, per ora";
   $("videoLead").textContent = state.video
-    ? (state.video.series ? `Serie: ${state.video.series}. ` : "") + `Iniziata alle ${fmtTime(state.video.started_at)}.`
+    ? (state.video.series ? `Serie: ${state.video.series}. ` : "") + `Iniziato alle ${fmtTime(state.video.started_at)}.` + (ready ? ` Pronto da guardare verso le ${fmtTime(ready.toISOString())}.` : "")
     : "Ogni mattina la sveglia accende la prima lanterna e la storia passa di reparto in reparto fino alla tua scrivania.";
 
   $("string").innerHTML = DEPTS.map((d) => {
@@ -637,7 +672,8 @@ function render() {
     const sts = ph.depts.map((id) => (deps[id] || {}).status || "idle");
     const st = sts.includes("waiting") ? "waiting" : sts.includes("error") ? "error" : sts.includes("working") ? "working"
       : sts.every((x) => x === "done") ? "done" : "idle";
-    const pill = { working: `<span class="pill made">In corso</span>`, waiting: `<span class="pill made">Tocca a te</span>`,
+    const pw = ph.depts.map((id) => progress(id, deps[id])).find(Boolean);
+    const pill = { working: `<span class="pill made">In corso${pw ? `: ${etaText(pw)}` : ""}</span>`, waiting: `<span class="pill made">Tocca a te</span>`,
       done: `<span class="pill published">Fatto</span>`, error: `<span class="pill">Si è fermato</span>` }[st] || "";
     return `<li data-st="${st}"><div><b>${esc(ph.title)}</b><span class="who">${esc(ph.depts.map((id) => BY_ID[id].name).join(" · "))}</span>
       <p>${esc(ph.text)}</p>${pill}</div></li>`;
@@ -726,6 +762,35 @@ function attachFilms(queue) {
   }).catch(() => {});
 }
 
+// "Scarica": on a phone the share sheet with the file ("Salva video" puts it in the gallery); elsewhere a normal download
+const dlButton = (q) => q.preview_url ? `<button class="btn" data-dl="${esc(q.id)}" aria-label="Scarica il video">Scarica</button>` : "";
+async function saveFilm(q, b) {
+  if (!q) return;
+  const name = (q.title || q.id).replace(/[^\w\- ]+/g, "").trim().replace(/\s+/g, "-") + ".mp4";
+  if (demo) { toast("Nella prova non c'è un file da scaricare"); return; }
+  try {
+    // iPhone opens the share sheet only right after a tap: if the file is not ready yet, the first tap prepares it
+    // and the second one saves it
+    const file = saveFilm.ready?.[q.id];
+    if (file && navigator.canShare?.({ files: [file] })) { await navigator.share({ files: [file], title: q.title }); b.textContent = "Scarica"; return; }
+    b.disabled = true; b.textContent = "Preparo…";
+    const url = filmUrl(q, "film.mp4");
+    const blob = films.has(url) ? await (await fetch(films.get(url))).blob() : await filmBlob(url, (k) => { b.textContent = `Scarico ${Math.round(k * 100)}%`; });
+    const f = new File([blob], name, { type: "video/mp4" });
+    b.disabled = false;
+    if (navigator.canShare?.({ files: [f] })) {
+      (saveFilm.ready ||= {})[q.id] = f;
+      b.textContent = "Salva sul telefono";
+      try { await navigator.share({ files: [f], title: q.title }); b.textContent = "Scarica"; }
+      catch (err) { if (err?.name !== "AbortError") toast("Pronto: tocca di nuovo per salvarlo"); }
+      return;
+    }
+    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name;
+    document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 30000);
+    b.textContent = "Scarica";
+  } catch (err) { b.disabled = false; b.textContent = "Scarica"; if (err?.name !== "AbortError") toast("Non riesco a scaricarlo: riprova"); }
+}
+
 function reviewCard(q) {
   // the film comes through the Office (/media/…) so it plays on iPhone too, and is downloaded whole
   // into the phone's cache before it starts (attachFilms), so it never stops to load halfway
@@ -738,10 +803,11 @@ function reviewCard(q) {
   const actions = q.status === "pending"
     ? `<label for="note-${esc(q.id)}" class="note">Se va rifatto, cosa cambiare</label>
        <textarea id="note-${esc(q.id)}" placeholder="Per esempio: la voce più lenta nel finale"></textarea>
-       <div class="row"><button class="btn primary" data-approve="${esc(q.id)}">Pubblica</button><button class="btn" data-redo="${esc(q.id)}">Rifai</button></div>`
+       <div class="row"><button class="btn primary" data-approve="${esc(q.id)}">Pubblica</button><button class="btn" data-redo="${esc(q.id)}">Rifai</button>${dlButton(q)}</div>`
     : q.status === "redo" ? `<p class="decided">Da rifare (chiesto alle ${fmtTime(q.decided_at)})${q.note ? `: ${esc(q.note)}` : ""}</p><p class="note" style="margin:0">La Regia sistema il copione e le scene, poi la nuova versione arriva qui in circa mezz'ora.</p>`
     : publishedBlock(q);
-  return `<article class="review"><div>${media}</div><div><h4>${esc(q.title)}</h4><ul class="chips">${plats}</ul>
+  const no = q.n ? `<span class="vno">Video ${q.n} del ${new Date(q.day + "T12:00:00").toLocaleDateString("it-IT", { day: "numeric", month: "short" })}</span>` : "";
+  return `<article class="review"><div>${media}</div><div>${no}<h4>${esc(q.title)}</h4><ul class="chips">${plats}</ul>
     <p class="cap">${esc(q.caption || "")}</p>${actions}</div></article>`;
 }
 
@@ -756,7 +822,7 @@ function publishedBlock(q) {
   const row = (key, name) => pub[key]?.url ? `<li><a href="${esc(pub[key].url)}" target="_blank" rel="noopener">${name}: uscito ↗</a></li>`
     : pub[key]?.draft ? `<li>${name}: nelle bozze</li>`
     : pub[key]?.error ? `<li>${name}: non riuscito, riprovo al prossimo giro</li>` : `<li>${name}: esce alle ${local}</li>`;
-  const now = q.status === "approved" ? `<div class="row"><button class="btn primary" data-now="${esc(q.id)}">Pubblica adesso</button></div>` : "";
+  const now = `<div class="row">${q.status === "approved" ? `<button class="btn primary" data-now="${esc(q.id)}">Pubblica adesso</button>` : ""}${dlButton(q)}</div>`;
   return `<p class="decided">${q.status === "published" ? "Pubblicato" : "Approvato"} alle ${fmtTime(q.decided_at)}</p>
     <ul class="chips">${row("instagram", "Instagram")}${row("youtube", "YouTube")}${pub.tiktok ? row("tiktok", "TikTok") : ""}</ul>${now}
     ${pub.tiktok?.url ? "" : pub.tiktok?.draft ? `<p class="note" style="margin:0 0 8px">Su TikTok il video è nelle bozze: apri l'app, tocca la notifica, incolla la didascalia e premi Pubblica.</p>
@@ -825,6 +891,7 @@ function fillSheet(id) {
     <p style="margin:16px 0 0">${esc(d.does)}</p>
     <p class="note" style="margin:8px 0 0">Dentro: ${esc(INSIDE[id])}${info.status === "idle" ? " Adesso però dorme." : ""}</p>
     <div class="now"><b>${info.status === "idle" ? "Ultimo lavoro" : "Adesso"}</b>${info.task ? esc(info.task) : `<span class="note">Niente da fare, per ora.</span>`}
+      ${(() => { const p = progress(id, info); return p ? `<div class="meter"><i style="width:${Math.round(p.k * 100)}%"></i></div><p class="note" style="margin-top:6px">Di solito ci mette ${TYPICAL[id]} min: ${etaText(p)}.</p>` : ""; })()}
       ${info.output ? `<p class="out">${esc(info.output)}</p>` : ""}${info.updated_at ? `<p class="note" style="margin-top:6px">Aggiornato alle ${fmtTime(info.updated_at)}</p>` : ""}</div>
     ${isDesk ? `<div class="row" style="margin-top:14px"><button class="btn primary" data-goto="approva">${pending ? `Guarda ${pending === 1 ? "il video" : `i ${pending} video`} da approvare` : "Apri la coda di approvazione"}</button></div>` : ""}
     ${d.skills.length ? `<h3>Con quali strumenti lavora</h3><ul class="chips">${d.skills.map((s) => `<li>${esc(s)}</li>`).join("")}</ul>` : ""}`;
@@ -865,6 +932,8 @@ $("queue").addEventListener("click", async (e) => {
     try { await navigator.clipboard.writeText(q?.caption || ""); toast("Didascalia copiata"); } catch { toast("Non riesco a copiare: tieni premuto sul testo"); }
     return;
   }
+  const dl = e.target.closest("[data-dl]");
+  if (dl) { saveFilm(state.queue.find((x) => x.id === dl.dataset.dl), dl); return; }
   const n = e.target.closest("[data-now]");
   if (n) {
     if (demo) { toast("Pubblicazione avviata (per finta: è una prova)"); return; }

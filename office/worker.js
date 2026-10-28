@@ -228,7 +228,15 @@ async function applyEvent(env, event) {
   if (event.reset) {
     for (const d of DEPTS) state.departments[d] = { status: "idle", task: "", output: "", updated_at: now };
   }
-  if (event.video) state.video = { ...event.video, started_at: event.video.started_at || now };
+  if (event.video) {
+    // today's videos are numbered in the order they start (a "Rifai" keeps its number); the day is Italy's
+    const day = new Date(Date.now() + 3600e3).toISOString().slice(0, 10);
+    if (state.today?.day !== day) state.today = { day, ids: [] };
+    if (event.video.id && !state.today.ids.includes(event.video.id)) state.today.ids.push(event.video.id);
+    const n = event.video.id ? state.today.ids.indexOf(event.video.id) + 1 : undefined;
+    const same = state.video?.id === event.video.id;
+    state.video = { ...(same ? state.video : {}), ...event.video, n, started_at: event.video.started_at || (same && state.video.started_at) || now };
+  }
   if (event.dept) {
     if (!DEPTS.includes(event.dept)) throw new Error("reparto sconosciuto: " + event.dept);
     const status = STATUSES.includes(event.status) ? event.status : "working";
@@ -241,6 +249,8 @@ async function applyEvent(env, event) {
   }
   if (event.queue) {
     const item = { status: "pending", created_at: now, ...event.queue };
+    const k = state.today?.ids.indexOf(item.id);
+    if (k >= 0) Object.assign(item, { n: k + 1, day: state.today.day });
     const idea = item.request && state.ideas.find((i) => i.id === item.request);
     if (idea) Object.assign(idea, { status: "ready", video: item.id, title: item.title });
     state.queue = state.queue.filter((q) => q.id !== item.id).concat(item);
@@ -538,7 +548,9 @@ export default {
     if (url.pathname === "/chain/events" && request.method === "POST") {
       if (!(await publishOk(request, env))) return json({ error: "non autorizzato" }, 401);
       const allowed = ["ricerca", "soggetto", "copione", "regia"];
+      // also { video: { id, title, series } } (the video it is making: numbered among today's), with reset: true at the start of a new one
       const events = [].concat(await request.json().catch(() => [])).map((e) => e.calendar ? { calendar: e.calendar }
+        : e.video ? { reset: Boolean(e.reset), video: { id: clip(e.video.id, 80), title: clip(e.video.title, 120), series: clip(e.video.series, 80) } }
         : allowed.includes(e.dept) ? { dept: e.dept, status: e.status, task: e.task, output: e.output } : null).filter(Boolean);
       for (const e of events) await applyEvent(env, e);
       return json({ ok: true, applied: events.length });

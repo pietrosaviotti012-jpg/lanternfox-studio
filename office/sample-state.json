@@ -1,10 +1,11 @@
 {
   "updated_at": "2026-10-27T09:40:00Z",
   "video": {
-    "id": "2026-10-27",
+    "id": "2026-10-28-lantern-night-1",
     "title": "Il guardiano del faro e la volpe",
     "series": "Storie del faro",
-    "started_at": "2026-10-27T06:00:00Z"
+    "started_at": "2026-10-27T06:00:00Z",
+    "n": 2
   },
   "departments": {
     "ricerca": {
@@ -99,7 +100,9 @@
         "TikTok"
       ],
       "preview_url": "https://github.com/pietrosaviotti012-jpg/lanternfox-studio/releases/download/film-2026-10-28-lighthouse-fox/film.mp4",
-      "cover_url": "https://github.com/pietrosaviotti012-jpg/lanternfox-studio/releases/download/film-2026-10-28-lighthouse-fox/poster.jpg"
+      "cover_url": "https://github.com/pietrosaviotti012-jpg/lanternfox-studio/releases/download/film-2026-10-28-lighthouse-fox/poster.jpg",
+      "n": 1,
+      "day": "2026-10-28"
     }
   ],
   "calendar": [

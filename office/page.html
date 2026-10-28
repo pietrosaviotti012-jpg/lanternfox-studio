@@ -63,6 +63,15 @@
     font-size: .78rem; line-height: 1.2; background: rgba(14, 21, 50, .78); border: 1px solid #2a3a6a; color: var(--paper);
     transition: opacity .2s; }
   .tag .n { font-weight: 700; color: var(--muted); font-variant-numeric: tabular-nums; }
+  /* progress of a working house: a thin bar under its label, and a bigger one in its sheet */
+  .tag .bar { position: absolute; left: 10px; right: 10px; bottom: -6px; height: 4px; border-radius: 2px; background: rgba(14,21,50,.9); overflow: hidden; }
+  .tag .bar[hidden] { display: none; }
+  .tag .bar b { display: block; height: 100%; width: 0; background: var(--lamp); transition: width .6s; }
+  .meter { margin-top: 10px; height: 6px; border-radius: 3px; background: #1a2756; overflow: hidden; }
+  .meter i { display: block; height: 100%; background: var(--lamp); }
+  /* which of today's videos we are talking about */
+  .vno { display: inline-block; margin-bottom: 6px; padding: 3px 10px; border-radius: 999px; background: var(--fox); color: var(--ink); font-size: .78rem; font-weight: 700; }
+  .vno[hidden] { display: none; }
   .tag .st { width: 7px; height: 7px; border-radius: 50%; background: #45557f; flex: none; }
   .tag[data-status="working"] { border-color: rgba(255,184,98,.6); }
   .tag[data-status="working"] .st { background: var(--lamp); box-shadow: 0 0 8px var(--lamp); }
@@ -246,6 +255,7 @@
 
   <section role="tabpanel" id="p-oggi" aria-labelledby="t-oggi">
     <p class="demo-flag">Questa è una prova: si muove solo sul tuo schermo, nessun video viene creato o pubblicato.</p>
+    <span class="vno" id="videoNo" hidden></span>
     <h2 id="videoTitle">Nessuna storia oggi, per ora</h2>
     <p class="lead" id="videoLead">Ogni mattina la sveglia accende la prima lanterna e la storia passa di reparto in reparto fino alla tua scrivania.</p>
     <ol class="string" id="string" aria-label="Il percorso del video di oggi"></ol>

@@ -18,7 +18,9 @@ createServer((req, res) => {
   }
   if (url.pathname === "/state.json") {
     res.writeHead(200, { "Content-Type": "application/json" });
-    return res.end(JSON.stringify(sample));
+    // working houses started a few minutes ago, so the progress bars and the "verso le…" show something real
+    for (const d of Object.values(sample.departments || {})) if (d.status === "working") d.updated_at = new Date(Date.now() - 4 * 60000).toISOString();
+    return res.end(JSON.stringify({ ...sample, publish_at_utc: [16, 22] }));
   }
   if (url.pathname === "/idea") {   // the idea goes in the list, as if the Regia had started
     let body = "";

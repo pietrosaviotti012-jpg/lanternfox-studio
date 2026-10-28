@@ -70,7 +70,8 @@ jobs:
           key: hf-chatterbox-whisper-v1
       - name: Voce
         run: |
-          node tools/office.mjs '{"dept":"voce","status":"working","task":"Registro il narratore riga per riga"}'
+          VIDEO=$(node -e "const m=require('./${{ steps.which.outputs.dir }}/meta.json'); console.log(JSON.stringify({video:{id:'${{ steps.which.outputs.id }}',title:m.title,series:m.series||''}}))")
+          node tools/office.mjs "$VIDEO" '{"dept":"voce","status":"working","task":"Registro il narratore riga per riga"}'
           python tools/voice.py "${{ steps.which.outputs.dir }}" || { node tools/office.mjs '{"dept":"voce","status":"error","task":"Una riga non si capisce: va riscritta"}'; exit 1; }
           node tools/office.mjs '{"dept":"voce","status":"done","task":"Narrazione pronta e controllata"}' '{"dept":"animazione","status":"working","task":"Disegno i fotogrammi su 6 macchine insieme"}'
       - uses: actions/upload-artifact@v4
