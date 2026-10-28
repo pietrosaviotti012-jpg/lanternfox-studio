@@ -1,37 +1,150 @@
 {
   "updated_at": "2026-10-27T09:40:00Z",
-  "video": { "id": "2026-10-27", "title": "Il guardiano del faro e la volpe", "series": "Storie del faro", "started_at": "2026-10-27T06:00:00Z" },
+  "video": {
+    "id": "2026-10-27",
+    "title": "Il guardiano del faro e la volpe",
+    "series": "Storie del faro",
+    "started_at": "2026-10-27T06:00:00Z"
+  },
   "departments": {
-    "ricerca": { "status": "done", "task": "Ho guardato le 40 storie animate più viste della settimana", "output": "Funzionano: volpi e lanterne, finali con un piccolo colpo di scena, 35-45 secondi.", "updated_at": "2026-10-27T06:12:00Z" },
-    "soggetto": { "status": "done", "task": "Storia scelta", "output": "Il guardiano del faro e la volpe — serie Storie del faro, episodio 1.", "updated_at": "2026-10-27T06:20:00Z" },
-    "copione": { "status": "done", "task": "Copione di 8 righe", "output": "Aggancio: Every night, he left one window lit. Not for the ships.", "updated_at": "2026-10-27T06:41:00Z" },
-    "regia": { "status": "done", "task": "Sei scene disegnate", "output": "", "updated_at": "2026-10-27T07:05:00Z" },
-    "animazione": { "status": "working", "task": "Animo la scena 4 di 6: la volpe sale la scala del faro", "output": "", "updated_at": "2026-10-27T09:38:00Z" },
-    "voce": { "status": "working", "task": "Registro la riga 6: sussurro", "output": "", "updated_at": "2026-10-27T09:39:00Z" },
-    "musica": { "status": "idle", "task": "", "output": "", "updated_at": null },
-    "montaggio": { "status": "idle", "task": "", "output": "", "updated_at": null },
-    "qualita": { "status": "idle", "task": "", "output": "", "updated_at": null },
-    "revisione": { "status": "waiting", "task": "Il video di ieri aspetta ancora il tuo ok", "output": "", "updated_at": "2026-10-27T08:00:00Z" },
-    "pubblicazione": { "status": "idle", "task": "", "output": "", "updated_at": null },
-    "community": { "status": "done", "task": "Risposto a 12 commenti, 3 messaggi con la parola STORY", "output": "", "updated_at": "2026-10-27T09:00:00Z" },
-    "statistiche": { "status": "error", "task": "Instagram non risponde: riprovo alle 21", "output": "", "updated_at": "2026-10-27T08:30:00Z" }
+    "ricerca": {
+      "status": "done",
+      "task": "Ho guardato le 40 storie animate più viste della settimana",
+      "output": "Funzionano: volpi e lanterne, finali con un piccolo colpo di scena, 35-45 secondi.",
+      "updated_at": "2026-10-27T06:12:00Z"
+    },
+    "soggetto": {
+      "status": "done",
+      "task": "Storia scelta",
+      "output": "Il guardiano del faro e la volpe — serie Storie del faro, episodio 1.",
+      "updated_at": "2026-10-27T06:20:00Z"
+    },
+    "copione": {
+      "status": "done",
+      "task": "Copione di 8 righe",
+      "output": "Aggancio: Every night, he left one window lit. Not for the ships.",
+      "updated_at": "2026-10-27T06:41:00Z"
+    },
+    "regia": {
+      "status": "done",
+      "task": "Sei scene disegnate",
+      "output": "",
+      "updated_at": "2026-10-27T07:05:00Z"
+    },
+    "animazione": {
+      "status": "working",
+      "task": "Animo la scena 4 di 6: la volpe sale la scala del faro",
+      "output": "",
+      "updated_at": "2026-10-27T09:38:00Z"
+    },
+    "voce": {
+      "status": "working",
+      "task": "Registro la riga 6: sussurro",
+      "output": "",
+      "updated_at": "2026-10-27T09:39:00Z"
+    },
+    "musica": {
+      "status": "idle",
+      "task": "",
+      "output": "",
+      "updated_at": null
+    },
+    "montaggio": {
+      "status": "idle",
+      "task": "",
+      "output": "",
+      "updated_at": null
+    },
+    "qualita": {
+      "status": "idle",
+      "task": "",
+      "output": "",
+      "updated_at": null
+    },
+    "revisione": {
+      "status": "waiting",
+      "task": "Il video di ieri aspetta ancora il tuo ok",
+      "output": "",
+      "updated_at": "2026-10-27T08:00:00Z"
+    },
+    "pubblicazione": {
+      "status": "idle",
+      "task": "",
+      "output": "",
+      "updated_at": null
+    },
+    "community": {
+      "status": "done",
+      "task": "Risposto a 12 commenti, 3 messaggi con la parola STORY",
+      "output": "",
+      "updated_at": "2026-10-27T09:00:00Z"
+    },
+    "statistiche": {
+      "status": "error",
+      "task": "Instagram non risponde: riprovo alle 21",
+      "output": "",
+      "updated_at": "2026-10-27T08:30:00Z"
+    }
   },
   "queue": [
-    { "id": "2026-10-26", "title": "La luna che non riusciva a dormire", "status": "pending", "created_at": "2026-10-26T18:00:00Z",
+    {
+      "id": "2026-10-28-lighthouse-fox",
+      "title": "The Lighthouse Fox",
+      "status": "pending",
+      "created_at": "2026-10-26T18:00:00Z",
       "caption": "The moon tried counting sheep. The sheep were asleep first. 🌙🦊\n\n#bedtimestory #papercut #animatedstory",
-      "platforms": ["Instagram", "YouTube", "TikTok"] }
+      "platforms": [
+        "Instagram",
+        "YouTube",
+        "TikTok"
+      ],
+      "preview_url": "https://github.com/pietrosaviotti012-jpg/lanternfox-studio/releases/download/film-2026-10-28-lighthouse-fox/film.mp4",
+      "cover_url": "https://github.com/pietrosaviotti012-jpg/lanternfox-studio/releases/download/film-2026-10-28-lighthouse-fox/poster.jpg"
+    }
   ],
   "calendar": [
-    { "date": "2026-10-26", "title": "La luna che non riusciva a dormire", "status": "made" },
-    { "date": "2026-10-27", "title": "Il guardiano del faro e la volpe", "status": "planned" }
+    {
+      "date": "2026-10-26",
+      "title": "La luna che non riusciva a dormire",
+      "status": "made"
+    },
+    {
+      "date": "2026-10-27",
+      "title": "Il guardiano del faro e la volpe",
+      "status": "planned"
+    }
   ],
   "stats": null,
   "log": [
-    { "at": "2026-10-27T06:00:00Z", "dept": "ricerca", "text": "La sveglia ha acceso la prima lanterna" },
-    { "at": "2026-10-27T06:20:00Z", "dept": "soggetto", "text": "Oggi: Il guardiano del faro e la volpe" },
-    { "at": "2026-10-27T08:30:00Z", "dept": "statistiche", "text": "Instagram non risponde: riprovo alle 21" },
-    { "at": "2026-10-27T09:38:00Z", "dept": "animazione", "text": "Animo la scena 4 di 6: la volpe sale la scala del faro" }
+    {
+      "at": "2026-10-27T06:00:00Z",
+      "dept": "ricerca",
+      "text": "La sveglia ha acceso la prima lanterna"
+    },
+    {
+      "at": "2026-10-27T06:20:00Z",
+      "dept": "soggetto",
+      "text": "Oggi: Il guardiano del faro e la volpe"
+    },
+    {
+      "at": "2026-10-27T08:30:00Z",
+      "dept": "statistiche",
+      "text": "Instagram non risponde: riprovo alle 21"
+    },
+    {
+      "at": "2026-10-27T09:38:00Z",
+      "dept": "animazione",
+      "text": "Animo la scena 4 di 6: la volpe sale la scala del faro"
+    }
   ],
   "clock": null,
-  "devices": 0
+  "devices": 0,
+  "ideas": [
+    {
+      "id": "idea-1",
+      "text": "Una lucciola che ha paura del buio e scopre di essere lei la luce",
+      "at": "2026-10-28T09:41:35.445Z",
+      "status": "making"
+    }
+  ]
 }

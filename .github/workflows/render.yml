@@ -172,6 +172,6 @@ jobs:
             const m = require('./' + process.env.P + '/meta.json');
             const caption = m.caption + '\n\n' + (m.hashtags || []).join(' ');
             console.log(JSON.stringify({ queue: { id: process.env.ID, title: m.title, caption, platforms: ['Instagram', 'YouTube', 'TikTok'],
-              preview_url: process.env.BASE + '/film.mp4', cover_url: process.env.BASE + '/poster.jpg' } }));
+              preview_url: process.env.BASE + '/film.mp4', cover_url: process.env.BASE + '/poster.jpg', request: m.request } }));
           " > queue.json
           node tools/office.mjs "$(cat queue.json)" '{"dept":"revisione","status":"waiting","task":"Il video è pronto: guardalo e scegli"}'

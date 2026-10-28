@@ -96,16 +96,58 @@ const warmGlow = glowTexture("rgba(255,184,98,.95)", "rgba(255,184,98,0)");
 const foxGlow = glowTexture("rgba(232,116,59,.95)", "rgba(232,116,59,0)");
 const redGlow = glowTexture("rgba(255,120,100,.9)", "rgba(255,120,100,0)");
 
-// sentiero: sassi di carta che uniscono i reparti nell'ordine del video
+// marciapiede: una striscia di carta che passa davanti alle casette nell'ordine della catena,
+// a serpentina sulle tre file (sinistra → destra, poi indietro, poi di nuovo avanti), con frecce che indicano il verso
+const WALK_W = 1.3;
+const walkPath = (() => {
+  const rows = [...new Set(DEPTS.map((d) => d.at[1]))].sort((p, q) => p - q);   // le tre file, dalla più lontana
+  const front = (z) => z + 2.5;                                                  // il marciapiede corre davanti alla fila
+  const xs = DEPTS.map((d) => d.at[0]), x0 = Math.min(...xs) - 2.8, x1 = Math.max(...xs) + 2.8, r = 1.4;
+  const path = new THREE.CurvePath();
+  const P = (x, z) => new THREE.Vector3(x, 0.37, z);
+  let side = 0;                                       // 0: la fila va verso destra, 1: verso sinistra
+  rows.forEach((z, i) => {
+    const zf = front(z), from = side ? x1 : x0, to = side ? x0 : x1, dir = side ? -1 : 1;
+    const startX = i === 0 ? from : from + dir * r, endX = i === rows.length - 1 ? to : to - dir * r;
+    path.add(new THREE.LineCurve3(P(startX, zf), P(endX, zf)));
+    if (i < rows.length - 1) {                        // la curva che scende alla fila dopo
+      const zn = front(rows[i + 1]);
+      path.add(new THREE.QuadraticBezierCurve3(P(endX, zf), P(to, zf), P(to, zf + r)));
+      path.add(new THREE.LineCurve3(P(to, zf + r), P(to, zn - r)));
+      path.add(new THREE.QuadraticBezierCurve3(P(to, zn - r), P(to, zn), P(to - dir * r, zn)));
+    }
+    side = 1 - side;
+  });
+  return path;
+})();
 {
-  const curve = new THREE.CatmullRomCurve3(DEPTS.map((d) => new THREE.Vector3(d.at[0] + 0.4, 0.36, d.at[1] + 1.9)));
-  const n = 90;
-  const stone = new THREE.CylinderGeometry(0.22, 0.22, 0.06, 12);
-  const mat = paper(0x6a86c2);
-  const stones = new THREE.InstancedMesh(stone, mat, n);
-  const m = new THREE.Matrix4();
-  for (let i = 0; i < n; i++) { const p = curve.getPoint(i / (n - 1)); m.makeTranslation(p.x, p.y, p.z); stones.setMatrixAt(i, m); }
-  scene.add(stones);
+  const pts = walkPath.getSpacedPoints(420);
+  const pos = [], idx = [];
+  const up = new THREE.Vector3(0, 1, 0), t = new THREE.Vector3(), n = new THREE.Vector3();
+  pts.forEach((p, i) => {
+    t.subVectors(pts[Math.min(i + 1, pts.length - 1)], pts[Math.max(i - 1, 0)]).normalize();
+    n.crossVectors(up, t).multiplyScalar(WALK_W / 2);
+    pos.push(p.x + n.x, p.y, p.z + n.z, p.x - n.x, p.y, p.z - n.z);
+    if (i) { const k = i * 2; idx.push(k - 2, k - 1, k, k - 1, k + 1, k); }
+  });
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); geo.setIndex(idx); geo.computeVertexNormals();
+  const walk = new THREE.Mesh(geo, paper(0x8fa3cf, { side: THREE.DoubleSide }));
+  walk.position.y = 0.01;
+  scene.add(walk);
+  // frecce di carta sul marciapiede: il verso in cui viaggia il video
+  const arrow = new THREE.Shape();
+  arrow.moveTo(-0.22, -0.18); arrow.lineTo(0.05, -0.18); arrow.lineTo(0.3, 0); arrow.lineTo(0.05, 0.18); arrow.lineTo(-0.22, 0.18); arrow.lineTo(0.02, 0); arrow.closePath();
+  const arrowGeo = new THREE.ShapeGeometry(arrow); arrowGeo.rotateX(-Math.PI / 2);
+  const len = walkPath.getLength(), step = 2.4, count = Math.floor(len / step);
+  const arrows = new THREE.InstancedMesh(arrowGeo, new THREE.MeshBasicMaterial({ color: 0xffd8a0, transparent: true, opacity: .55, side: THREE.DoubleSide }), count);
+  const m = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler(), one = new THREE.Vector3(1, 1, 1);
+  for (let i = 0; i < count; i++) {
+    const u = (i + 0.5) / count, p = walkPath.getPointAt(u), d = walkPath.getTangentAt(u);
+    e.set(0, Math.atan2(-d.z, d.x), 0); q.setFromEuler(e);
+    m.compose(new THREE.Vector3(p.x, 0.39, p.z), q, one); arrows.setMatrixAt(i, m);
+  }
+  scene.add(arrows);
 }
 
 // alberi di carta sparsi (diventano trasparenti quando si entra in una casetta)
@@ -113,7 +155,7 @@ const treeMats = [];
 {
   const treeGeo = new THREE.ConeGeometry(0.8, 2.2, 5); treeGeo.translate(0, 1.45, 0);
   const trunkGeo = new THREE.BoxGeometry(0.2, 0.5, 0.2); trunkGeo.translate(0, 0.45, 0);
-  const spots = [[-13, -8.5], [-12.6, 3.8], [-12, 8.4], [-2, 2.6], [3.4, 2.4], [12.6, -7.8], [12.8, 0.6], [12.4, 8.2], [-1.6, -9.4], [8.6, -9.2], [2.4, 9], [-9.6, 8.6]];
+  const spots = [[-13, -8.8], [-7.5, -9.3], [2.6, -9.4], [12.9, -9], [-0.1, -3.2], [6.7, -3.1], [-6.7, -3], [-13.2, -1.3], [13.2, 2.8], [0, 3], [6.7, 3.2], [-6.7, 2.6], [-13.1, 9.2], [13.1, 9.2], [0, 9.4]];
   for (const [x, z] of spots) {
     const t = new THREE.Group();
     const trunkMat = paper(0x2a1d14, { transparent: true }), crownMat = paper(Math.random() > .5 ? 0x22356c : 0x2c4580, { transparent: true });
@@ -179,7 +221,7 @@ for (const [i, d] of DEPTS.entries()) {
   const inside = new THREE.Vector3(room.seat[0] * k, 0.36 + seatSize / 2, room.seat[1] * k);
   g.add(backZ, backX, skirtZ, skirtX, frontZ, frontX, roof, chimney, win, win2, door, glow, light, ring, critter, room.group);
   g.position.set(d.at[0], 0, d.at[1]);
-  g.rotation.y = d.big ? 0 : (i % 2 ? -0.12 : 0.1);
+  // casette dritte, tutte con la porta sul marciapiede
   for (const m of [frontZ, frontX, roof, door, critter]) { m.userData.dept = d.id; clickable.push(m); }
   scene.add(g);
   houses[d.id] = { g, winMat, glow, light, ring, critter, room, roof, roofY, chimney, chimneyY: chimney.position.y,
@@ -230,10 +272,10 @@ function setHouse(id, status) {
 // ---------------------------------------------------------------- etichette (HTML sopra la scena)
 const labels = $("labels");
 const tags = {};
-for (const d of DEPTS) {
+for (const [i, d] of DEPTS.entries()) {
   const b = document.createElement("button");
   b.className = "tag"; b.type = "button"; b.dataset.status = "idle"; b.setAttribute("aria-pressed", "false");
-  b.innerHTML = `<span class="st"></span><span>${esc(d.name)}</span>`;
+  b.innerHTML = `<span class="st"></span><span class="n">${i + 1}</span><span>${esc(d.name)}</span>`;
   b.addEventListener("click", () => openDept(d.id));
   labels.append(b); tags[d.id] = b;
 }
@@ -256,7 +298,7 @@ function fit() {
   const w = stage.clientWidth, h = stage.clientHeight;
   renderer.setSize(w, h, false);
   const aspect = w / h;
-  const half = Math.max(12.5, 13.5 / aspect);
+  const half = Math.max(12.5, 16 / aspect);   // on a phone the three rows still fit from end to end
   camera.left = -half * aspect; camera.right = half * aspect; camera.top = half; camera.bottom = -half;
   camera.updateProjectionMatrix();
 }
@@ -358,6 +400,22 @@ loop();
 
 const fmtTime = (iso) => iso ? new Date(iso).toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" }) : "";
 const fmtDay = (iso) => new Date(iso + "T12:00:00").toLocaleDateString("it-IT", { weekday: "short", day: "numeric" });
+const fmtDayTime = (iso) => new Date(iso).toLocaleString("it-IT", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+const IDEA_TEXT = { sent: "Inviata", making: "In lavorazione", ready: "Pronto in Approva", error: "Non partita" };
+
+// le cinque fasi della catena, spiegate: ognuna raggruppa le casette del villaggio nell'ordine del marciapiede
+const PHASES = [
+  { title: "L'idea", depts: ["ricerca", "soggetto"],
+    text: "Si sceglie la storia: da quello che sta funzionando adesso, oppure dall'idea che scrivi tu nella sezione Idea." },
+  { title: "La scrittura", depts: ["copione", "regia"],
+    text: "Claude scrive l'aggancio dei primi secondi e le righe con il tono di ogni frase, poi disegna le scene di carta." },
+  { title: "La produzione in cloud", depts: ["voce", "animazione", "musica", "montaggio", "qualita"],
+    text: "Il narratore registra riga per riga, sei macchine disegnano i fotogrammi, arrivano carillon e suoni, poi il montaggio e il controllo. Circa 25 minuti." },
+  { title: "Decidi tu", depts: ["revisione"],
+    text: "Guardi il video in Approva: Pubblica, oppure Rifai con una nota su cosa cambiare." },
+  { title: "L'uscita", depts: ["pubblicazione", "community", "statistiche"],
+    text: "Alle 23:00, o subito con Pubblica adesso, esce su Instagram e YouTube (TikTok a mano); poi risposte ai commenti e numeri della sera." },
+];
 
 function render() {
   if (!state) return;
@@ -385,6 +443,22 @@ function render() {
     return `<li data-status="${s}"><button type="button" data-dept="${d.id}" aria-label="${esc(d.name)}: ${STATUS_TEXT[s]}"><span class="lantern"><i></i></span>${esc(d.name)}</button></li>`;
   }).join("");
 
+  $("phases").innerHTML = PHASES.map((ph) => {
+    const sts = ph.depts.map((id) => (deps[id] || {}).status || "idle");
+    const st = sts.includes("waiting") ? "waiting" : sts.includes("error") ? "error" : sts.includes("working") ? "working"
+      : sts.every((x) => x === "done") ? "done" : "idle";
+    const pill = { working: `<span class="pill made">In corso</span>`, waiting: `<span class="pill made">Tocca a te</span>`,
+      done: `<span class="pill published">Fatto</span>`, error: `<span class="pill">Si è fermato</span>` }[st] || "";
+    return `<li data-st="${st}"><div><b>${esc(ph.title)}</b><span class="who">${esc(ph.depts.map((id) => BY_ID[id].name).join(" · "))}</span>
+      <p>${esc(ph.text)}</p>${pill}</div></li>`;
+  }).join("");
+
+  const ideas = [...(state.ideas || [])].reverse();
+  $("ideas").innerHTML = ideas.length ? ideas.map((i) => `<li><span>${esc(i.text)}</span>
+      <span class="note">${fmtDayTime(i.at)}${i.title ? ` · ${esc(i.title)}` : ""}</span>
+      <span class="pill ${i.status === "ready" ? "published" : i.status === "making" ? "made" : ""}">${IDEA_TEXT[i.status] || i.status}</span></li>`).join("")
+    : `<li class="empty" style="display:block"><strong>Nessuna idea, per ora</strong>Quelle che mandi da qui compaiono in questa lista, con il loro stato.</li>`;
+
   const log = (state.log || []).slice(-25).reverse();
   $("diary").innerHTML = log.length ? log.map((l) => `<li><time>${fmtTime(l.at)}</time><img alt="" src="${ICONS[l.dept] || ICONS.regia}"><span>${esc(l.text)}</span></li>`).join("")
     : `<li class="empty" style="display:block"><strong>Il diario è vuoto</strong>Qui ogni reparto scrive cosa ha fatto, con l'ora.</li>`;
@@ -403,8 +477,10 @@ function render() {
 }
 
 function reviewCard(q) {
+  // the film comes through the Office (/media/…) so it plays on iPhone too; the demo has no file
+  const src = (f, url) => demo ? url : `/media/${encodeURIComponent(q.id)}/${f}`;
   const media = q.preview_url
-    ? `<video src="${esc(q.preview_url)}" ${q.cover_url ? `poster="${esc(q.cover_url)}"` : ""} controls playsinline preload="metadata"></video>`
+    ? `<video src="${esc(src("film.mp4", q.preview_url))}#t=0.1" ${q.cover_url ? `poster="${esc(src("poster.jpg", q.cover_url))}"` : ""} controls playsinline preload="metadata"></video>`
     : `<div class="ph">L'anteprima arriva con il primo video vero</div>`;
   const plats = (q.platforms || ["Instagram", "YouTube", "TikTok"]).map((p) => `<li>${esc(p)}</li>`).join("");
   const actions = q.status === "pending"
@@ -432,7 +508,7 @@ function publishedBlock(q) {
     ${pub.tiktok?.url ? "" : pub.tiktok?.draft ? `<p class="note" style="margin:0 0 8px">Su TikTok il video è nelle bozze: apri l'app, tocca la notifica, incolla la didascalia e premi Pubblica.</p>
     <div class="row"><button class="btn" data-copy="${esc(q.id)}">Copia didascalia</button></div>`
     : `<p class="note" style="margin:0 0 8px">TikTok per ora si pubblica a mano: apri il video, salvalo e caricalo dall'app con la didascalia.</p>
-    <div class="row"><a class="btn" href="${esc(q.preview_url || "#")}" target="_blank" rel="noopener" style="text-decoration:none">Apri il video</a>
+    <div class="row"><a class="btn" href="/media/${encodeURIComponent(q.id)}/film.mp4" target="_blank" rel="noopener" style="text-decoration:none">Apri il video</a>
     <button class="btn" data-copy="${esc(q.id)}">Copia didascalia</button></div>`}`;
 }
 
@@ -509,7 +585,7 @@ addEventListener("keydown", (e) => { if (e.key === "Escape" && selected) closeSh
 $("string").addEventListener("click", (e) => { const b = e.target.closest("[data-dept]"); if (b) openDept(b.dataset.dept); });
 
 // schede del pannello
-const tabNames = ["oggi", "approva", "calendario", "numeri"];
+const tabNames = ["oggi", "idea", "approva", "calendario", "numeri"];
 function selectTab(name) {
   for (const t of tabNames) {
     $("t-" + t).setAttribute("aria-selected", String(t === name));
@@ -562,6 +638,19 @@ $("queue").addEventListener("click", async (e) => {
   load();
 });
 
+// chiedi un video
+$("ideaSend").addEventListener("click", async () => {
+  const box = $("ideaText"), text = box.value.trim();
+  if (text.length < 8) { toast("Scrivi l'idea in una frase o due"); box.focus(); return; }
+  if (demo) { toast("Idea mandata (per finta: è una prova)"); return; }
+  const b = $("ideaSend"); b.disabled = true;
+  const r = await fetch("/idea", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text }) });
+  b.disabled = false;
+  if (r.ok) { box.value = ""; toast("Idea mandata: la Regia comincia adesso"); }
+  else toast(r.status === 400 ? "Scrivi l'idea in una frase o due" : "La Regia non è partita: riprova tra poco");
+  load();
+});
+
 function toast(text) {
   const t = $("toast"); t.textContent = text; t.classList.add("show");
   clearTimeout(toast.timer); toast.timer = setTimeout(() => t.classList.remove("show"), 2800);
@@ -589,8 +678,8 @@ const DEMO_STEPS = [
   ["soggetto", "Scelgo la storia di oggi", "\"Il guardiano del faro e la volpe\", serie Storie del faro, episodio 1."],
   ["copione", "Scrivo l'aggancio e il copione", "Aggancio: \"Every night, he left one window lit. Not for the ships.\" Otto righe, il finale sussurrato."],
   ["regia", "Disegno le sei scene nella scatola di carta", "Faro sulla scogliera, la volpe tra le dune, la tempesta, la scala, la luce che si spegne, la lanterna."],
-  ["animazione", "Animo gli strati di carta", "Sei scene, 42 secondi, 30 fotogrammi al secondo."],
   ["voce", "Registro il narratore riga per riga", "Intensità crescente fino alla tempesta, sussurro sull'ultima frase."],
+  ["animazione", "Animo gli strati di carta su sei macchine", "Sei scene, 42 secondi, 30 fotogrammi al secondo."],
   ["musica", "Compongo il carillon e i suoni della carta", "Carillon in re minore, vento, fruscii di carta, il click della lanterna."],
   ["montaggio", "Metto insieme video, voce, musica e sottotitoli", "1080×1920, sottotitoli a tempo con le parole, −14 LUFS."],
   ["qualita", "Guardo il video come uno spettatore", "Tutto a posto: aggancio chiaro nei primi 2 secondi, nessuna parola tagliata."],

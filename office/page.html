@@ -31,7 +31,11 @@
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; background: var(--night); color: var(--paper); }
-  body { font: 16px/1.5 var(--sans); -webkit-font-smoothing: antialiased; }
+  body { font: 16px/1.5 var(--sans); -webkit-font-smoothing: antialiased; padding-top: var(--safe-top); }
+  /* iPhone: la pagina passa sotto l'orologio e iOS sfoca quello che c'è sotto. Una fascia di colore pieno
+     sta sempre lì, e tutto il resto comincia sotto di lei: così si sfoca solo un colore uniforme, mai il titolo */
+  :root { --safe-top: env(safe-area-inset-top, 0px); }
+  .topband { position: fixed; inset: 0 0 auto 0; height: var(--safe-top); background: var(--night); z-index: 30; pointer-events: none; }
   button, input, textarea { font: inherit; color: inherit; }
   :focus-visible { outline: 3px solid var(--lamp); outline-offset: 2px; border-radius: 8px; }
 
@@ -40,7 +44,7 @@
     background: radial-gradient(110% 90% at 50% 100%, #1b2a5c 0%, var(--night) 62%); touch-action: none; }
   .stage canvas { display: block; width: 100%; height: 100%; }
   .top { position: absolute; inset: 0 0 auto 0; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
-    padding: max(14px, env(safe-area-inset-top)) var(--gutter) 0; pointer-events: none; }
+    padding: 14px var(--gutter) 0; pointer-events: none; }
   .top > * { pointer-events: auto; }
   .brand h1 { margin: 0; font: 600 1.35rem/1.1 var(--serif); letter-spacing: -.01em; }
   .brand p { margin: 4px 0 0; color: var(--muted); font-size: .92rem; max-width: 30ch; }
@@ -56,6 +60,7 @@
     display: flex; align-items: center; gap: 6px; padding: 4px 9px 4px 7px; border-radius: 999px; white-space: nowrap;
     font-size: .78rem; line-height: 1.2; background: rgba(14, 21, 50, .78); border: 1px solid #2a3a6a; color: var(--paper);
     transition: opacity .2s; }
+  .tag .n { font-weight: 700; color: var(--muted); font-variant-numeric: tabular-nums; }
   .tag .st { width: 7px; height: 7px; border-radius: 50%; background: #45557f; flex: none; }
   .tag[data-status="working"] { border-color: rgba(255,184,98,.6); }
   .tag[data-status="working"] .st { background: var(--lamp); box-shadow: 0 0 8px var(--lamp); }
@@ -70,10 +75,12 @@
 
   /* ---------------------------------------------------------------- il pannello */
   .panel { padding: 18px var(--gutter) calc(32px + env(safe-area-inset-bottom)); max-width: 720px; margin: 0 auto; }
-  .tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; padding: 4px; border-radius: 14px; background: var(--ink);
-    border: 1px solid #1f2c58; position: sticky; top: 8px; z-index: 2; }
+  .tabs { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; padding: 4px; border-radius: 14px; background: var(--ink);
+    border: 1px solid #1f2c58; position: sticky; top: calc(var(--safe-top) + 8px); z-index: 2; }
   .tabs button { border: 0; background: transparent; padding: 9px 4px; border-radius: 10px; cursor: pointer; color: var(--muted);
     font-size: .9rem; position: relative; }
+  @media (max-width: 430px) { .tabs button { font-size: .8rem; padding: 9px 2px; white-space: nowrap; }
+    .tabs .count { position: absolute; top: -6px; right: 0; margin: 0; } }
   .tabs button[aria-selected="true"] { background: var(--deep); color: var(--paper); box-shadow: inset 0 0 0 1px #2a3a6a; }
   .tabs .count { display: inline-grid; place-items: center; min-width: 18px; height: 18px; padding: 0 5px; margin-left: 4px; border-radius: 9px;
     background: var(--fox); color: var(--ink); font-size: .72rem; font-weight: 700; }
@@ -103,6 +110,26 @@
   [data-status="working"] button, [data-status="waiting"] button, [data-status="done"] button { color: var(--paper); }
   @keyframes flicker { 0%, 100% { box-shadow: 0 0 10px rgba(255,184,98,.4); } 50% { box-shadow: 0 0 26px rgba(255,184,98,.85); } }
   @keyframes breathe { 0%, 100% { box-shadow: 0 0 6px rgba(232,116,59,.3); } 50% { box-shadow: 0 0 22px rgba(232,116,59,.8); } }
+
+  /* come nasce un video: le cinque fasi, con quella in corso accesa */
+  .phases { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; counter-reset: ph; }
+  .phases li { display: grid; grid-template-columns: 34px 1fr; gap: 12px; padding: 12px 14px; border-radius: 14px; background: #101b40; border: 1px solid transparent; }
+  .phases li::before { counter-increment: ph; content: counter(ph); width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center;
+    background: #1a2756; color: var(--muted); font-weight: 700; }
+  .phases b { display: block; font: 600 1rem/1.3 var(--serif); }
+  .phases .who { color: var(--muted); font-size: .82rem; }
+  .phases p { margin: 4px 0 0; font-size: .9rem; color: #d8cbb2; }
+  .phases .pill { justify-self: start; margin-top: 6px; }
+  .phases li[data-st="working"] { border-color: rgba(255,184,98,.55); }
+  .phases li[data-st="working"]::before { background: var(--lamp); color: var(--ink); }
+  .phases li[data-st="waiting"] { border-color: var(--fox); }
+  .phases li[data-st="waiting"]::before { background: var(--fox); color: var(--ink); }
+  .phases li[data-st="done"]::before { background: rgba(159,217,168,.2); color: var(--ok); }
+  .field { width: 100%; min-height: 110px; resize: vertical; padding: 12px; border-radius: 12px; background: var(--ink); border: 1px solid #2a3a6a; margin: 6px 0 12px; }
+  .ideas { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+  .ideas li { padding: 12px 14px; border-radius: 14px; background: #101b40; display: grid; gap: 6px; }
+  .ideas .pill { justify-self: start; }
+  .steps { margin: 14px 0 0; padding-left: 20px; color: var(--muted); font-size: .9rem; display: grid; gap: 4px; }
 
   .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
   .btn { border: 1px solid #2a3a6a; background: var(--deep); padding: 11px 16px; border-radius: 12px; cursor: pointer; }
@@ -182,6 +209,7 @@
 </style>
 </head>
 <body>
+<div class="topband" aria-hidden="true"></div>
 <div class="stage" id="stage">
   <div class="labels" id="labels"></div>
   <div class="top">
@@ -202,6 +230,7 @@
 <main class="panel">
   <div class="tabs" role="tablist" aria-label="Sezioni">
     <button role="tab" id="t-oggi" aria-controls="p-oggi" aria-selected="true">Oggi</button>
+    <button role="tab" id="t-idea" aria-controls="p-idea" aria-selected="false">Idea</button>
     <button role="tab" id="t-approva" aria-controls="p-approva" aria-selected="false">Approva<span class="count" id="queueCount" hidden></span></button>
     <button role="tab" id="t-calendario" aria-controls="p-calendario" aria-selected="false">Calendario</button>
     <button role="tab" id="t-numeri" aria-controls="p-numeri" aria-selected="false">Numeri</button>
@@ -212,11 +241,28 @@
     <h2 id="videoTitle">Nessuna storia oggi, per ora</h2>
     <p class="lead" id="videoLead">Ogni mattina la sveglia accende la prima lanterna e la storia passa di reparto in reparto fino alla tua scrivania.</p>
     <ol class="string" id="string" aria-label="Il percorso del video di oggi"></ol>
+    <h3>Come nasce un video</h3>
+    <ol class="phases" id="phases"></ol>
     <div class="row" style="margin-top:18px">
       <button class="btn" id="demoBtn">Guarda una giornata di prova</button>
     </div>
     <h3>Diario</h3>
     <ul class="diary" id="diary"></ul>
+  </section>
+
+  <section role="tabpanel" id="p-idea" aria-labelledby="t-idea" hidden>
+    <h2>Chiedi un video</h2>
+    <p class="lead">Scrivi l'idea come la racconteresti a un amico: chi c'è, cosa succede, cosa deve restare alla fine. La Regia la trasforma in una storia di 30-50 secondi, in inglese e nello stile della volpe di carta.</p>
+    <label for="ideaText" class="note">La tua idea</label>
+    <textarea id="ideaText" class="field" maxlength="600" placeholder="Per esempio: una lucciola che ha paura del buio e scopre di essere lei la luce"></textarea>
+    <div class="row"><button class="btn primary" id="ideaSend">Crea questo video</button></div>
+    <ol class="steps">
+      <li>La Regia scrive il copione e disegna le scene (circa 5 minuti).</li>
+      <li>Il cloud registra la voce, anima i fogli di carta e monta (circa 25 minuti).</li>
+      <li>Ti arriva la notifica e il video ti aspetta in Approva.</li>
+    </ol>
+    <h3>Le tue idee</h3>
+    <ul class="ideas" id="ideas"></ul>
   </section>
 
   <section role="tabpanel" id="p-approva" aria-labelledby="t-approva" hidden>

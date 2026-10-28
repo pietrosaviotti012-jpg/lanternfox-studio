@@ -186,6 +186,7 @@ function emptyState() {
     calendar: [], // { date, title, status: planned|made|published|skipped }
     stats: null,  // { followers: {instagram, youtube, tiktok}, views_7d, best: {title, views}, updated_at }
     log: [],      // { at, dept, text }
+    ideas: [],    // { id, text, at, status: sent|making|ready|error, video? }: the videos the user asked for from the Office
     clock: null,
   };
 }
@@ -203,6 +204,7 @@ async function saveState(env, state) {
   state.log = state.log.slice(-80);
   state.queue = state.queue.slice(-20);
   state.calendar = state.calendar.slice(-60);
+  state.ideas = state.ideas.slice(-12);
   await env.DATA.put("state", JSON.stringify(state));
 }
 
@@ -230,6 +232,8 @@ async function applyEvent(env, event) {
   }
   if (event.queue) {
     const item = { status: "pending", created_at: now, ...event.queue };
+    const idea = item.request && state.ideas.find((i) => i.id === item.request);
+    if (idea) Object.assign(idea, { status: "ready", video: item.id, title: item.title });
     state.queue = state.queue.filter((q) => q.id !== item.id).concat(item);
     if (item.status === "pending") {
       await pushAll(env, { title: "Un video aspetta il tuo ok", body: item.title || "Nuova storia pronta", url: "/#approva", urgent: true });
@@ -444,6 +448,22 @@ export default {
       return json({ error: "accesso richiesto" }, 401);
     }
 
+    // the film and its cover, served from here: GitHub hands release files out as downloads
+    // (application/octet-stream, attachment, nosniff), which Safari refuses to play in a <video>
+    const media = url.pathname.match(/^\/media\/([\w-]+)\/(film\.mp4|poster\.jpg)$/);
+    if (media) {
+      const item = (await loadState(env)).queue.find((q) => q.id === media[1]);
+      const src = item && (media[2] === "film.mp4" ? item.preview_url : item.cover_url);
+      if (!src || !src.startsWith("https://github.com/")) return json({ error: "file non trovato" }, 404);
+      const range = request.headers.get("Range");
+      const up = await fetch(src, { headers: range ? { Range: range } : {}, redirect: "follow" });
+      if (!up.ok) return json({ error: "file non raggiungibile" }, 502);
+      const headers = { ...SECURITY, "Content-Type": media[2] === "film.mp4" ? "video/mp4" : "image/jpeg",
+        "Accept-Ranges": "bytes", "Cache-Control": "private, max-age=3600" };
+      for (const h of ["Content-Length", "Content-Range", "ETag", "Last-Modified"]) if (up.headers.get(h)) headers[h] = up.headers.get(h);
+      return new Response(up.body, { status: up.status, headers });
+    }
+
     if (url.pathname === "/state.json") {
       ctx.waitUntil(clock(env).ensure());
       const state = await loadState(env);
@@ -471,6 +491,22 @@ export default {
         text: decision === "approved" ? `Hai approvato "${item.title}": esce all'orario di pubblicazione` : `Hai chiesto di rifare "${item.title}"` });
       await saveState(env, state);
       return json({ ok: true, started: decision === "redo" ? redoOk : undefined });
+    }
+    // "Chiedi un video": an idea of the user's goes to the Regia routine, which writes the story, draws it and starts the render
+    if (url.pathname === "/idea" && request.method === "POST") {
+      const text = clip(String((await request.json()).text || "").trim(), 600);
+      if (text.length < 8) return json({ error: "scrivi un'idea un po' più lunga" }, 400);
+      const state = await loadState(env);
+      const now = new Date().toISOString();
+      const idea = { id: "idea-" + now.replace(/\D/g, "").slice(0, 14), text, at: now, status: "sent" };
+      const started = await fireRoutine(env, "REDO", `idea: ${text}\nrequest: ${idea.id}`);
+      const ok = started >= 200 && started < 300;
+      idea.status = ok ? "making" : "error";
+      state.ideas.push(idea);
+      state.departments.soggetto = { status: ok ? "working" : "error", task: ok ? `La tua idea: ${clip(text, 160)}` : "Non riesco ad avviare la Regia: controlla la routine", output: "", updated_at: now };
+      state.log.push({ at: now, dept: "soggetto", status: ok ? "working" : "error", text: ok ? `Hai chiesto un video: "${clip(text, 120)}"` : "La tua idea non è partita" });
+      await saveState(env, state);
+      return json({ ok, idea }, ok ? 200 : 502);
     }
     // "Pubblica adesso": an approved video goes out now instead of waiting for the evening slot
     if (url.pathname === "/publish/now" && request.method === "POST") {

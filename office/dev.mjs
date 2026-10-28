@@ -20,6 +20,28 @@ createServer((req, res) => {
     res.writeHead(200, { "Content-Type": "application/json" });
     return res.end(JSON.stringify(sample));
   }
+  if (url.pathname === "/idea") {   // the idea goes in the list, as if the Regia had started
+    let body = "";
+    req.on("data", (c) => (body += c));
+    req.on("end", () => {
+      const text = JSON.parse(body || "{}").text || "";
+      (sample.ideas ||= []).push({ id: "idea-dev", text, at: new Date().toISOString(), status: "making" });
+      res.writeHead(200, { "Content-Type": "application/json" }); res.end(JSON.stringify({ ok: true }));
+    });
+    return;
+  }
+  const media = url.pathname.match(/^\/media\/([\w-]+)\/(film\.mp4|poster\.jpg)$/);
+  if (media) {   // same as the Worker: fetch the release file and hand it out with the right type
+    const item = (sample.queue || []).find((q) => q.id === media[1]);
+    const src = item && (media[2] === "film.mp4" ? item.preview_url : item.cover_url);
+    if (!src) { res.writeHead(404); return res.end(); }
+    fetch(src, { headers: req.headers.range ? { Range: req.headers.range } : {} }).then(async (up) => {
+      const h = { "Content-Type": media[2] === "film.mp4" ? "video/mp4" : "image/jpeg", "Accept-Ranges": "bytes" };
+      for (const k of ["content-length", "content-range"]) if (up.headers.get(k)) h[k] = up.headers.get(k);
+      res.writeHead(up.status, h); res.end(Buffer.from(await up.arrayBuffer()));
+    }).catch(() => { res.writeHead(502); res.end(); });
+    return;
+  }
   if (url.pathname === "/approve" || url.pathname.startsWith("/push/")) {
     res.writeHead(200, { "Content-Type": "application/json" });
     return res.end(JSON.stringify({ ok: true, key: "", sent: 0 }));
