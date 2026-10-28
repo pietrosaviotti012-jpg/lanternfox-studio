@@ -3,11 +3,17 @@
 Gira ogni giorno alle 22:00 UTC (23:00 in Italia d'inverno, 18:00 a New York). Pubblica su Instagram e YouTube i video che
 l'utente ha approvato nell'Ufficio con "Pubblica". TikTok per ora lo pubblica l'utente a mano dall'Ufficio.
 
-Le variabili d'ambiente della routine sono `OFFICE_URL` e `PUBLISH_KEY`. La chiave può solo leggere la coda e segnare i video come pubblicati. Non scriverle mai in file, commit o messaggi.
+I valori `OFFICE_URL` e `PUBLISH_KEY` sono nel prompt della routine. La chiave può solo leggere la coda e segnare i video come pubblicati. Non scriverle mai in file, commit o messaggi.
 
-## 1. Leggi la coda
-```sh
-curl -s -H "Authorization: Bearer $PUBLISH_KEY" -H "User-Agent: lanternfox-routine" "$OFFICE_URL/publish/queue"
+## 1. Leggi la coda (dal banco di lavoro di Composio)
+L'ambiente della routine non può raggiungere l'Ufficio (il proxy rifiuta workers.dev); il `COMPOSIO_REMOTE_WORKBENCH` sì.
+Quindi **tutte** le chiamate all'Ufficio si fanno da lì, in Python, con `OFFICE_URL` e `PUBLISH_KEY` scritti nella cella:
+```python
+import requests
+OFFICE_URL, PUBLISH_KEY = "…", "…"   # i valori del prompt della routine
+H = {"Authorization": "Bearer " + PUBLISH_KEY, "User-Agent": "lanternfox-routine"}
+queue = requests.get(OFFICE_URL + "/publish/queue", headers=H, timeout=30).json()
+print([(i["id"], i["title"], list(i["published"])) for i in queue["items"]])
 ```
 Risposta: `{"items": [{id, title, caption, preview_url, cover_url, published: {instagram?, youtube?}}]}`. Se `items` è vuoto, hai finito: scrivi "Niente da pubblicare oggi" e chiudi.
 
@@ -32,11 +38,11 @@ res, err = run_composio_tool("YOUTUBE_UPLOAD_VIDEO", {
 ```
 Il link è `https://youtube.com/shorts/<id>`, dove `<id>` è `res["data"]["response_data"]["id"]`.
 
-## 4. Segnala all'Ufficio, una piattaforma per volta
-```sh
-curl -s -X POST -H "Authorization: Bearer $PUBLISH_KEY" -H "Content-Type: application/json" -H "User-Agent: lanternfox-routine" \
-  "$OFFICE_URL/publish/done" -d '{"id":"<id>","platform":"instagram","url":"<permalink>"}'
-# se non è andata: -d '{"id":"<id>","platform":"youtube","error":"<cosa è successo, in breve>"}'
+## 4. Segnala all'Ufficio, una piattaforma per volta (sempre dal banco di lavoro)
+```python
+requests.post(OFFICE_URL + "/publish/done", headers=H, json={"id": ID, "platform": "instagram", "url": PERMALINK}, timeout=30)
+# se non è andata:
+requests.post(OFFICE_URL + "/publish/done", headers=H, json={"id": ID, "platform": "youtube", "error": "cosa è successo, in breve"}, timeout=30)
 ```
 L'Ufficio aggiorna calendario e diario e manda la notifica all'utente.
 
