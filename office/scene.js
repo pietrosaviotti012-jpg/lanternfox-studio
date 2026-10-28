@@ -150,6 +150,63 @@ const walkPath = (() => {
   scene.add(arrows);
 }
 
+// i due capi del marciapiede: una piazzetta tonda invece del taglio netto,
+// all'inizio un arco di carta con la lanterna, alla fine un cartello, una panchina e un lampione
+function board(text, w = 2, h = 0.62) {
+  const c = document.createElement("canvas"); c.width = 512; c.height = Math.round(512 * h / w);
+  const g = c.getContext("2d");
+  g.fillStyle = "#f3e6cf"; g.beginPath(); g.roundRect(6, 6, c.width - 12, c.height - 12, 22); g.fill();
+  g.strokeStyle = "#8a6a4a"; g.lineWidth = 8; g.stroke();
+  g.fillStyle = "#1a2550"; g.font = `600 ${Math.round(c.height * 0.5)}px Fraunces, Georgia, serif`;
+  g.textAlign = "center"; g.textBaseline = "middle"; g.fillText(text, c.width / 2, c.height / 2 + 4);
+  const tex = new THREE.CanvasTexture(c); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 4;
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: tex, side: THREE.DoubleSide }));
+  m.rotation.y = Math.PI / 4;   // girato verso chi guarda il villaggio
+  return m;
+}
+const ends = (() => {
+  const wood = paper(0x5a4030), dark = paper(0x1a2550);
+  const plaza = (p) => {
+    const rim = new THREE.Mesh(new THREE.CylinderGeometry(1.25, 1.25, 0.05, 40), paper(0x6a86c2)); rim.position.set(p.x, 0.37, p.z);
+    const top = new THREE.Mesh(new THREE.CylinderGeometry(1.05, 1.05, 0.06, 40), paper(0x8fa3cf)); top.position.set(p.x, 0.39, p.z);
+    scene.add(rim, top);
+  };
+  const lanternGlow = (x, y, z, s = 1.8) => {
+    const head = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.3, 0.24), new THREE.MeshBasicMaterial({ color: 0xffd08a })); head.position.set(x, y, z);
+    const glow = new THREE.Sprite(new THREE.SpriteMaterial({ map: warmGlow, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: .65 }));
+    glow.scale.set(s, s, 1); glow.position.set(x, y, z); scene.add(head, glow); return glow;
+  };
+  // inizio: piazzetta e arco a cavallo del marciapiede, con l'insegna e una lanterna appesa
+  const a = walkPath.getPointAt(0), da = walkPath.getTangentAt(0);
+  plaza(a);
+  const side = new THREE.Vector3(-da.z, 0, da.x).multiplyScalar(WALK_W / 2 + 0.2);
+  const gx = a.x + da.x * 1.1, gz = a.z + da.z * 1.1;
+  for (const s of [1, -1]) {
+    const post = new THREE.Mesh(new THREE.BoxGeometry(0.16, 2.3, 0.16), wood); post.position.set(gx + side.x * s, 0.37 + 1.15, gz + side.z * s); scene.add(post);
+  }
+  const beam = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.18, side.length() * 2 + 0.5), wood);
+  beam.position.set(gx, 0.37 + 2.3, gz); beam.rotation.y = Math.atan2(side.x, side.z); scene.add(beam);
+  const sign = board("Inizio", 3.4, 1.05); sign.position.set(gx, 0.37 + 3.0, gz); scene.add(sign);
+  const hang = new THREE.Mesh(new THREE.CylinderGeometry(0.01, 0.01, 0.35, 4), dark); hang.position.set(gx, 0.37 + 2.03, gz); scene.add(hang);
+  const startGlow = lanternGlow(gx, 0.37 + 1.72, gz, 2.2);
+  // fine: piazzetta con cartello, panchina e lampione
+  const b = walkPath.getPointAt(1), db = walkPath.getTangentAt(1);
+  plaza(b);
+  // sul bordo della piazzetta verso il davanti dell'isola, lontano dall'orso delle Statistiche
+  const sx = b.x + db.x * 0.6 + db.z * 1.0, sz = b.z + db.z * 0.6 + db.x * 1.0;
+  const pole = new THREE.Mesh(new THREE.BoxGeometry(0.16, 2.2, 0.16), wood); pole.position.set(sx, 0.37 + 1.1, sz); scene.add(pole);
+  const endSign = board("Fine", 2.6, 0.95); endSign.position.set(sx, 0.37 + 2.25, sz); scene.add(endSign);
+  const bench = new THREE.Group();
+  const seat = new THREE.Mesh(new THREE.BoxGeometry(1.1, 0.08, 0.36), wood); seat.position.y = 0.42; bench.add(seat);
+  const back = new THREE.Mesh(new THREE.BoxGeometry(1.1, 0.34, 0.06), wood); back.position.set(0, 0.62, -0.16); bench.add(back);
+  for (const x of [-0.45, 0.45]) { const leg = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.4, 0.3), dark); leg.position.set(x, 0.2, 0); bench.add(leg); }
+  bench.position.set(b.x - db.x * 0.55 + db.z * 1.05, 0.37, b.z - db.z * 0.55 + db.x * 1.05); bench.rotation.y = Math.atan2(db.x, db.z) + Math.PI / 2;
+  scene.add(bench);
+  const lamp = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.07, 1.7, 6), dark); lamp.position.set(b.x + db.x * 0.9 + db.z * 0.7, 0.37 + 0.85, b.z + db.z * 0.9 - db.x * 0.7); scene.add(lamp);
+  const endGlow = lanternGlow(lamp.position.x, 0.37 + 1.85, lamp.position.z);
+  return { glows: [startGlow, endGlow] };
+})();
+
 // alberi di carta sparsi (diventano trasparenti quando si entra in una casetta)
 const treeMats = [];
 {
@@ -350,6 +407,7 @@ let meteorAt = 6;
 function liveTick(t, dt) {
   if (reduceMotion) return;
   for (const l of lamps) l.glow.material.opacity = 0.5 + Math.sin(t * 2.3 + l.phase) * 0.05 + Math.sin(t * 7.1 + l.phase) * 0.03;
+  ends.glows.forEach((g, i) => { g.material.opacity = 0.62 + Math.sin(t * 2.9 + i * 2) * 0.06; });
   for (const puffs of smoke) for (const p of puffs) {
     const h = houses[p.id], on = h.status === "working" && h.open < 0.1;
     const k = (t * 0.22 + p.offset) % 1, base = chimneyTop(p.id);
