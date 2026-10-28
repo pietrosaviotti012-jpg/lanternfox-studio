@@ -212,6 +212,8 @@ function clip(text, n) {
   return String(text ?? "").slice(0, n);
 }
 
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
 // Un evento: { dept, status, task, output, video, queue, calendar, stats, reset }
 async function applyEvent(env, event) {
   const state = await loadState(env);
@@ -266,6 +268,46 @@ async function dispatch(env, workflow, inputs = {}) {
 
 // Claude routines started on demand through their /fire endpoint: PUBLISH ("Pubblica adesso") and REDO ("Rifai").
 // ROUTINE_<which>_ID is a plain variable, ROUTINE_<which>_TOKEN a secret; without them the button only records the choice.
+// ---------------------------------------------------------------- YouTube, with the user's own Google project
+// Composio's shared Google project runs out of daily uploads, so the Office uploads itself:
+// YT_CLIENT_ID / YT_CLIENT_SECRET are the OAuth client, the refresh token arrives in KV after "Collega YouTube".
+const YT_SCOPES = "https://www.googleapis.com/auth/youtube.upload https://www.googleapis.com/auth/youtube.force-ssl";
+const ytRedirect = (env) => `${env.OFFICE_URL}/youtube/callback`;
+
+async function youtubeToken(env) {
+  const refresh = await env.DATA.get("yt_refresh");
+  if (!refresh || !env.YT_CLIENT_ID || !env.YT_CLIENT_SECRET) return null;
+  const r = await fetch("https://oauth2.googleapis.com/token", { method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({ client_id: env.YT_CLIENT_ID, client_secret: env.YT_CLIENT_SECRET, refresh_token: refresh, grant_type: "refresh_token" }) });
+  return (await r.json().catch(() => ({}))).access_token || null;
+}
+
+// resumable upload: the film is streamed from the GitHub release straight to YouTube, never held in memory
+async function youtubeUpload(env, item) {
+  const token = await youtubeToken(env);
+  if (!token) throw new Error("YouTube non è collegato: nell'ufficio apri le impostazioni e premi Collega YouTube");
+  const film = await fetch(item.preview_url, { redirect: "follow" });
+  const size = Number(film.headers.get("Content-Length"));
+  if (!film.ok || !size) throw new Error(`il film non si scarica (${film.status})`);
+  const meta = {
+    snippet: { title: clip(`${item.title} 🦊 #shorts`, 100), description: item.caption || "", categoryId: "1",
+      tags: ["bedtime story", "paper cut animation", "animated story", "shorts"] },
+    status: { privacyStatus: "public", selfDeclaredMadeForKids: false, containsSyntheticMedia: true },
+  };
+  const init = await fetch("https://www.googleapis.com/upload/youtube/v3/videos?uploadType=resumable&part=snippet,status", {
+    method: "POST", body: JSON.stringify(meta),
+    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json; charset=UTF-8",
+      "X-Upload-Content-Type": "video/mp4", "X-Upload-Content-Length": String(size) } });
+  if (!init.ok) throw new Error(`YouTube ${init.status}: ${clip(await init.text(), 200)}`);
+  const { readable, writable } = new FixedLengthStream(size);
+  film.body.pipeTo(writable);
+  const put = await fetch(init.headers.get("Location"), { method: "PUT", headers: { "Content-Type": "video/mp4" }, body: readable });
+  const done = await put.json().catch(() => ({}));
+  if (!put.ok || !done.id) throw new Error(`YouTube ${put.status}: ${clip(JSON.stringify(done.error || done), 200)}`);
+  return `https://youtube.com/shorts/${done.id}`;
+}
+
 async function fireRoutine(env, which, text) {
   const id = env[`ROUTINE_${which}_ID`], token = env[`ROUTINE_${which}_TOKEN`];
   if (!id || !token) return 0;
@@ -372,6 +414,16 @@ export default {
            <p>It is not offered to the public. Content is original or in the public domain, and AI-assisted videos are labelled as such where the platforms provide it.</p>`;
       return html(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Lantern Fox Tales · ${privacy ? "Privacy" : "Terms"}</title>
         <style>body{max-width:640px;margin:40px auto;padding:0 16px;font:17px/1.6 Georgia,serif;color:#1a1d2a;background:#fbf3e2}h1{font-size:1.6rem}</style></head><body>${body}<p style="color:#666;font-size:.9rem">Last updated 28 October 2026.</p></body></html>`);
+    }
+
+    // —— YouTube: the routine asks, the Office uploads with the user's own Google project and returns the link ——
+    if (url.pathname === "/publish/youtube" && request.method === "POST") {
+      if (!(await publishOk(request, env))) return json({ error: "non autorizzato" }, 401);
+      const { id } = await request.json().catch(() => ({}));
+      const item = (await loadState(env)).queue.find((q) => q.id === id && q.status === "approved");
+      if (!item) return json({ error: "video non approvato o non trovato" }, 404);
+      try { return json({ ok: true, url: await youtubeUpload(env, item) }); }
+      catch (err) { return json({ ok: false, error: clip(err.message, 300) }, 502); }
     }
 
     // —— publishing routine: what is approved and waiting, and "done" reports per platform ——
@@ -485,8 +537,36 @@ export default {
       const state = await loadState(env);
       state.devices = (await subscriptions(env)).length;
       state.publish_at_utc = Number(env.PUBLISH_AT_UTC || 22);
+      state.youtube = JSON.parse((await env.DATA.get("yt_channel")) || "null");
       return json(state);
     }
+    // "Collega YouTube": Google's consent page, then back here with a code that becomes the refresh token
+    if (url.pathname === "/youtube/connect") {
+      if (!env.YT_CLIENT_ID) return json({ error: "manca YT_CLIENT_ID" }, 500);
+      const st = crypto.randomUUID();
+      await env.DATA.put("yt_state", st, { expirationTtl: 900 });
+      const q = new URLSearchParams({ client_id: env.YT_CLIENT_ID, redirect_uri: ytRedirect(env), response_type: "code",
+        scope: YT_SCOPES, access_type: "offline", prompt: "consent", include_granted_scopes: "true", state: st });
+      return new Response(null, { status: 302, headers: { ...SECURITY, Location: `https://accounts.google.com/o/oauth2/v2/auth?${q}` } });
+    }
+    if (url.pathname === "/youtube/callback") {
+      const page = (msg) => new Response(`<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+        <title>YouTube</title><body style="font:17px/1.5 system-ui;background:#0a1330;color:#f3e6cf;padding:40px 20px;text-align:center">
+        <p>${msg}</p><p><a href="/" style="color:#ffb862">Torna all'ufficio</a></p></body>`, { headers: { ...SECURITY, "Content-Type": "text/html; charset=utf-8" } });
+      const code = url.searchParams.get("code");
+      if (!code || url.searchParams.get("state") !== (await env.DATA.get("yt_state"))) return page("Collegamento non riuscito: riprova da Collega YouTube.");
+      const r = await fetch("https://oauth2.googleapis.com/token", { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({ code, client_id: env.YT_CLIENT_ID, client_secret: env.YT_CLIENT_SECRET, redirect_uri: ytRedirect(env), grant_type: "authorization_code" }) });
+      const tok = await r.json().catch(() => ({}));
+      if (!tok.refresh_token) return page(`Google non ha dato l'accesso (${esc(tok.error_description || tok.error || r.status)}). Riprova.`);
+      await env.DATA.put("yt_refresh", tok.refresh_token);
+      const ch = await (await fetch("https://www.googleapis.com/youtube/v3/channels?part=snippet&mine=true",
+        { headers: { Authorization: `Bearer ${tok.access_token}` } })).json().catch(() => ({}));
+      const channel = { title: ch.items?.[0]?.snippet?.title || "?", id: ch.items?.[0]?.id || "", at: new Date().toISOString() };
+      await env.DATA.put("yt_channel", JSON.stringify(channel));
+      return page(`YouTube collegato al canale <b>${esc(channel.title)}</b>. Da ora i video li carica l'ufficio.`);
+    }
+
     if (url.pathname === "/approve" && request.method === "POST") {
       const { id, decision, note } = await request.json();
       if (!["approved", "redo"].includes(decision)) return json({ error: "decisione non valida" }, 400);

@@ -27,18 +27,14 @@ Per ogni video, salta le piattaforme dove `published.<piattaforma>` ha già `url
 3. `INSTAGRAM_POST_IG_USER_MEDIA_PUBLISH` con `ig_user_id`, `creation_id`, `max_wait_seconds: 120`: ottieni l'id del post.
 4. `INSTAGRAM_GET_IG_MEDIA` con quell'id e `fields: "permalink"` ti dà il link.
 
-## 3. YouTube (connettore Composio, account `youtube_obley-songo` = canale Lantern Fox Tales; MAI l'altro account)
-Nel `COMPOSIO_REMOTE_WORKBENCH`:
+## 3. YouTube (lo carica l'Ufficio, con il progetto Google dell'utente)
+Composio per YouTube NON si usa più: il suo progetto Google condiviso esaurisce la quota giornaliera di caricamenti.
+Il caricamento lo fa l'Ufficio; dal banco di lavoro basta chiederlo (può durare 1-2 minuti):
 ```python
-import requests
-r = requests.get(PREVIEW_URL, timeout=120); open("/home/user/film.mp4", "wb").write(r.content)
-up, err = upload_local_file("/home/user/film.mp4")   # → up["s3key"]
-res, err = run_composio_tool("YOUTUBE_UPLOAD_VIDEO", {
-  "title": TITLE + " 🦊 #shorts", "description": CAPTION, "tags": ["bedtime story", "paper cut animation", "animated story", "shorts"],
-  "categoryId": "1", "privacyStatus": "public",
-  "videoFilePath": {"name": "film.mp4", "mimetype": "video/mp4", "s3key": up["s3key"]}}, account="youtube_obley-songo")
+y = requests.post(OFFICE_URL + "/publish/youtube", headers=H, json={"id": ID}, timeout=300).json()
+# {"ok": true, "url": "https://youtube.com/shorts/…"}  oppure  {"ok": false, "error": "…"}
 ```
-Il link è `https://youtube.com/shorts/<id>`, dove `<id>` è `res["data"]["response_data"]["id"]`.
+Poi segnala come sempre al passo 4 (con `y["url"]` oppure con `y["error"]`).
 
 ## 3b. TikTok, nelle bozze (connettore Composio, account `tiktok_upgive-apse` = Lantern Fox Tales)
 Nel `COMPOSIO_REMOTE_WORKBENCH`, riusando il file già caricato per YouTube (`up["s3key"]`; se manca, scaricalo allo stesso modo):

@@ -974,6 +974,10 @@ $("openSettings").addEventListener("click", () => {
       ${can ? `<button class="btn primary" id="pushOn">Attiva le notifiche su questo dispositivo</button>
         <div class="row"><button class="btn" id="pushNow">Mandami una prova adesso</button><button class="btn" id="pushLater">Prova tra 1 minuto</button></div>`
         : `<p class="note">Questo browser non supporta le notifiche.</p>`}
+      <h3 style="margin-bottom:0">YouTube</h3>
+      <p class="note">${state?.youtube ? `Collegato al canale ${esc(state.youtube.title)}: i video li carica l'ufficio con il tuo progetto Google.`
+        : "Non collegato: accedi con l'account Google del canale Lantern Fox Tales."}</p>
+      <a class="btn${state?.youtube ? "" : " primary"}" href="/youtube/connect" style="text-align:center;text-decoration:none">${state?.youtube ? "Ricollega YouTube" : "Collega YouTube"}</a>
       <a class="btn quiet" href="/esci" style="text-align:center;text-decoration:none">Esci dall'ufficio</a>
     </div>`;
   sheet.hidden = false;
