@@ -417,19 +417,19 @@ function reviewCard(q) {
     <p class="cap">${esc(q.caption || "")}</p>${actions}</div></article>`;
 }
 
-// After "Pubblica": when it goes out, where it already is, and TikTok by hand for now
+// After "Pubblica": when it goes out and where it already is; TikTok arrives in the drafts and the user taps Publish
 function publishedBlock(q) {
   const pub = q.published || {};
   const hour = state?.publish_at_utc ?? 22;
   const outAt = new Date(); outAt.setUTCHours(hour, 0, 0, 0);
   const local = outAt.toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" });
   const row = (key, name) => pub[key]?.url ? `<li><a href="${esc(pub[key].url)}" target="_blank" rel="noopener">${name}: uscito ↗</a></li>`
+    : pub[key]?.draft ? `<li>${name}: nelle bozze</li>`
     : pub[key]?.error ? `<li>${name}: non riuscito, riprovo al prossimo giro</li>` : `<li>${name}: esce alle ${local}</li>`;
   return `<p class="decided">${q.status === "published" ? "Pubblicato" : "Approvato"} alle ${fmtTime(q.decided_at)}</p>
-    <ul class="chips">${row("instagram", "Instagram")}${row("youtube", "YouTube")}${pub.tiktok?.url ? `<li><a href="${esc(pub.tiktok.url)}" target="_blank" rel="noopener">TikTok: uscito ↗</a></li>` : ""}</ul>
-    ${pub.tiktok?.url ? "" : `<p class="note" style="margin:0 0 8px">TikTok per ora si pubblica a mano: apri il video, salvalo e caricalo dall'app con la didascalia.</p>
-    <div class="row"><a class="btn" href="${esc(q.preview_url || "#")}" target="_blank" rel="noopener" style="text-decoration:none">Apri il video</a>
-    <button class="btn" data-copy="${esc(q.id)}">Copia didascalia</button></div>`}`;
+    <ul class="chips">${row("instagram", "Instagram")}${row("youtube", "YouTube")}${row("tiktok", "TikTok")}</ul>
+    ${pub.tiktok?.draft ? `<p class="note" style="margin:0 0 8px">Su TikTok il video è nelle bozze: apri l'app, tocca la notifica, incolla la didascalia e premi Pubblica.</p>
+    <div class="row"><button class="btn" data-copy="${esc(q.id)}">Copia didascalia</button></div>` : ""}`;
 }
 
 function renderDays() {

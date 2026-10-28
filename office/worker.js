@@ -61,7 +61,8 @@ async function publishOk(request, env) {
   const auth = request.headers.get("Authorization") || "";
   return (Boolean(env.PUBLISH_KEY) && (await same(auth, `Bearer ${env.PUBLISH_KEY}`))) || bearerOk(request, env);
 }
-const PLATFORMS = ["instagram", "youtube"];   // published by the routine; TikTok is done by hand from the Office for now
+const PLATFORMS = ["instagram", "youtube", "tiktok"];   // all sent by the routine; TikTok lands in the drafts (unaudited app) and the user taps Publish
+const sent = (p) => p?.url || p?.draft;
 
 async function bearerOk(request, env) {
   const auth = request.headers.get("Authorization") || "";
@@ -360,28 +361,28 @@ export default {
       if (!(await publishOk(request, env))) return json({ error: "non autorizzato" }, 401);
       const state = await loadState(env);
       if (url.pathname === "/publish/queue") {
-        const items = state.queue.filter((q) => q.status === "approved" && PLATFORMS.some((p) => !q.published?.[p]?.url));
+        const items = state.queue.filter((q) => q.status === "approved" && PLATFORMS.some((p) => !sent(q.published?.[p])));
         return json({ platforms: PLATFORMS, items: items.map(({ id, title, caption, preview_url, cover_url, published }) => ({ id, title, caption, preview_url, cover_url, published: published || {} })) });
       }
       if (request.method !== "POST") return json({ error: "metodo non valido" }, 405);
-      const { id, platform, url: link, error } = await request.json();
+      const { id, platform, url: link, error, draft } = await request.json();
       const item = state.queue.find((q) => q.id === id);
-      if (!item || !PLATFORMS.concat("tiktok").includes(platform)) return json({ error: "video o piattaforma non validi" }, 400);
+      if (!item || !PLATFORMS.includes(platform)) return json({ error: "video o piattaforma non validi" }, 400);
       const now = new Date().toISOString();
-      item.published = { ...(item.published || {}), [platform]: error ? { error: clip(error, 300), at: now } : { url: clip(link, 400), at: now } };
+      item.published = { ...(item.published || {}), [platform]: error ? { error: clip(error, 300), at: now } : draft ? { draft: true, at: now } : { url: clip(link, 400), at: now } };
       const name = { instagram: "Instagram", youtube: "YouTube", tiktok: "TikTok" }[platform];
-      state.log.push({ at: now, dept: "pubblicazione", status: error ? "error" : "done", text: error ? `${name}: non pubblicato (${clip(error, 120)})` : `Uscito su ${name}: "${item.title}"` });
-      const done = PLATFORMS.every((p) => item.published[p]?.url);
+      state.log.push({ at: now, dept: "pubblicazione", status: error ? "error" : "done", text: error ? `${name}: non pubblicato (${clip(error, 120)})` : draft ? `${name}: "${item.title}" è nelle bozze, da pubblicare dall'app` : `Uscito su ${name}: "${item.title}"` });
+      const done = PLATFORMS.every((p) => sent(item.published[p]));
       if (done) {
         item.status = "published";
         const date = now.slice(0, 10);
         state.calendar = state.calendar.filter((c) => c.date !== date).concat({ date, title: item.title, status: "published" });
         state.calendar.sort((a, b) => a.date.localeCompare(b.date));
       }
-      state.departments.pubblicazione = { status: error ? "error" : done ? "done" : "working", task: error ? `${name}: ${clip(error, 200)}` : done ? `Pubblicato: ${item.title}` : `Pubblicato su ${name}`, output: "", updated_at: now };
+      state.departments.pubblicazione = { status: error ? "error" : done ? "done" : "working", task: error ? `${name}: ${clip(error, 200)}` : done ? `Pubblicato: ${item.title}` : draft ? `${name}: nelle bozze` : `Pubblicato su ${name}`, output: "", updated_at: now };
       await saveState(env, state);
       await pushAll(env, error ? { title: `${name}: pubblicazione non riuscita`, body: clip(error, 120), url: "/", urgent: true }
-        : { title: `Uscito su ${name}`, body: item.title, url: link || "/" });
+        : draft ? { title: `${name}: video nelle bozze`, body: `Apri TikTok e pubblica "${item.title}"`, url: "/" } : { title: `Uscito su ${name}`, body: item.title, url: link || "/" });
       return json({ ok: true, published: done });
     }
 

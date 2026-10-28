@@ -1,7 +1,7 @@
 # Routine "Pubblicazione" — il manuale
 
 Gira ogni giorno alle 22:00 UTC (23:00 in Italia d'inverno, 18:00 a New York). Pubblica su Instagram e YouTube i video che
-l'utente ha approvato nell'Ufficio con "Pubblica". TikTok per ora lo pubblica l'utente a mano dall'Ufficio.
+l'utente ha approvato nell'Ufficio con "Pubblica", e li manda nelle bozze di TikTok (l'app TikTok non è ancora verificata: l'utente tocca Pubblica dall'app).
 
 I valori `OFFICE_URL` e `PUBLISH_KEY` sono nel prompt della routine. La chiave può solo leggere la coda e segnare i video come pubblicati. Non scriverle mai in file, commit o messaggi.
 
@@ -15,9 +15,9 @@ H = {"Authorization": "Bearer " + PUBLISH_KEY, "User-Agent": "lanternfox-routine
 queue = requests.get(OFFICE_URL + "/publish/queue", headers=H, timeout=30).json()
 print([(i["id"], i["title"], list(i["published"])) for i in queue["items"]])
 ```
-Risposta: `{"items": [{id, title, caption, preview_url, cover_url, published: {instagram?, youtube?}}]}`. Se `items` è vuoto, hai finito: scrivi "Niente da pubblicare oggi" e chiudi.
+Risposta: `{"items": [{id, title, caption, preview_url, cover_url, published: {instagram?, youtube?, tiktok?}}]}`. Se `items` è vuoto, hai finito: scrivi "Niente da pubblicare oggi" e chiudi.
 
-Per ogni video, salta le piattaforme dove `published.<piattaforma>.url` c'è già (vuol dire che è uscito in un giro precedente).
+Per ogni video, salta le piattaforme dove `published.<piattaforma>` ha già `url` oppure `draft` (vuol dire che è stato fatto in un giro precedente).
 
 ## 2. Instagram (connettore Composio, account `instagram_folia-ferly`, ig_user_id `40769843119273114`)
 1. `INSTAGRAM_POST_IG_USER_MEDIA` con `ig_user_id`, `media_type: "REELS"`, `video_url: preview_url`, `caption: caption`, `share_to_feed: true`, `cover_url: cover_url`. Restituisce l'`id` del contenitore.
@@ -37,6 +37,16 @@ res, err = run_composio_tool("YOUTUBE_UPLOAD_VIDEO", {
   "videoFilePath": {"name": "film.mp4", "mimetype": "video/mp4", "s3key": up["s3key"]}}, account="youtube_obley-songo")
 ```
 Il link è `https://youtube.com/shorts/<id>`, dove `<id>` è `res["data"]["response_data"]["id"]`.
+
+## 3b. TikTok, nelle bozze (connettore Composio, account `tiktok_upgive-apse` = Lantern Fox Tales)
+Nel `COMPOSIO_REMOTE_WORKBENCH`, riusando il file già caricato per YouTube (`up["s3key"]`; se manca, scaricalo allo stesso modo):
+```python
+res, err = run_composio_tool("TIKTOK_UPLOAD_VIDEO", {
+  "file_to_upload": {"name": "film.mp4", "mimetype": "video/mp4", "s3key": up["s3key"]},
+  "publish": False, "is_aigc": True}, account="tiktok_upgive-apse")
+```
+Se `res["data"]["upload_completed"]` è vero, il video è nelle bozze: segnala `{"id": ID, "platform": "tiktok", "draft": true}`.
+Lo stato su TikTok resta `PROCESSING_UPLOAD` finché l'utente non apre la bozza: è normale, non aspettare e non ricaricarlo.
 
 ## 4. Segnala all'Ufficio, una piattaforma per volta (sempre dal banco di lavoro)
 ```python
