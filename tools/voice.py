@@ -22,7 +22,7 @@ hashes = json.load(open(hash_file)) if os.path.exists(hash_file) else {}
 voice = script.get("voice", {})
 
 def key(L):
-    return hashlib.sha1(json.dumps([L["text"], L.get("say"), L.get("act", {}), voice], sort_keys=True).encode()).hexdigest()[:12]
+    return hashlib.sha1(json.dumps([L["text"], L.get("say"), L.get("act", {}), voice, 2], sort_keys=True).encode()).hexdigest()[:12]
 
 def norm_words(s):
     return re.sub(r"[^a-z0-9' ]", " ", s.lower().replace("—", " ")).split()
@@ -39,7 +39,9 @@ def synth(L, attempt):
     import torch
     act = L.get("act", {})
     torch.manual_seed(1000 * attempt + int(L["id"].strip("L") or 0))
-    wav = model.generate(L.get("say", L["text"]), exaggeration=float(act.get("intensity", .5)), cfg_weight=float(act.get("pace", .45)),
+    # words in capitals ("Comment GO or STAY") are read letter by letter: the narrator gets them in lower case
+    spoken = L.get("say") or re.sub(r"\b[A-Z]{2,}\b", lambda m: m.group(0).lower(), L["text"])
+    wav = model.generate(spoken, exaggeration=float(act.get("intensity", .5)), cfg_weight=float(act.get("pace", .45)),
                          **({"audio_prompt_path": voice["prompt"]} if voice.get("prompt") else {}))
     x = wav.squeeze().cpu().numpy().astype(np.float32)
     with tempfile.TemporaryDirectory() as d:
