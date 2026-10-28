@@ -48,10 +48,12 @@ const bindings = [
   { type: "durable_object_namespace", name: "CLOCK", class_name: "Clock" },
   { type: "plain_text", name: "DAILY_HOUR_UTC", text: DAILY_HOUR_UTC },
   { type: "plain_text", name: "OFFICE_URL", text: url },
+  { type: "plain_text", name: "PUBLISH_AT_UTC", text: "22" },   // the publishing routine runs at this hour (UTC)
 ];
 if (withSecrets) {
   bindings.push({ type: "secret_text", name: "PASSWORD", text: env.OFFICE_PASSWORD });
   bindings.push({ type: "secret_text", name: "STUDIO_SECRET", text: env.STUDIO_SECRET });
+  if (env.PUBLISH_KEY) bindings.push({ type: "secret_text", name: "PUBLISH_KEY", text: env.PUBLISH_KEY });
 }
 const metadata = { main_module: "worker.js", compatibility_date: "2025-06-01", bindings,
   ...(withSecrets ? {} : { keep_bindings: ["secret_text"] }),

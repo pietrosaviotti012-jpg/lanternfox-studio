@@ -411,9 +411,25 @@ function reviewCard(q) {
     ? `<label for="note-${esc(q.id)}" class="note">Se va rifatto, cosa cambiare</label>
        <textarea id="note-${esc(q.id)}" placeholder="Per esempio: la voce più lenta nel finale"></textarea>
        <div class="row"><button class="btn primary" data-approve="${esc(q.id)}">Pubblica</button><button class="btn" data-redo="${esc(q.id)}">Rifai</button></div>`
-    : `<p class="decided">${q.status === "approved" ? "Approvato" : "Rimandato al Copione"} alle ${fmtTime(q.decided_at)}${q.note ? `: ${esc(q.note)}` : ""}</p>`;
+    : q.status === "redo" ? `<p class="decided">Rimandato al Copione alle ${fmtTime(q.decided_at)}${q.note ? `: ${esc(q.note)}` : ""}</p>`
+    : publishedBlock(q);
   return `<article class="review"><div>${media}</div><div><h4>${esc(q.title)}</h4><ul class="chips">${plats}</ul>
     <p class="cap">${esc(q.caption || "")}</p>${actions}</div></article>`;
+}
+
+// After "Pubblica": when it goes out, where it already is, and TikTok by hand for now
+function publishedBlock(q) {
+  const pub = q.published || {};
+  const hour = state?.publish_at_utc ?? 22;
+  const outAt = new Date(); outAt.setUTCHours(hour, 0, 0, 0);
+  const local = outAt.toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" });
+  const row = (key, name) => pub[key]?.url ? `<li><a href="${esc(pub[key].url)}" target="_blank" rel="noopener">${name}: uscito ↗</a></li>`
+    : pub[key]?.error ? `<li>${name}: non riuscito, riprovo al prossimo giro</li>` : `<li>${name}: esce alle ${local}</li>`;
+  return `<p class="decided">${q.status === "published" ? "Pubblicato" : "Approvato"} alle ${fmtTime(q.decided_at)}</p>
+    <ul class="chips">${row("instagram", "Instagram")}${row("youtube", "YouTube")}${pub.tiktok?.url ? `<li><a href="${esc(pub.tiktok.url)}" target="_blank" rel="noopener">TikTok: uscito ↗</a></li>` : ""}</ul>
+    ${pub.tiktok?.url ? "" : `<p class="note" style="margin:0 0 8px">TikTok per ora si pubblica a mano: apri il video, salvalo e caricalo dall'app con la didascalia.</p>
+    <div class="row"><a class="btn" href="${esc(q.preview_url || "#")}" target="_blank" rel="noopener" style="text-decoration:none">Apri il video</a>
+    <button class="btn" data-copy="${esc(q.id)}">Copia didascalia</button></div>`}`;
 }
 
 function renderDays() {
@@ -509,6 +525,12 @@ if (tabNames.includes(location.hash.slice(1))) selectTab(location.hash.slice(1))
 
 // approvazioni
 $("queue").addEventListener("click", async (e) => {
+  const c = e.target.closest("[data-copy]");
+  if (c) {
+    const q = (state?.queue || []).find((x) => x.id === c.dataset.copy);
+    try { await navigator.clipboard.writeText(q?.caption || ""); toast("Didascalia copiata"); } catch { toast("Non riesco a copiare: tieni premuto sul testo"); }
+    return;
+  }
   const b = e.target.closest("[data-approve],[data-redo]");
   if (!b) return;
   const id = b.dataset.approve || b.dataset.redo;
@@ -520,7 +542,7 @@ $("queue").addEventListener("click", async (e) => {
   const r = await fetch("/approve", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, decision, note }) });
   b.disabled = false;
   if (!r.ok) { toast("Non sono riuscito a salvare la scelta: riprova"); return; }
-  toast(decision === "approved" ? "Approvato: la Pubblicazione è avvisata" : "Rimandato al Copione con la tua nota");
+  toast(decision === "approved" ? "Approvato: esce all'orario di pubblicazione" : "Rimandato al Copione con la tua nota");
   load();
 });
 

@@ -56,6 +56,13 @@ function loginPage(error) {
   return html(LOGIN.replace("<!--ERRORE-->", message), error ? 401 : 200);
 }
 
+// The publishing routine gets its own key: it can only read the approved videos and mark them published.
+async function publishOk(request, env) {
+  const auth = request.headers.get("Authorization") || "";
+  return (Boolean(env.PUBLISH_KEY) && (await same(auth, `Bearer ${env.PUBLISH_KEY}`))) || bearerOk(request, env);
+}
+const PLATFORMS = ["instagram", "youtube"];   // published by the routine; TikTok is done by hand from the Office for now
+
 async function bearerOk(request, env) {
   const auth = request.headers.get("Authorization") || "";
   return Boolean(env.STUDIO_SECRET) && (await same(auth, `Bearer ${env.STUDIO_SECRET}`));
@@ -334,6 +341,36 @@ export default {
     }
 
     // Chi lavora (routine di Claude, GitHub Actions) scrive qui con il segreto dello studio.
+    // —— publishing routine: what is approved and waiting, and "done" reports per platform ——
+    if (url.pathname === "/publish/queue" || url.pathname === "/publish/done") {
+      if (!(await publishOk(request, env))) return json({ error: "non autorizzato" }, 401);
+      const state = await loadState(env);
+      if (url.pathname === "/publish/queue") {
+        const items = state.queue.filter((q) => q.status === "approved" && PLATFORMS.some((p) => !q.published?.[p]?.url));
+        return json({ platforms: PLATFORMS, items: items.map(({ id, title, caption, preview_url, cover_url, published }) => ({ id, title, caption, preview_url, cover_url, published: published || {} })) });
+      }
+      if (request.method !== "POST") return json({ error: "metodo non valido" }, 405);
+      const { id, platform, url: link, error } = await request.json();
+      const item = state.queue.find((q) => q.id === id);
+      if (!item || !PLATFORMS.concat("tiktok").includes(platform)) return json({ error: "video o piattaforma non validi" }, 400);
+      const now = new Date().toISOString();
+      item.published = { ...(item.published || {}), [platform]: error ? { error: clip(error, 300), at: now } : { url: clip(link, 400), at: now } };
+      const name = { instagram: "Instagram", youtube: "YouTube", tiktok: "TikTok" }[platform];
+      state.log.push({ at: now, dept: "pubblicazione", status: error ? "error" : "done", text: error ? `${name}: non pubblicato (${clip(error, 120)})` : `Uscito su ${name}: "${item.title}"` });
+      const done = PLATFORMS.every((p) => item.published[p]?.url);
+      if (done) {
+        item.status = "published";
+        const date = now.slice(0, 10);
+        state.calendar = state.calendar.filter((c) => c.date !== date).concat({ date, title: item.title, status: "published" });
+        state.calendar.sort((a, b) => a.date.localeCompare(b.date));
+      }
+      state.departments.pubblicazione = { status: error ? "error" : done ? "done" : "working", task: error ? `${name}: ${clip(error, 200)}` : done ? `Pubblicato: ${item.title}` : `Pubblicato su ${name}`, output: "", updated_at: now };
+      await saveState(env, state);
+      await pushAll(env, error ? { title: `${name}: pubblicazione non riuscita`, body: clip(error, 120), url: "/", urgent: true }
+        : { title: `Uscito su ${name}`, body: item.title, url: link || "/" });
+      return json({ ok: true, published: done });
+    }
+
     if (request.method === "POST" && ["/events", "/push/send", "/timer/test"].includes(url.pathname)) {
       if (!(await bearerOk(request, env))) return json({ error: "non autorizzato" }, 401);
       if (url.pathname === "/events") {
@@ -376,6 +413,7 @@ export default {
       ctx.waitUntil(clock(env).ensure());
       const state = await loadState(env);
       state.devices = (await subscriptions(env)).length;
+      state.publish_at_utc = Number(env.PUBLISH_AT_UTC || 22);
       return json(state);
     }
     if (url.pathname === "/approve" && request.method === "POST") {
@@ -387,11 +425,12 @@ export default {
       item.status = decision;
       item.note = clip(note, 400);
       item.decided_at = new Date().toISOString();
-      const github = decision === "approved" ? await dispatch(env, "publish.yml", { id }) : await dispatch(env, "redo.yml", { id, note: item.note });
+      // approved videos wait for the publishing routine's slot (PUBLISH_AT_UTC); "redo" goes back to the chain
+      const github = decision === "redo" ? await dispatch(env, "redo.yml", { id, note: item.note }) : 0;
       state.departments.revisione = { status: "done", task: decision === "approved" ? `Approvato: ${item.title}` : `Da rifare: ${item.note || item.title}`,
         output: "", updated_at: item.decided_at };
       state.log.push({ at: item.decided_at, dept: "revisione", status: "done",
-        text: decision === "approved" ? `Hai approvato "${item.title}"` : `Hai chiesto di rifare "${item.title}"` });
+        text: decision === "approved" ? `Hai approvato "${item.title}": esce all'orario di pubblicazione` : `Hai chiesto di rifare "${item.title}"` });
       await saveState(env, state);
       return json({ ok: true, github });
     }
