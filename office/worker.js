@@ -341,6 +341,20 @@ export default {
     }
 
     // Chi lavora (routine di Claude, GitHub Actions) scrive qui con il segreto dello studio.
+    // —— public pages the platforms ask for when registering a developer app (TikTok, Meta) ——
+    if (url.pathname === "/privacy" || url.pathname === "/terms") {
+      const privacy = url.pathname === "/privacy";
+      const body = privacy
+        ? `<h1>Privacy policy</h1><p>Lantern Fox Tales is a small studio that publishes its own short animated stories on TikTok, Instagram and YouTube.</p>
+           <p>This app is used only by the studio owner to upload the studio's own videos to the studio's own accounts. It does not collect, store, sell or share data about other people.</p>
+           <p>The access tokens granted by the platforms are kept by the connection provider (Composio) and used only to publish the studio's videos and read their basic statistics. They can be revoked at any time from the platform's settings.</p>
+           <p>Contact: through the Lantern Fox Tales profiles.</p>`
+        : `<h1>Terms of service</h1><p>This app is a private publishing tool used only by Lantern Fox Tales to upload its own original animated videos to its own social accounts.</p>
+           <p>It is not offered to the public. Content is original or in the public domain, and AI-assisted videos are labelled as such where the platforms provide it.</p>`;
+      return html(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Lantern Fox Tales · ${privacy ? "Privacy" : "Terms"}</title>
+        <style>body{max-width:640px;margin:40px auto;padding:0 16px;font:17px/1.6 Georgia,serif;color:#1a1d2a;background:#fbf3e2}h1{font-size:1.6rem}</style></head><body>${body}<p style="color:#666;font-size:.9rem">Last updated 28 October 2026.</p></body></html>`);
+    }
+
     // —— publishing routine: what is approved and waiting, and "done" reports per platform ——
     if (url.pathname === "/publish/queue" || url.pathname === "/publish/done") {
       if (!(await publishOk(request, env))) return json({ error: "non autorizzato" }, 401);
