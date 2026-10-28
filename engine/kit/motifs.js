@@ -314,4 +314,107 @@ export function cottage(x, o, g) {
       x.fillStyle = col; x.fillRect(cx - s * .008, by + h * .4, s * .016, h * .34); }
   }
   if (g && lit) { g.fillStyle = '#fff'; g.fillRect(cx - s * .14, by + h * .4, s * .28, h * .34); }
+
+// —— Added for Lantern Night (Your Call): a town that can go dark, neighbours with lanterns, a forest edge, a phone, a door ——
+
+// A house: walls, gable roof, chimney, a door; windows are dark glass on the sheet and burn in g when lit.
+// o.lit: true (all), false, or an array of window indices. Returns the window centres [[x, y], …].
+export function house(x, o, g) {
+  const { cx, by, w, h, roof = h * .55, cols = 2, rows = 2, col = '#0e1532', glass = '#2c2a44', chimney = .7, door = true, lit = true } = o;
+  const ww = w * .16, wh = h * .22, wins = [];
+  for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
+    if (door && r === 0 && c === Math.floor(cols / 2) && cols % 2) continue;   // the door takes the middle of the ground floor
+    wins.push([cx - w / 2 + w * (c + .5) / cols, by + h * (r + .55) / rows]);
+  }
+  if (x) {
+    x.fillStyle = col; x.fillRect(cx - w / 2, by, w, h);
+    x.beginPath(); x.moveTo(cx - w * .56, by + h); x.lineTo(cx, by + h + roof); x.lineTo(cx + w * .56, by + h); x.closePath(); x.fill();
+    if (chimney) x.fillRect(cx + w * (chimney - .5) * .8, by + h + roof * .35, w * .09, roof * .55);
+    x.fillStyle = glass; for (const [px, py] of wins) x.fillRect(px - ww / 2, py - wh / 2, ww, wh);
+    x.fillStyle = col; for (const [px, py] of wins) { x.fillRect(px - ww / 2, py - h * .006, ww, h * .012); x.fillRect(px - w * .006, py - wh / 2, w * .012, wh); }
+    if (door) { x.fillStyle = glass; x.fillRect(cx - w * .08, by, w * .16, h * .38); x.fillStyle = col; x.fillRect(cx - w * .1, by + h * .38, w * .2, h * .025); }
+  }
+  if (g) { g.fillStyle = '#fff'; wins.forEach(([px, py], i) => { if (lit === true || (Array.isArray(lit) && lit.includes(i))) g.fillRect(px - ww / 2, py - wh / 2, ww, wh); }); }
+  return wins;
+}
+
+// A row of houses of varied size along a street (seeded). Same o as house() for colours; returns all window centres.
+export function houses(x, o, g) {
+  const { x0, x1, by, h = .05, seed = 5, gapK = .12 } = o, R = mulberry(seed), out = [];
+  let px = x0;
+  while (px < x1) {
+    const w = h * (1.1 + R() * .8), hh = h * (.8 + R() * .5);
+    out.push(...house(x, { ...o, cx: px + w / 2, by, w, h: hh, roof: hh * (.4 + R() * .3), cols: R() < .5 ? 2 : 3, rows: R() < .7 ? 2 : 1, chimney: R() < .7 ? .3 + R() * .5 : 0 }, g));
+    px += w * (1 + gapK + R() * .1);
+  }
+  return out;
+}
+
+// A street lamp: post, arm, hood; the lamp glows in g
+export function streetlamp(x, o, g) {
+  const { cx, by, h, col = '#0e1532', dir = 1 } = o, lw = h * .03, ax = cx + dir * h * .16, ay = by + h * .97;
+  if (x) {
+    x.fillStyle = col; x.fillRect(cx - lw / 2, by, lw, h); x.fillRect(cx - lw * 1.6, by, lw * 3.2, h * .05);
+    x.fillRect(Math.min(cx, ax), by + h - lw, Math.abs(ax - cx), lw);
+    x.beginPath(); x.moveTo(ax - h * .06, ay - h * .04); x.lineTo(ax - h * .035, ay + h * .01); x.lineTo(ax + h * .035, ay + h * .01); x.lineTo(ax + h * .06, ay - h * .04); x.closePath(); x.fill();
+    x.fillStyle = '#3a3040'; x.fillRect(ax - h * .045, ay - h * .075, h * .09, h * .035);
+  }
+  if (g) { const gr = g.createRadialGradient(ax, ay - h * .06, 0, ax, ay - h * .06, h * .07); gr.addColorStop(0, '#fff'); gr.addColorStop(1, 'rgba(255,255,255,.4)'); g.fillStyle = gr; g.fillRect(ax - h * .045, ay - h * .075, h * .09, h * .035); }
+  return [ax, ay - h * .06];
+}
+
+// A standing person, seen from the front (or from behind: back = true). o.lantern: 'left' | 'right' | false, a paper lantern
+// hanging from the hand (glows in g); o.smile: a thin crescent cut in the face that catches the lantern light (glows in g).
+export function neighbor(x, o, g) {
+  const { cx, by, s, col = '#0b0f1e', lantern = 'right', smile = false, back = false, hat = false } = o;
+  const hy = by + s * .87, hr = s * .075;
+  if (x) {
+    x.fillStyle = col;
+    x.beginPath(); x.arc(cx, hy, hr, 0, TAU); x.fill();
+    if (hat) { x.fillRect(cx - hr * 1.6, hy + hr * .55, hr * 3.2, s * .015); x.fillRect(cx - hr * .9, hy + hr * .55, hr * 1.8, hr * .9); }
+    x.fillRect(cx - s * .025, hy - hr * 1.3, s * .05, hr * .5);                                                      // neck
+    x.beginPath(); x.moveTo(cx - s * .11, by + s * .73); x.quadraticCurveTo(cx - s * .13, by + s * .5, cx - s * .14, by + s * .3);   // coat
+    x.lineTo(cx + s * .14, by + s * .3); x.quadraticCurveTo(cx + s * .13, by + s * .5, cx + s * .11, by + s * .73);
+    x.quadraticCurveTo(cx, by + s * .79, cx - s * .11, by + s * .73); x.closePath(); x.fill();
+    x.fillRect(cx - s * .085, by, s * .06, s * .32); x.fillRect(cx + s * .025, by, s * .06, s * .32);              // legs
+    x.fillRect(cx - s * .1, by, s * .08, s * .02); x.fillRect(cx + s * .02, by, s * .08, s * .02);
+    for (const d of [-1, 1]) { x.beginPath(); x.moveTo(cx + d * s * .1, by + s * .72); x.quadraticCurveTo(cx + d * s * .16, by + s * .6, cx + d * s * .155, by + s * .43);   // arms
+      x.lineTo(cx + d * s * .12, by + s * .43); x.quadraticCurveTo(cx + d * s * .12, by + s * .58, cx + d * s * .08, by + s * .68); x.closePath(); x.fill(); }
+  }
+  let lan = null;
+  if (lantern) { const d = lantern === 'left' ? -1 : 1, r = s * .055; lan = [cx + d * s * .14, by + s * .43 - r * 1.1 - r * .6];
+    hangLantern(x, { cx: lan[0], cy: lan[1], r, string: r * .6 }, g); }
+  if (smile && !back) {
+    const arc = (c, lw) => { c.strokeStyle = c === g ? '#fff' : '#c9a46a'; c.lineWidth = lw; c.lineCap = 'round'; c.beginPath(); c.arc(cx, hy + hr * .25, hr * .55, Math.PI * 1.18, Math.PI * 1.82); c.stroke(); };
+    if (x) arc(x, hr * .14); if (g) arc(g, hr * .16);
+  }
+  return { head: [cx, hy], lantern: lan };
+}
+
+// A forest edge: a row of pines (triangle tiers), seeded heights
+export function pines(x, o) {
+  const { x0, x1, base, h = .06, n = 14, seed = 9 } = o, R = mulberry(seed);
+  x.beginPath(); x.rect(x0, base - 1, x1 - x0, 1 + h * .1); x.fill();
+  for (let i = 0; i < n; i++) {
+    const px = lerp(x0, x1, (i + R() * .8) / n), ph = h * (.6 + R() * .6), pw = ph * (.28 + R() * .1);
+    x.fillRect(px - ph * .02, base, ph * .04, ph * .2);
+    for (let k = 0; k < 3; k++) { const ty = base + ph * (.12 + k * .26), tw = pw * (1 - k * .25);
+      x.beginPath(); x.moveTo(px - tw, ty); x.lineTo(px, ty + ph * (.5 - k * .08)); x.lineTo(px + tw, ty); x.closePath(); x.fill(); }
+  }
+}
+
+// A phone lying on a nightstand, seen from the front, tilted up: body, screen (dark paper, burns in g when on)
+export function phone(x, o, g) {
+  const { cx, cy, w, h, col = '#0b0f1e', screen = '#3a3550' } = o, m = w * .06;
+  const rr = (c, x0, y0, ww, hh, r) => { c.beginPath(); c.moveTo(x0 + r, y0); c.arcTo(x0 + ww, y0, x0 + ww, y0 + hh, r); c.arcTo(x0 + ww, y0 + hh, x0, y0 + hh, r); c.arcTo(x0, y0 + hh, x0, y0, r); c.arcTo(x0, y0, x0 + ww, y0, r); c.closePath(); c.fill(); };
+  if (x) { x.fillStyle = col; rr(x, cx - w / 2, cy - h / 2, w, h, w * .14); x.fillStyle = screen; rr(x, cx - w / 2 + m, cy - h / 2 + m * 1.4, w - 2 * m, h - 2.8 * m, w * .08);
+    x.fillStyle = col; x.fillRect(cx - w * .12, cy + h / 2 - m * .95, w * .24, m * .35); }
+  if (g) { g.fillStyle = '#fff'; rr(g, cx - w / 2 + m, cy - h / 2 + m * 1.4, w - 2 * m, h - 2.8 * m, w * .08); }
+}
+
+// A door frame in a wall (the dark opening behind the leaf); the leaf is its own sheet so it can swing
+export function doorFrame(x, o) {
+  const { cx, by, w, h, col } = o;
+  if (col) x.fillStyle = col;
+  x.fillRect(cx - w / 2 - w * .08, by, w * .08, h + w * .08); x.fillRect(cx + w / 2, by, w * .08, h + w * .08); x.fillRect(cx - w / 2 - w * .08, by + h, w * 1.16, w * .08);
 }
