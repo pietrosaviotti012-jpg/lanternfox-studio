@@ -48,6 +48,7 @@ const pipe = new Pipe(renderer, W, H, SSAA);
 pipe.fin.material.uniforms.aspect.value = W / H;
 const pmrem = new THREE.PMREMGenerator(renderer); const ENV = pmrem.fromScene(new RoomEnvironment(), .04).texture;
 await document.fonts.load('60px Cormorant', 'Lantern Fox Tales');
+await document.fonts.load('60px Anton', 'LANTERN FOX');
 
 const word = (id, k, p) => C[id].at - p.start + (WORDS[id]?.[k] ? WORDS[id][k][1] : C[id].dur * k / C[id].text.split(/\s+/).length);
 const live = new Map();
@@ -66,8 +67,45 @@ async function drawShot(i, t, target) {
   return s.grade(tl);
 }
 
-// —— Subtitles: English, split near the middle when long ——
-const sub = document.getElementById('sub');
+// —— On-screen text. captions "pop" (default): 2-3 spoken words at a time from vo/words.json, the line's `em` words in colour;
+// "line": the whole line as a subtitle. hud: { tag, part } shown from frame 0, plus each line's `clock` once it has been said.
+// ?cover=1 shows meta.cover { kicker, text (with *stars* for the coloured words), t } instead: the Reel cover. ——
+const sub = document.getElementById('sub'), pop = document.getElementById('pop'), hud = document.getElementById('hud');
+const META = await load('meta.json', {});
+const COVER = Q.get('cover') === '1';
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const CAPS = script.captions || 'pop';
+const norm = w => w.toLowerCase().replace(/[^a-z0-9']/g, '');
+// the words of each line, grouped into chunks of 2-3 that end at punctuation when they can; times are film times
+const CHUNKS = {};
+for (const L of script.lines) {
+  const c = C[L.id], ws = WORDS[L.id]?.length ? WORDS[L.id] : L.text.split(/\s+/).map((w, k, a) => [w, c.dur * k / a.length, c.dur * (k + 1) / a.length]);
+  const em = new Set((L.em || []).map(norm)), out = [];
+  let cur = [];
+  ws.forEach(([w, s, e], k) => {
+    cur.push({ w, s: c.at + s, e: c.at + e, em: em.has(norm(w)) });
+    const end = /[.,;:!?—]$/.test(w) || cur.length === 3 || (cur.length === 2 && ws[k + 1] && ws[k + 1][0].length > 7);
+    if (end || k === ws.length - 1) { out.push(cur); cur = []; }
+  });
+  CHUNKS[L.id] = out;
+}
+function popAt(t) {
+  for (const L of Object.values(C)) {
+    if (!L.sub || t < L.at - .05 || t > L.end + .25) continue;
+    const ch = CHUNKS[Object.keys(C).find(k => C[k] === L)];
+    const i = ch.findIndex((g, j) => t >= g[0].s - .05 && (j === ch.length - 1 || t < ch[j + 1][0].s - .05));
+    if (i >= 0) return ch[i];
+  }
+  return null;
+}
+if (script.hud && !COVER) hud.innerHTML = `<span class="tag">${esc(script.hud.tag || '')}</span>${script.hud.part ? `<span class="part">${esc(script.hud.part)}</span>` : ''}<div class="clock"></div>`;
+if (COVER) {
+  const cv = META.cover || { text: META.title || '' };
+  const box = document.getElementById('cover'); box.style.display = 'flex';
+  box.querySelector('.kicker').textContent = cv.kicker || '';
+  box.querySelector('.big').innerHTML = esc(cv.text || '').replace(/\*([^*]+)\*/g, '<b>$1</b>');
+}
+window.COVER_T = (META.cover && META.cover.t) ?? null;
 function lines(text) {
   const s = text.replace(/[.,;:]+$/, '');
   if (s.length <= 30) return s;
@@ -75,7 +113,11 @@ function lines(text) {
   const best = cuts.sort((a, b) => Math.abs(a.i - mid) + a.pref - (Math.abs(b.i - mid) + b.pref))[0];
   return best ? s.slice(0, best.i + (s[best.i] === ' ' ? 0 : 1)).trim() + '\n' + s.slice(best.i + 1).trim() : s;
 }
-window.TEXTS = t => { const L = Object.values(C).find(L => L.sub && t > L.at - .15 && t < L.end + .3); return L ? [{ id: 'sub', text: L.text, x0: 80, y0: 1260, x1: 1000, y1: 1400 }] : []; };
+window.TEXTS = t => {
+  if (COVER) return [];
+  if (CAPS === 'pop') { const g = popAt(t); return g ? [{ id: 'pop', text: g.map(x => x.w).join(' '), x0: 70, y0: 1020, x1: 1010, y1: 1260 }] : []; }
+  const L = Object.values(C).find(L => L.sub && t > L.at - .15 && t < L.end + .3); return L ? [{ id: 'sub', text: L.text, x0: 80, y0: 1260, x1: 1000, y1: 1400 }] : [];
+};
 
 window.render = async (t) => {
   let i = plan.findIndex(p => t >= p.start && t < p.end); if (i < 0) i = plan.length - 1;
@@ -90,8 +132,21 @@ window.render = async (t) => {
     g = await drawShot(i, t, pipe.rtA); gc([i]);
   }
   pipe.final({ ...g, mixB, mode: tr.type === 'iris' ? 1 : 0, center: tr.center, time: t, fade: (g.fade ?? 1) * ss(clamp((DUR - t) / 1.2))   /* no fade-in: frame 0 is the hook */ });
-  let txt = '', a = 0;
-  for (const L of Object.values(C)) if (L.sub && t > L.at - .15 && t < L.end + .3) { txt = L.text; a = Math.min(ss(seg(t, L.at - .15, L.at + .05)), 1 - ss(seg(t, L.end + .1, L.end + .3))); }
-  sub.textContent = txt ? lines(txt) : ''; sub.style.opacity = a;
+  if (COVER) { sub.style.opacity = 0; pop.innerHTML = ''; return; }
+  if (CAPS === 'pop') {
+    // each chunk pops in (a quick scale from 1.18) and keeps its words until the next chunk starts
+    const g = popAt(t);
+    pop.innerHTML = g ? '<div>' + g.map(x => `<span style="--k:${(1 + .18 * (1 - ss(seg(t, x.s - .05, x.s + .1)))).toFixed(3)};opacity:${t >= x.s - .06 ? 1 : 0}">${x.em ? `<b>${esc(x.w)}</b>` : esc(x.w)}</span>`).join(' ') + '</div>' : '';   // wrapped: a flex box would drop the spaces
+    sub.style.opacity = 0;
+  } else {
+    let txt = '', a = 0;
+    for (const L of Object.values(C)) if (L.sub && t > L.at - .15 && t < L.end + .3) { txt = L.text; a = Math.min(ss(seg(t, L.at - .15, L.at + .05)), 1 - ss(seg(t, L.end + .1, L.end + .3))); }
+    sub.textContent = txt ? lines(txt) : ''; sub.style.opacity = a;
+  }
+  if (script.hud) {
+    hud.style.opacity = 1;
+    const said = script.lines.filter(L => L.clock && t >= C[L.id].at - .1);
+    hud.querySelector('.clock').textContent = said.length ? said[said.length - 1].clock : (script.hud.clock || '');
+  }
 };
 window.READY = true;

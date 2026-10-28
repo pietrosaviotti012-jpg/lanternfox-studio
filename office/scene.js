@@ -673,7 +673,7 @@ function render() {
   // the queue is redrawn only when it really changes: redrawing it every few seconds stopped the video
   // halfway and wiped a half-written note
   const queue = [...(state.queue || [])].reverse();
-  const sig = JSON.stringify([queue, Boolean(demo), new Date().getUTCHours() >= (state.publish_at_utc ?? 22)]);
+  const sig = JSON.stringify([queue, Boolean(demo), new Date().getUTCHours()]);
   if (sig !== render.queueSig) {
     render.queueSig = sig;
     const notes = Object.fromEntries([...document.querySelectorAll("#queue textarea")].map((t) => [t.id, t.value]));
@@ -748,7 +748,9 @@ function reviewCard(q) {
 // After "Pubblica": when it goes out and where it already is; TikTok arrives in the drafts and the user taps Publish
 function publishedBlock(q) {
   const pub = q.published || {};
-  const hour = state?.publish_at_utc ?? 22;
+  // the next publishing slot (one story per slot)
+  const slots = [].concat(state?.publish_at_utc ?? [22]);
+  const hour = slots.find((h) => h > new Date().getUTCHours()) ?? slots[0];
   const outAt = new Date(); outAt.setUTCHours(hour, 0, 0, 0);
   const local = outAt.toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" });
   const row = (key, name) => pub[key]?.url ? `<li><a href="${esc(pub[key].url)}" target="_blank" rel="noopener">${name}: uscito ↗</a></li>`

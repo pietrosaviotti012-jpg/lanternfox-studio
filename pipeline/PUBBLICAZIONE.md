@@ -1,7 +1,12 @@
 # Routine "Pubblicazione" — il manuale
 
-Gira ogni giorno alle 22:00 UTC (23:00 in Italia d'inverno, 18:00 a New York). Pubblica su Instagram e YouTube i video che
-l'utente ha approvato nell'Ufficio con "Pubblica". TikTok per ora lo pubblica l'utente a mano: l'app TikTok non è verificata
+Gira ogni giorno alle 16:00 e alle 22:00 UTC (17:00 e 23:00 in Italia d'inverno, 11:00 e 17:00 a New York). Pubblica su Instagram e YouTube i video che
+l'utente ha approvato nell'Ufficio con "Pubblica".
+
+**Una sola storia per giro**, così le due del giorno escono a ore diverse:
+- se il prompt ha un blocco routine-fire-payload "Pubblica adesso: <id>", pubblica quella;
+- altrimenti la prima della coda, cioè la più vecchia fra le approvate;
+- fa eccezione una storia già uscita su una piattaforma e non sull'altra: finiscila prima di cominciarne una nuova. TikTok per ora lo pubblica l'utente a mano: l'app TikTok non è verificata
 (errore `unaudited_client_can_only_post_to_private_accounts`, e le bozze restano ferme in `PROCESSING_UPLOAD`).
 Il passo 3b vale solo quando la coda elenca `tiktok` in `platforms`.
 
@@ -19,7 +24,7 @@ print([(i["id"], i["title"], list(i["published"])) for i in queue["items"]])
 ```
 Risposta: `{"items": [{id, title, caption, preview_url, cover_url, published: {instagram?, youtube?, tiktok?}}]}`. Se `items` è vuoto, hai finito: scrivi "Niente da pubblicare oggi" e chiudi.
 
-Per ogni video, salta le piattaforme dove `published.<piattaforma>` ha già `url` oppure `draft` (vuol dire che è stato fatto in un giro precedente).
+Per la storia scelta, salta le piattaforme dove `published.<piattaforma>` ha già `url` oppure `draft`: vuol dire che è stata fatta in un giro precedente.
 
 ## 2. Instagram (connettore Composio, account `instagram_sain-curr`, ig_user_id `40769843119273114`)
 1. `INSTAGRAM_POST_IG_USER_MEDIA` con `ig_user_id`, `media_type: "REELS"`, `video_url: preview_url`, `caption: caption`, `share_to_feed: true`, `cover_url: cover_url`. Restituisce l'`id` del contenitore.

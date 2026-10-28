@@ -160,7 +160,7 @@ jobs:
         run: |
           TITLE=$(node -e "console.log(require('./$P/meta.json').title)")
           gh release delete "film-$ID" --yes --cleanup-tag 2>/dev/null || true
-          gh release create "film-$ID" "$P/out/film.mp4" "$P/out/poster.jpg" "$P/out/sheet.jpg" "$P/out/film.srt" --title "$TITLE" --notes "Lantern Fox Tales · $ID"
+          gh release create "film-$ID" "$P/out/film.mp4" "$P/out/poster.jpg" "$P/out/cover.jpg" "$P/out/sheet.jpg" "$P/out/film.srt" --title "$TITLE" --notes "Lantern Fox Tales · $ID"
           echo "base=https://github.com/${{ github.repository }}/releases/download/film-$ID" >> "$GITHUB_OUTPUT"
       - name: To the Office for approval
         env:
@@ -172,6 +172,6 @@ jobs:
             const m = require('./' + process.env.P + '/meta.json');
             const caption = m.caption + '\n\n' + (m.hashtags || []).join(' ');
             console.log(JSON.stringify({ queue: { id: process.env.ID, title: m.title, caption, platforms: ['Instagram', 'YouTube', 'TikTok'],
-              preview_url: process.env.BASE + '/film.mp4', cover_url: process.env.BASE + '/poster.jpg', request: m.request } }));
+              preview_url: process.env.BASE + '/film.mp4', cover_url: process.env.BASE + '/cover.jpg', request: m.request } }));
           " > queue.json
           node tools/office.mjs "$(cat queue.json)" '{"dept":"revisione","status":"waiting","task":"Il video è pronto: guardalo e scegli"}'

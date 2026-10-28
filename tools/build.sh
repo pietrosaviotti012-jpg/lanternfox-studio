@@ -36,5 +36,10 @@ sh core/render/mux.sh "$P/out/video.mp4" "$P/out/mix.wav" "$P/out/film.mp4" 30 1
 POSTER_T=$(node -e "const e=JSON.parse(require('fs').readFileSync(process.argv[1],'utf8')); const l=e.ev.find(x=>x.type==='line'); console.log((l.t+l.dur*.8).toFixed(2))" "$P/events.json")
 ffmpeg -v error -y -ss "$POSTER_T" -i "$P/out/film.mp4" -frames:v 1 -q:v 2 "$P/out/poster.jpg"
 ffmpeg -v error -y -i "$P/out/film.mp4" -vf "fps=1/3,scale=270:-1,tile=6x3" -frames:v 1 "$P/out/sheet.jpg"
+# cover: the frame at meta.cover.t (or the poster time) with meta.cover's big promise on it; the Reel cover
+COVER_T=$(node -e "const m=JSON.parse(require('fs').readFileSync(process.argv[1],'utf8')); console.log(m.cover?.t ?? process.argv[2])" "$P/meta.json" "$POSTER_T")
+rm -rf "$P/out/cover"
+node core/render/still.mjs "$P" "$COVER_T" --size 1080x1920 --q "$Q&cover=1" --prefix c_ --out "$P/out/cover" 2>&1 | grep -v "optional file missing" || true
+ffmpeg -v error -y -i "$(ls "$P"/out/cover/c_* | head -1)" -q:v 2 "$P/out/cover.jpg" || cp "$P/out/poster.jpg" "$P/out/cover.jpg"
 office '{"dept":"montaggio","status":"done","task":"Film montato"}'
 echo "film: $P/out/film.mp4"

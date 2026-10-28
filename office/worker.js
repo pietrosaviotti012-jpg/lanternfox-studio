@@ -533,6 +533,17 @@ export default {
       return json({ ok: true, published: done });
     }
 
+    // the production routine (in the cloud, with the publishing key) lights departments 1-4 and the calendar;
+    // nothing else of /events is open to that key
+    if (url.pathname === "/chain/events" && request.method === "POST") {
+      if (!(await publishOk(request, env))) return json({ error: "non autorizzato" }, 401);
+      const allowed = ["ricerca", "soggetto", "copione", "regia"];
+      const events = [].concat(await request.json().catch(() => [])).map((e) => e.calendar ? { calendar: e.calendar }
+        : allowed.includes(e.dept) ? { dept: e.dept, status: e.status, task: e.task, output: e.output } : null).filter(Boolean);
+      for (const e of events) await applyEvent(env, e);
+      return json({ ok: true, applied: events.length });
+    }
+
     if (request.method === "POST" && ["/events", "/push/send", "/timer/test", "/routine/test"].includes(url.pathname)) {
       if (!(await bearerOk(request, env))) return json({ error: "non autorizzato" }, 401);
       // checks that a routine starts: PUBLISH by default (with nothing approved it does nothing), or REDO with {which, text}
@@ -613,7 +624,7 @@ export default {
       ctx.waitUntil(clock(env).ensure());
       const state = await loadState(env);
       state.devices = (await subscriptions(env)).length;
-      state.publish_at_utc = Number(env.PUBLISH_AT_UTC || 22);
+      state.publish_at_utc = String(env.PUBLISH_AT_UTC || "22").split(",").map(Number);   // the publishing slots (UTC hours)
       state.youtube = JSON.parse((await env.DATA.get("yt_channel")) || "null");
       return json(state);
     }

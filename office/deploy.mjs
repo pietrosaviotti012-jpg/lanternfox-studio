@@ -48,7 +48,7 @@ const bindings = [
   { type: "durable_object_namespace", name: "CLOCK", class_name: "Clock" },
   { type: "plain_text", name: "DAILY_HOUR_UTC", text: DAILY_HOUR_UTC },
   { type: "plain_text", name: "OFFICE_URL", text: url },
-  { type: "plain_text", name: "PUBLISH_AT_UTC", text: "22" },   // the publishing routine runs at this hour (UTC)
+  { type: "plain_text", name: "PUBLISH_AT_UTC", text: "16,22" },   // the publishing routine runs at these hours (UTC), one story each
 ];
 // Claude routines the buttons start ("Pubblica adesso", "Rifai"): ids are plain, tokens are secrets
 if (env.YT_CLIENT_ID) bindings.push({ type: "plain_text", name: "YT_CLIENT_ID", text: env.YT_CLIENT_ID });
