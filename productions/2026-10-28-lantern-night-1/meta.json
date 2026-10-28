@@ -5,12 +5,29 @@
   "format": "your-call",
   "series": "Lantern Night",
   "episode": 1,
-  "idea": "At 2:07 am every light in your town goes out; your neighbors walk smiling toward the forest with lanterns, a dead phone says don't follow them, and a fox with a lantern waits under your window. GO or STAY?",
+  "idea": "At 2:07 am every light in your town goes out; your neighbors walk smiling, eyes shut, into the forest and never come out, a dead phone says don't follow them and don't turn around, a fox with a lantern waits under your window, and your bedroom door creaks open behind you. GO or STAY?",
   "hook": "It's 2:07 am, and every light in your town just went out.",
-  "cover": { "kicker": "LANTERN NIGHT · PART 1", "text": "Don't *follow* the lanterns", "t": 10.5 },
-  "caption": "It's 2:07 am. Every light in your town just went out. Every light except theirs. 🏮\n\nYOUR CALL: the fox is waiting under your window.\n\nComment GO or STAY. Part 2 follows the most-commented choice. 🦊",
-  "hashtags": ["#yourcall", "#pov", "#choosewisely", "#animatedstory", "#papercut", "#mystery", "#storytime", "#lanternfoxtales"],
+  "cover": {
+    "kicker": "LANTERN NIGHT · PART 1",
+    "text": "Don't *turn* around",
+    "t": 10.5
+  },
+  "caption": "It's 2:07 am. Every light in your town just went out. Your neighbors are walking into the forest, smiling, eyes shut. 🏮\n\nYOUR CALL: the fox is waiting outside. Something just opened your door.\n\nComment GO or STAY. Part 2 follows the most-commented choice. 🦊",
+  "hashtags": [
+    "#yourcall",
+    "#pov",
+    "#choosewisely",
+    "#scarystory",
+    "#creepy",
+    "#animatedstory",
+    "#papercut",
+    "#lanternfoxtales"
+  ],
   "first_comment": "GO or STAY? Part 2 follows the most-commented answer 🦊🏮",
   "ai_label": true,
-  "platforms": ["instagram", "youtube", "tiktok"]
+  "platforms": [
+    "instagram",
+    "youtube",
+    "tiktok"
+  ]
 }

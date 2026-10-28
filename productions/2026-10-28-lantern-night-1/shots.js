@@ -86,7 +86,7 @@ export function SHOTS(C, DUR) {
       } },
 
     // 4 · You at your window: the lanterns walk up the hill into the old forest; nobody looks back
-    { id: 'S4', start: at('L05') - .35, in: { type: 'dissolve', dur: .8 }, sfx: [{ t: 0, type: 'wind', d: end('L07') - at('L05') + 1, v: .5 }],
+    { id: 'S4', start: at('L05') - .35, in: { type: 'dissolve', dur: .8 }, sfx: [{ t: 0, type: 'wind', d: end('L07') - at('L05') + 1, v: .5 }, { t: .6, type: 'steps', n: 12, every: .75, v: .45, pan: .3 }],
       build: E => {
         const N = 7, t0 = 0, t1 = E.cueEnd('L07') + .6;
         return layered(E, {
@@ -159,8 +159,9 @@ export function SHOTS(C, DUR) {
         });
       } },
 
-    // 7 · Behind you, your bedroom door creaks open: a dark door, ajar, a thin warm line of light in the gap; quick push in
-    { id: 'S7', start: at('L13') - .2, in: { type: 'dissolve', dur: .35 }, sfx: [{ t: .2 + C.L13.dur * .55, type: 'paper', v: 1.4 }, { t: .3, type: 'whoosh', v: .5 }],
+    // 7 · Behind you, your bedroom door creaks open: a dark door, ajar, a thin warm line of light in the gap; quick push in,
+    //     a low boom on the creak and three slow steps in the silence after
+    { id: 'S7', start: at('L13') - .2, in: { type: 'dissolve', dur: .35 }, sfx: [{ t: .2 + C.L13.dur * .55, type: 'paper', v: 1.4 }, { t: .2 + C.L13.dur * .5, type: 'thunder', v: .45 }, { t: .3, type: 'whoosh', v: .5 }, { t: end('L13') - at('L13') + .3, type: 'steps', n: 3, every: .55, v: .7 }],
       build: E => {
         const open = E.cue('L13') + C.L13.dur * .5;
         return layered(E, {

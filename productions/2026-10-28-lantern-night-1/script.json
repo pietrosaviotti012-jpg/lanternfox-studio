@@ -44,50 +44,54 @@
   },
   {
    "id": "L03",
-   "text": "But your neighbors aren't scared.",
+   "text": "But nobody in your street is screaming.",
    "em": [
-    "aren't"
+    "screaming"
    ],
-   "gap": 0.25,
-   "act": {
-    "intensity": 0.55,
-    "pace": 0.32,
-    "speed": 0.97
-   }
-  },
-  {
-   "id": "L04",
-   "text": "They're outside. Smiling. Holding lanterns.",
-   "em": [
-    "smiling",
-    "lanterns"
-   ],
-   "gap": 0.9,
-   "act": {
-    "intensity": 0.6,
-    "pace": 0.32,
-    "speed": 0.95,
-    "gain_db": 0.5
-   }
-  },
-  {
-   "id": "L05",
-   "text": "You watch from your window.",
    "gap": 0.3,
    "act": {
-    "intensity": 0.4,
+    "intensity": 0.5,
     "pace": 0.32,
     "speed": 0.97,
     "gain_db": -1
    }
   },
   {
+   "id": "L04",
+   "text": "They're already outside. Smiling. Eyes shut.",
+   "em": [
+    "smiling",
+    "shut"
+   ],
+   "gap": 1.1,
+   "act": {
+    "intensity": 0.55,
+    "pace": 0.32,
+    "speed": 0.95,
+    "gain_db": -0.5
+   }
+  },
+  {
+   "id": "L05",
+   "text": "You watch from your window. You don't breathe.",
+   "gap": 0.4,
+   "act": {
+    "intensity": 0.35,
+    "pace": 0.32,
+    "speed": 0.97,
+    "gain_db": -3
+   },
+   "em": [
+    "breathe"
+   ]
+  },
+  {
    "id": "L06",
-   "text": "One by one, they walk toward the old forest.",
+   "text": "One by one, they walk into the old forest.",
    "em": [
     "forest"
    ],
-   "gap": 0.35,
+   "gap": 0.4,
    "act": {
     "intensity": 0.45,
     "pace": 0.32,
@@ -96,51 +100,53 @@
   },
   {
    "id": "L07",
-   "text": "Nobody talks. Nobody looks back.",
+   "text": "Nobody talks. And nobody comes back out.",
    "em": [
     "nobody"
    ],
-   "gap": 0.9,
+   "gap": 1.2,
    "act": {
     "intensity": 0.4,
     "pace": 0.32,
     "speed": 0.95,
-    "gain_db": -2
+    "gain_db": -3
    }
   },
   {
    "id": "L08",
-   "text": "Your phone lights up. It's dead, but there's a message.",
+   "text": "Your phone lights up. It's been dead for an hour.",
    "em": [
     "dead"
    ],
    "clock": "DAY 1 · 02:19 AM",
-   "gap": 0.4,
+   "gap": 0.5,
    "act": {
-    "intensity": 0.55,
+    "intensity": 0.5,
     "pace": 0.32,
-    "speed": 0.97
+    "speed": 0.97,
+    "gain_db": -1.5
    }
   },
   {
    "id": "L09",
-   "text": "Don't follow the lanterns.",
+   "text": "Don't follow the lanterns. And don't turn around.",
    "em": [
-    "don't"
+    "don't",
+    "around"
    ],
-   "gap": 1.1,
+   "gap": 1.3,
    "act": {
     "intensity": 0.7,
     "pace": 0.32,
     "speed": 0.95,
-    "gain_db": 1
+    "gain_db": 0.5
    },
    "card": {
     "app": "Messages",
     "kind": "info",
     "title": "Unknown",
-    "body": "Don't follow the lanterns.",
-    "hold": 2.6
+    "body": "Don't follow the lanterns. And don't turn around.",
+    "hold": 3.2
    }
   },
   {
@@ -149,39 +155,40 @@
    "em": [
     "light"
    ],
-   "gap": 0.35,
+   "gap": 0.4,
    "act": {
     "intensity": 0.4,
     "pace": 0.32,
     "speed": 0.95,
-    "gain_db": -2.5
+    "gain_db": -3
    }
   },
   {
    "id": "L11",
-   "text": "A fox. Holding a lantern. Looking right at you.",
+   "text": "A fox. Holding a lantern. It isn't smiling.",
    "em": [
-    "fox"
+    "isn't"
    ],
-   "gap": 0.5,
+   "gap": 0.6,
    "act": {
-    "intensity": 0.55,
+    "intensity": 0.5,
     "pace": 0.32,
-    "speed": 0.95
+    "speed": 0.95,
+    "gain_db": -1.5
    }
   },
   {
    "id": "L12",
-   "text": "It tilts its head toward the trees, and waits.",
+   "text": "It looks at the trees. Then right past you.",
    "em": [
-    "waits"
+    "past"
    ],
-   "gap": 0.8,
+   "gap": 1.3,
    "act": {
-    "intensity": 0.45,
+    "intensity": 0.4,
     "pace": 0.32,
     "speed": 0.95,
-    "gain_db": -1
+    "gain_db": -3.5
    }
   },
   {
@@ -191,9 +198,9 @@
     "creaks"
    ],
    "clock": "DAY 1 · 02:23 AM",
-   "gap": 1,
+   "gap": 1.3,
    "act": {
-    "intensity": 0.75,
+    "intensity": 0.8,
     "pace": 0.32,
     "speed": 0.97,
     "gain_db": 1.5
@@ -201,16 +208,17 @@
   },
   {
    "id": "L14",
-   "text": "Follow the fox, or stay inside?",
+   "text": "Follow the fox into the dark, or stay with what's behind you?",
    "em": [
-    "fox",
-    "inside"
+    "dark",
+    "behind"
    ],
-   "gap": 0.35,
+   "gap": 0.4,
    "act": {
     "intensity": 0.6,
     "pace": 0.32,
-    "speed": 0.97
+    "speed": 0.97,
+    "gain_db": -0.5
    }
   },
   {
@@ -233,11 +241,15 @@
  "music": [
   {
    "at": "S1",
-   "mood": "hush"
+   "mood": "storm"
   },
   {
    "at": "S3",
-   "mood": "calm"
+   "mood": "hush"
+  },
+  {
+   "at": "S4",
+   "mood": "storm"
   },
   {
    "at": "S5",
@@ -245,16 +257,7 @@
   },
   {
    "at": "S6",
-   "mood": "warm"
-  },
-  {
-   "at": "S7",
-   "mood": "rise"
-  },
-  {
-   "at": "S8",
-   "mood": "end",
-   "offset": 4
+   "mood": "storm"
   }
  ]
 }
