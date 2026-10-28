@@ -28,7 +28,9 @@ if not voice.get("prompt"):
     meta_path = os.path.join(prod, "meta.json")
     fmt = json.load(open(meta_path, encoding="utf-8")).get("format", "") if os.path.exists(meta_path) else ""
     preset = voice.get("preset") or BY_FORMAT.get(fmt) or next((v for k, v in BY_FORMAT.items() if k in fmt), None)
-    if preset and os.path.exists(os.path.join(VOICES, preset + ".wav")):
+    if preset:
+        if not os.path.exists(os.path.join(VOICES, preset + ".wav")):
+            sys.exit(f"voice: the narrator '{preset}' is missing (voices/{preset}.wav)")   # never fall back silently
         voice["prompt"] = os.path.join(VOICES, preset + ".wav")
         print(f"voice: narrator '{preset}'", flush=True)
 
