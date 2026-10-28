@@ -455,13 +455,29 @@ export default {
       const item = (await loadState(env)).queue.find((q) => q.id === media[1]);
       const src = item && (media[2] === "film.mp4" ? item.preview_url : item.cover_url);
       if (!src || !src.startsWith("https://github.com/")) return json({ error: "file non trovato" }, 404);
-      const range = request.headers.get("Range");
-      const up = await fetch(src, { headers: range ? { Range: range } : {}, redirect: "follow" });
-      if (!up.ok) return json({ error: "file non raggiungibile" }, 502);
-      const headers = { ...SECURITY, "Content-Type": media[2] === "film.mp4" ? "video/mp4" : "image/jpeg",
-        "Accept-Ranges": "bytes", "Cache-Control": "private, max-age=3600" };
-      for (const h of ["Content-Length", "Content-Range", "ETag", "Last-Modified"]) if (up.headers.get(h)) headers[h] = up.headers.get(h);
-      return new Response(up.body, { status: up.status, headers });
+      // the whole file is kept in Cloudflare's cache, keyed by its GitHub address and the render time (a "Rifai" reuses the address):
+      // GitHub is asked once, then every piece the player wants comes straight from the edge
+      const type = media[2] === "film.mp4" ? "video/mp4" : "image/jpeg";
+      const key = new Request(`https://media.lanternfox/${encodeURIComponent(src)}?v=${encodeURIComponent(item.created_at || "")}`);
+      const cache = caches.default;
+      let whole = await cache.match(key);
+      if (!whole) {
+        const up = await fetch(src, { redirect: "follow" });
+        if (!up.ok) return json({ error: "file non raggiungibile" }, 502);
+        whole = new Response(await up.arrayBuffer(), { headers: { "Content-Type": type, "Cache-Control": "public, max-age=604800" } });
+        ctx.waitUntil(cache.put(key, whole.clone()));
+      }
+      const body = await whole.arrayBuffer(), size = body.byteLength;
+      const headers = { ...SECURITY, "Content-Type": type, "Accept-Ranges": "bytes", "Cache-Control": "private, max-age=86400" };
+      const r = (request.headers.get("Range") || "").match(/^bytes=(\d*)-(\d*)$/);
+      if (r && (r[1] || r[2])) {
+        let start = r[1] ? Number(r[1]) : Math.max(0, size - Number(r[2]));
+        let end = r[1] && r[2] ? Math.min(Number(r[2]), size - 1) : size - 1;
+        if (start >= size || start > end) return new Response(null, { status: 416, headers: { ...headers, "Content-Range": `bytes */${size}` } });
+        return new Response(body.slice(start, end + 1), { status: 206,
+          headers: { ...headers, "Content-Range": `bytes ${start}-${end}/${size}`, "Content-Length": String(end - start + 1) } });
+      }
+      return new Response(body, { headers: { ...headers, "Content-Length": String(size) } });
     }
 
     if (url.pathname === "/state.json") {

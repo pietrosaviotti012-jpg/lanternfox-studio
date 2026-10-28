@@ -258,6 +258,137 @@ const flies = (() => {
   return { geo, seeds, pts };
 })();
 
+// ---------------------------------------------------------------- la vita del villaggio
+// lampioni di carta lungo il marciapiede
+const lamps = [];
+{
+  const rows = [...new Set(DEPTS.map((d) => d.at[1]))].sort((p, q) => p - q);
+  const postGeo = new THREE.CylinderGeometry(0.05, 0.07, 1.5, 6); postGeo.translate(0, 0.75, 0);
+  const headGeo = new THREE.BoxGeometry(0.26, 0.3, 0.26);
+  const postMat = paper(0x1a2550);
+  for (const z of rows) {
+    const xs = DEPTS.filter((d) => d.at[1] === z).map((d) => d.at[0]).sort((p, q) => p - q);
+    for (let i = 0; i < xs.length - 1; i++) {
+      const g = new THREE.Group();
+      g.add(new THREE.Mesh(postGeo, postMat));
+      const head = new THREE.Mesh(headGeo, new THREE.MeshBasicMaterial({ color: 0xffd08a })); head.position.y = 1.62; g.add(head);
+      const glow = new THREE.Sprite(new THREE.SpriteMaterial({ map: warmGlow, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: .55 }));
+      glow.scale.set(2.2, 2.2, 1); glow.position.y = 1.62; g.add(glow);
+      // tra due casette, sul bordo del marciapiede dalla parte delle case (lontano dagli animali sulla porta)
+      g.position.set((xs[i] + xs[i + 1]) / 2 + 0.45, 0.36, z + 2.5 - WALK_W / 2 - 0.2);
+      scene.add(g); lamps.push({ glow, phase: Math.random() * 6 });
+    }
+  }
+}
+
+// fiori di carta sul prato, lontano da case e marciapiede
+{
+  const geo = new THREE.ConeGeometry(0.09, 0.22, 5); geo.translate(0, 0.47, 0);
+  const colors = [0xe8743b, 0xffd08a, 0xf3e6cf, 0xc77dba];
+  const free = (x, z) => DEPTS.every((d) => Math.abs(x - d.at[0]) > 2.2 || Math.abs(z - d.at[1]) > 1.9) &&
+    walkPath.getSpacedPoints(120).every((p) => Math.hypot(p.x - x, p.z - z) > 1.05);
+  for (const c of colors) {
+    const spots = [];
+    for (let tries = 0; spots.length < 14 && tries < 400; tries++) {
+      const x = (Math.random() - .5) * 26, z = (Math.random() - .5) * 18.5;
+      if (free(x, z)) spots.push([x, z]);
+    }
+    const mesh = new THREE.InstancedMesh(geo, paper(c), spots.length), m = new THREE.Matrix4();
+    spots.forEach(([x, z], i) => { m.makeTranslation(x, 0, z); mesh.setMatrixAt(i, m); });
+    scene.add(mesh);
+  }
+}
+
+// fumo dai camini delle casette al lavoro: sbuffi che salgono e svaniscono
+const smokeTex = glowTexture("rgba(225,232,255,.75)", "rgba(225,232,255,0)");
+const smoke = DEPTS.map((d, i) => Array.from({ length: 4 }, (_, k) => {
+  const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: smokeTex, transparent: true, depthWrite: false, opacity: 0 }));
+  scene.add(s);
+  return { s, id: d.id, offset: k / 4 + i * 0.13 };
+}));
+const chimneyTop = (id) => { const c = houses[id].chimney; return c.getWorldPosition(new THREE.Vector3()).add(new THREE.Vector3(0, 0.45, 0)); };
+
+// il postino: una volpina con la lanterna che porta la storia lungo il marciapiede
+// e si ferma davanti alla casetta che ci sta lavorando
+const courier = (() => {
+  const tex = new THREE.CanvasTexture(paperCut("fox", "#e8743b", 256)); tex.colorSpace = THREE.SRGBColorSpace;
+  const fox = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true }));
+  fox.scale.set(1.5, 1.5, 1);
+  const glow = new THREE.Sprite(new THREE.SpriteMaterial({ map: warmGlow, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: .7 }));
+  glow.scale.set(2.4, 2.4, 1);
+  scene.add(fox, glow);
+  // dove si ferma per ogni reparto: il punto del marciapiede più vicino alla porta
+  const pts = walkPath.getSpacedPoints(600);
+  const stop = Object.fromEntries(DEPTS.map((d) => {
+    const door = new THREE.Vector3(d.at[0] + 0.6, 0.37, d.at[1] + 2.5);
+    let best = 0; pts.forEach((p, i) => { if (p.distanceTo(door) < pts[best].distanceTo(door)) best = i; });
+    return [d.id, best / (pts.length - 1)];
+  }));
+  const start = walkPath.getPointAt(0);
+  fox.position.set(start.x, 0.99, start.z); glow.position.set(start.x + 0.35, 1.27, start.z + 0.1);   // con i movimenti ridotti resta qui
+  return { fox, glow, stop, u: 0, dir: 1 };
+})();
+
+// nuvole di carta e stelle cadenti nel fondale
+const clouds = [];
+{
+  const shape = new THREE.Shape();
+  shape.moveTo(-3, 0); shape.quadraticCurveTo(-3, 1.2, -1.6, 1.1); shape.quadraticCurveTo(-1.2, 2.2, 0.2, 1.8);
+  shape.quadraticCurveTo(1.4, 2.4, 2, 1.2); shape.quadraticCurveTo(3.4, 1.2, 3, 0); shape.closePath();
+  const geo = new THREE.ShapeGeometry(shape, 8);
+  for (let i = 0; i < 4; i++) {
+    const c = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ color: i % 2 ? 0x8fa6dc : 0x6a86c2, transparent: true, opacity: .55, fog: false, depthWrite: false }));
+    const k = 0.9 + Math.random() * 0.8;
+    c.scale.set(k, k * 0.8, 1); c.position.set(-40 + i * 22, 7 + Math.random() * 4, -8);   // a metà dietro le colline, lontano dal titolo
+    backdrop.add(c); clouds.push({ c, speed: 0.25 + Math.random() * 0.35 });
+  }
+}
+const meteor = new THREE.Mesh(new THREE.PlaneGeometry(4.5, 0.08), new THREE.MeshBasicMaterial({ color: 0xffe9c4, transparent: true, opacity: 0, fog: false, depthWrite: false }));
+meteor.rotation.z = -0.45; backdrop.add(meteor);
+let meteorAt = 6;
+
+function liveTick(t, dt) {
+  if (reduceMotion) return;
+  for (const l of lamps) l.glow.material.opacity = 0.5 + Math.sin(t * 2.3 + l.phase) * 0.05 + Math.sin(t * 7.1 + l.phase) * 0.03;
+  for (const puffs of smoke) for (const p of puffs) {
+    const h = houses[p.id], on = h.status === "working" && h.open < 0.1;
+    const k = (t * 0.22 + p.offset) % 1, base = chimneyTop(p.id);
+    p.s.position.set(base.x + Math.sin(k * 5 + p.offset * 9) * 0.25 + k * 0.6, base.y + k * 2.6, base.z - k * 0.4);
+    const size = 0.5 + k * 1.3; p.s.scale.set(size, size, 1);
+    p.s.material.opacity = on ? (1 - k) * 0.5 : Math.max(0, p.s.material.opacity - dt);
+  }
+  // il postino va verso il reparto al lavoro (o che aspetta te); a riposo passeggia avanti e indietro
+  const busy = DEPTS.find((d) => houses[d.id].status === "working") || DEPTS.find((d) => houses[d.id].status === "waiting");
+  const len = walkPath.getLength(), speed = 2.2 / len;
+  let moving = true;
+  if (busy) {
+    const goal = courier.stop[busy.id], gap = goal - courier.u;
+    if (Math.abs(gap) < 0.002) moving = false;
+    else { courier.dir = Math.sign(gap); courier.u += courier.dir * Math.min(Math.abs(gap), speed * 1.6 * dt); }
+  } else {
+    courier.u += courier.dir * speed * 0.45 * dt;
+    if (courier.u > 1 || courier.u < 0) { courier.dir *= -1; courier.u = Math.min(1, Math.max(0, courier.u)); }
+  }
+  const p = walkPath.getPointAt(Math.min(1, Math.max(0, courier.u)));
+  const hop = moving ? Math.abs(Math.sin(t * 9)) * 0.14 : Math.sin(t * 1.5) * 0.03;
+  courier.fox.position.set(p.x, 0.37 + 0.75 + hop, p.z);
+  // la volpina guarda dove va: sullo schermo, a destra o a sinistra
+  const ahead = walkPath.getPointAt(Math.min(1, Math.max(0, courier.u + courier.dir * 0.01)));
+  const sx = ahead.clone().project(camera).x - p.clone().project(camera).x;
+  courier.fox.scale.x = (sx < 0 ? -1 : 1) * Math.abs(courier.fox.scale.x);
+  courier.glow.position.set(p.x + 0.35, 0.37 + 0.9 + hop, p.z + 0.1);
+  courier.glow.material.opacity = 0.6 + Math.sin(t * 6.3) * 0.08;
+  courier.fox.material.opacity = 1 - 0.8 * Math.max(...DEPTS.map((d) => houses[d.id].open));   // si fa da parte quando entri in una casetta
+  for (const c of clouds) { c.c.position.x += c.speed * dt; if (c.c.position.x > 45) c.c.position.x = -45; }
+  if (t > meteorAt) {
+    const k = (t - meteorAt) / 0.9;
+    if (k === 0 || !meteor.userData.x) { meteor.userData.x = -20 + Math.random() * 40; meteor.userData.y = 18 + Math.random() * 8; }
+    meteor.position.set(meteor.userData.x + k * 9, meteor.userData.y - k * 4.2, -9);
+    meteor.material.opacity = Math.sin(Math.min(1, k) * Math.PI) * 0.9;
+    if (k >= 1) { meteorAt = t + 9 + Math.random() * 14; meteor.userData.x = 0; meteor.material.opacity = 0; }
+  }
+}
+
 function setHouse(id, status) {
   const h = houses[id];
   if (!h) return;
@@ -389,6 +520,7 @@ function loop() {
     });
     flies.geo.attributes.position.needsUpdate = true;
   }
+  liveTick(t, Math.min(0.1, t - (loop.last ?? t))); loop.last = t;
   renderer.render(scene, camera);
   placeLabels();
 }
@@ -466,9 +598,18 @@ function render() {
   const pending = (state.queue || []).filter((q) => q.status === "pending");
   const count = $("queueCount");
   count.hidden = !pending.length; count.textContent = pending.length;
+  // the queue is redrawn only when it really changes: redrawing it every few seconds stopped the video
+  // halfway and wiped a half-written note
   const queue = [...(state.queue || [])].reverse();
-  $("queue").innerHTML = queue.length ? queue.map(reviewCard).join("")
-    : `<div class="empty"><strong>Nessun video aspetta il tuo ok</strong>Quando una storia è pronta ti arriva una notifica sul telefono e la trovi qui.</div>`;
+  const sig = JSON.stringify([queue, Boolean(demo), new Date().getUTCHours() >= (state.publish_at_utc ?? 22)]);
+  if (sig !== render.queueSig) {
+    render.queueSig = sig;
+    const notes = Object.fromEntries([...document.querySelectorAll("#queue textarea")].map((t) => [t.id, t.value]));
+    $("queue").innerHTML = queue.length ? queue.map(reviewCard).join("")
+      : `<div class="empty"><strong>Nessun video aspetta il tuo ok</strong>Quando una storia è pronta ti arriva una notifica sul telefono e la trovi qui.</div>`;
+    for (const [id, v] of Object.entries(notes)) if ($(id)) $(id).value = v;
+    attachFilms(queue);
+  }
 
   renderDays();
   renderStats();
@@ -476,11 +617,50 @@ function render() {
   if (selected) fillSheet(selected);
 }
 
+const filmUrl = (q, f) => `/media/${encodeURIComponent(q.id)}/${f}?v=${encodeURIComponent(q.created_at || "")}`;
+const films = new Map();   // address → object URL of the film already in memory
+const FILM_CACHE = "lanternfox-films";
+
+async function filmBlob(url, progress) {
+  const cache = "caches" in window ? await caches.open(FILM_CACHE).catch(() => null) : null;
+  let res = cache && await cache.match(url);
+  if (!res) {
+    const r = await fetch(url);
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    const total = Number(r.headers.get("Content-Length")) || 0, reader = r.body.getReader(), parts = [];
+    let got = 0;
+    for (;;) { const { done, value } = await reader.read(); if (done) break; parts.push(value); got += value.length; if (total) progress(got / total); }
+    res = new Response(new Blob(parts, { type: "video/mp4" }), { headers: { "Content-Type": "video/mp4" } });
+    if (cache) await cache.put(url, res.clone()).catch(() => {});
+  }
+  return res.blob();
+}
+
+// loads every film in the queue whole, then hands it to its <video>; old films leave the phone's cache
+function attachFilms(queue) {
+  for (const v of document.querySelectorAll("#queue video[data-film]")) {
+    const url = v.dataset.film, bar = v.parentElement.querySelector(".film-load");
+    if (demo) { v.src = url; continue; }
+    if (films.has(url)) { v.src = films.get(url); continue; }
+    bar.hidden = false;
+    filmBlob(url, (k) => { bar.querySelector("i").style.width = Math.round(k * 100) + "%"; bar.querySelector("b").textContent = `Scarico il video… ${Math.round(k * 100)}%`; })
+      .then((blob) => { const o = URL.createObjectURL(blob); films.set(url, o); bar.hidden = true;
+        for (const w of document.querySelectorAll("#queue video[data-film]")) if (w.dataset.film === url) w.src = o; })
+      .catch(() => { bar.hidden = true; v.preload = "metadata"; v.src = url; });   // no cache: plays streaming, as before
+  }
+  const keep = new Set(queue.map((q) => filmUrl(q, "film.mp4")));
+  if ("caches" in window) caches.open(FILM_CACHE).then(async (c) => {
+    for (const req of await c.keys()) if (!keep.has(new URL(req.url).pathname + new URL(req.url).search)) c.delete(req);
+  }).catch(() => {});
+}
+
 function reviewCard(q) {
-  // the film comes through the Office (/media/…) so it plays on iPhone too; the demo has no file
-  const src = (f, url) => demo ? url : `/media/${encodeURIComponent(q.id)}/${f}`;
+  // the film comes through the Office (/media/…) so it plays on iPhone too, and is downloaded whole
+  // into the phone's cache before it starts (attachFilms), so it never stops to load halfway
+  const src = (f, url) => demo ? url : filmUrl(q, f);
   const media = q.preview_url
-    ? `<video src="${esc(src("film.mp4", q.preview_url))}#t=0.1" ${q.cover_url ? `poster="${esc(src("poster.jpg", q.cover_url))}"` : ""} controls playsinline preload="metadata"></video>`
+    ? `<div class="filmbox"><video data-film="${esc(src("film.mp4", q.preview_url))}" ${q.cover_url ? `poster="${esc(src("poster.jpg", q.cover_url))}"` : ""} controls playsinline preload="none"></video>
+       <span class="film-load" hidden><i></i><b>Scarico il video…</b></span></div>`
     : `<div class="ph">L'anteprima arriva con il primo video vero</div>`;
   const plats = (q.platforms || ["Instagram", "YouTube", "TikTok"]).map((p) => `<li>${esc(p)}</li>`).join("");
   const actions = q.status === "pending"
@@ -508,7 +688,7 @@ function publishedBlock(q) {
     ${pub.tiktok?.url ? "" : pub.tiktok?.draft ? `<p class="note" style="margin:0 0 8px">Su TikTok il video è nelle bozze: apri l'app, tocca la notifica, incolla la didascalia e premi Pubblica.</p>
     <div class="row"><button class="btn" data-copy="${esc(q.id)}">Copia didascalia</button></div>`
     : `<p class="note" style="margin:0 0 8px">TikTok per ora si pubblica a mano: apri il video, salvalo e caricalo dall'app con la didascalia.</p>
-    <div class="row"><a class="btn" href="/media/${encodeURIComponent(q.id)}/film.mp4" target="_blank" rel="noopener" style="text-decoration:none">Apri il video</a>
+    <div class="row"><a class="btn" href="${filmUrl(q, "film.mp4")}" target="_blank" rel="noopener" style="text-decoration:none">Apri il video</a>
     <button class="btn" data-copy="${esc(q.id)}">Copia didascalia</button></div>`}`;
 }
 

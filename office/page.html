@@ -35,6 +35,8 @@
   /* iPhone: la pagina passa sotto l'orologio e iOS sfoca quello che c'è sotto. Una fascia di colore pieno
      sta sempre lì, e tutto il resto comincia sotto di lei: così si sfoca solo un colore uniforme, mai il titolo */
   :root { --safe-top: env(safe-area-inset-top, 0px); }
+  /* iOS sfoca anche un po' più giù dell'orologio: sul telefono la fascia piena scende di altri 22 px */
+  @media (max-width: 979px) { :root { --safe-top: calc(env(safe-area-inset-top, 0px) + 22px); } }
   .topband { position: fixed; inset: 0 0 auto 0; height: var(--safe-top); background: var(--night); z-index: 30; pointer-events: none; }
   button, input, textarea { font: inherit; color: inherit; }
   :focus-visible { outline: 3px solid var(--lamp); outline-offset: 2px; border-radius: 8px; }
@@ -148,6 +150,12 @@
   .review { display: grid; grid-template-columns: minmax(140px, 200px) 1fr; gap: 16px; padding: 16px; border-radius: 18px;
     background: linear-gradient(180deg, #13204a, #0e1838); border: 1px solid #22336a; margin-bottom: 14px; }
   .review video, .review .ph { width: 100%; aspect-ratio: 9 / 16; border-radius: 12px; background: var(--ink); object-fit: cover; display: block; }
+  .filmbox { position: relative; }
+  .film-load { position: absolute; left: 10px; right: 10px; bottom: 10px; padding: 8px 10px 10px; border-radius: 10px; background: rgba(10,19,48,.82);
+    font-size: .8rem; color: var(--paper); display: grid; gap: 6px; overflow: hidden; }
+  .film-load[hidden] { display: none; }
+  .film-load i { order: 2; display: block; height: 4px; width: 0; border-radius: 2px; background: var(--lamp); transition: width .2s; }
+  .film-load b { font-weight: 400; }
   .review .ph { display: grid; place-items: center; color: var(--muted); font-size: .85rem; text-align: center; padding: 10px; }
   .review h4 { margin: 0 0 6px; font: 600 1.15rem/1.25 var(--serif); }
   .review .cap { white-space: pre-wrap; color: #d8cbb2; font-size: .92rem; max-height: 9.5em; overflow: auto; margin: 0 0 12px; }
