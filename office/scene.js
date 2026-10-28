@@ -427,9 +427,12 @@ function publishedBlock(q) {
     : pub[key]?.draft ? `<li>${name}: nelle bozze</li>`
     : pub[key]?.error ? `<li>${name}: non riuscito, riprovo al prossimo giro</li>` : `<li>${name}: esce alle ${local}</li>`;
   return `<p class="decided">${q.status === "published" ? "Pubblicato" : "Approvato"} alle ${fmtTime(q.decided_at)}</p>
-    <ul class="chips">${row("instagram", "Instagram")}${row("youtube", "YouTube")}${row("tiktok", "TikTok")}</ul>
-    ${pub.tiktok?.draft ? `<p class="note" style="margin:0 0 8px">Su TikTok il video è nelle bozze: apri l'app, tocca la notifica, incolla la didascalia e premi Pubblica.</p>
-    <div class="row"><button class="btn" data-copy="${esc(q.id)}">Copia didascalia</button></div>` : ""}`;
+    <ul class="chips">${row("instagram", "Instagram")}${row("youtube", "YouTube")}${pub.tiktok ? row("tiktok", "TikTok") : ""}</ul>
+    ${pub.tiktok?.url ? "" : pub.tiktok?.draft ? `<p class="note" style="margin:0 0 8px">Su TikTok il video è nelle bozze: apri l'app, tocca la notifica, incolla la didascalia e premi Pubblica.</p>
+    <div class="row"><button class="btn" data-copy="${esc(q.id)}">Copia didascalia</button></div>`
+    : `<p class="note" style="margin:0 0 8px">TikTok per ora si pubblica a mano: apri il video, salvalo e caricalo dall'app con la didascalia.</p>
+    <div class="row"><a class="btn" href="${esc(q.preview_url || "#")}" target="_blank" rel="noopener" style="text-decoration:none">Apri il video</a>
+    <button class="btn" data-copy="${esc(q.id)}">Copia didascalia</button></div>`}`;
 }
 
 function renderDays() {

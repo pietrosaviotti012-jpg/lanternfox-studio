@@ -61,7 +61,7 @@ async function publishOk(request, env) {
   const auth = request.headers.get("Authorization") || "";
   return (Boolean(env.PUBLISH_KEY) && (await same(auth, `Bearer ${env.PUBLISH_KEY}`))) || bearerOk(request, env);
 }
-const PLATFORMS = ["instagram", "youtube", "tiktok"];   // all sent by the routine; TikTok lands in the drafts (unaudited app) and the user taps Publish
+const PLATFORMS = ["instagram", "youtube"];   // sent by the routine; TikTok by hand until the TikTok app passes review (then add "tiktok")
 const sent = (p) => p?.url || p?.draft;
 
 async function bearerOk(request, env) {
@@ -367,7 +367,7 @@ export default {
       if (request.method !== "POST") return json({ error: "metodo non valido" }, 405);
       const { id, platform, url: link, error, draft } = await request.json();
       const item = state.queue.find((q) => q.id === id);
-      if (!item || !PLATFORMS.includes(platform)) return json({ error: "video o piattaforma non validi" }, 400);
+      if (!item || !PLATFORMS.concat("tiktok").includes(platform)) return json({ error: "video o piattaforma non validi" }, 400);
       const now = new Date().toISOString();
       item.published = { ...(item.published || {}), [platform]: error ? { error: clip(error, 300), at: now } : draft ? { draft: true, at: now } : { url: clip(link, 400), at: now } };
       const name = { instagram: "Instagram", youtube: "YouTube", tiktok: "TikTok" }[platform];

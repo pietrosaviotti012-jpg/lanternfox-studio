@@ -1,7 +1,9 @@
 # Routine "Pubblicazione" — il manuale
 
 Gira ogni giorno alle 22:00 UTC (23:00 in Italia d'inverno, 18:00 a New York). Pubblica su Instagram e YouTube i video che
-l'utente ha approvato nell'Ufficio con "Pubblica", e li manda nelle bozze di TikTok (l'app TikTok non è ancora verificata: l'utente tocca Pubblica dall'app).
+l'utente ha approvato nell'Ufficio con "Pubblica". TikTok per ora lo pubblica l'utente a mano: l'app TikTok non è verificata
+(errore `unaudited_client_can_only_post_to_private_accounts`, e le bozze restano ferme in `PROCESSING_UPLOAD`).
+Il passo 3b vale solo quando la coda elenca `tiktok` in `platforms`.
 
 I valori `OFFICE_URL` e `PUBLISH_KEY` sono nel prompt della routine. La chiave può solo leggere la coda e segnare i video come pubblicati. Non scriverle mai in file, commit o messaggi.
 
