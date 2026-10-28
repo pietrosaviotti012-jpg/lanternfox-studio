@@ -133,6 +133,13 @@
         "pace": 0.32,
         "speed": 0.95,
         "gain_db": 1
+      },
+      "card": {
+        "app": "Messages",
+        "kind": "info",
+        "title": "Unknown",
+        "body": "Don't follow the lanterns.",
+        "hold": 2.6
       }
     },
     {

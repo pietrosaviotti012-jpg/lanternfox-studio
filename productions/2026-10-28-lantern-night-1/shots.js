@@ -113,7 +113,7 @@ export function SHOTS(C, DUR) {
         });
       } },
 
-    // 5 · The dead phone lights up on the nightstand: "Don't follow the lanterns."
+    // 5 · The dead phone lights up softly on the nightstand; the message itself is the L09 card: "Don't follow the lanterns."
     { id: 'S5', start: at('L08') - .3, in: { type: 'dissolve', dur: .6 }, sfx: [{ t: .3, type: 'click' }, { t: at('L09') - at('L08') + .3, type: 'chime', v: .6 }],
       build: E => {
         const on = E.cue('L08') + .5, msg = E.cue('L09') - .15;
@@ -122,21 +122,17 @@ export function SHOTS(C, DUR) {
           layers: [
             { name: 'wall', z: -.11, trans: .05, draw: x => { x.fillStyle = '#141a33'; x.fillRect(-.25, -.45, .5, .9); x.fillStyle = '#10152b'; for (let i = 0; i < 9; i++) x.fillRect(-.25 + i * .06, -.45, .004, .9); } },
             { name: 'stand', z: -.075, trans: .04, draw: x => { x.fillStyle = '#0a0d1c'; x.fillRect(-.2, -.45, .4, .5); x.fillRect(-.21, .045, .42, .012); } },
-            { name: 'phone', z: -.065, trans: .05, glow: 3.4, glowCol: '#d6e4ff', w: .1, h: .17, x: 0, y: .125,
-              draw: x => phone(x, { cx: 0, cy: 0, w: .075, h: .15 }), glowDraw: g => phone(null, { cx: 0, cy: 0, w: .075, h: .15 }, g) },
-            { name: 'msg', z: -.062, trans: 0, w: .07, h: .07, x: 0, y: .135, shadow: false, recv: false,
-              draw: x => { x.fillStyle = '#e9eefc'; x.fillRect(-.031, -.022, .062, .044);
-                text(x, "DON'T FOLLOW", 0, .007, .0095, '"Anton"', { fill: '#b3302a' }); text(x, 'THE LANTERNS', 0, -.007, .0095, '"Anton"', { fill: '#b3302a' }); } },
-            { name: 'time', z: -.062, trans: 0, w: .07, h: .03, x: 0, y: .178, shadow: false, recv: false, draw: x => text(x, '2:19', 0, 0, .014, '"Anton"', { fill: '#1b2440' }) },
+            { name: 'phone', z: -.065, trans: .05, glow: 1.1, glowCol: '#8ea6e0', w: .07, h: .11, x: 0, y: .1,
+              draw: x => phone(x, { cx: 0, cy: 0, w: .05, h: .09, screen: '#2a3150' }), glowDraw: g => phone(null, { cx: 0, cy: 0, w: .05, h: .09 }, g) },
+            { name: 'time', z: -.062, trans: 0, w: .05, h: .02, x: 0, y: .128, shadow: false, recv: false, draw: x => text(x, '2:19', 0, 0, .009, '"Anton"', { fill: '#1b2440' }) },
           ],
-          glows: { phone: [[0, 0], [on - .15, 0], [on - .08, .7], [on, .2], [on + .1, 1]] },
+          glows: { phone: [[0, 0], [on - .15, 0], [on - .08, .6], [on, .2], [on + .1, .75], [msg, .75], [msg + .2, 1]] },
           update: (t, L, S) => {
-            const k = ss(seg(t, on - .1, on + .3)), m = ss(seg(t, msg, msg + .35));
-            S.U.uLightR.value = .05 + .12 * k; S.U.uLit.value = .3 + .7 * k;
-            L.time.visible = k > .05; L.time.material.color.setScalar(k);
-            L.msg.visible = m > 0; L.msg.material.color.setScalar(m); L.msg.scale.setScalar(.85 + .15 * m);
+            const k = ss(seg(t, on - .1, on + .3));
+            S.U.uLightR.value = .05 + .07 * k; S.U.uLit.value = .3 + .35 * k;
+            L.time.visible = k > .05; L.time.material.color.setScalar(.8 * k);
           },
-          cam: [[0, [.03, .05, .55, .0, .08, -.07]], [E.cue('L09'), [0, .075, .44, 0, .088, -.07]], [E.dur, [0, .08, .4, 0, .09, -.07]]],
+          cam: [[0, [.03, .04, .55, .0, .06, -.07]], [E.cue('L09'), [0, .055, .46, 0, .062, -.07]], [E.dur, [0, .058, .43, 0, .064, -.07]]],
           focus: -.064, aper: 22, grade: { sat: .9, gain: [.95, 1, 1.08] },
         });
       } },
@@ -163,45 +159,46 @@ export function SHOTS(C, DUR) {
         });
       } },
 
-    // 7 · Behind you, your bedroom door creaks open: a quick push in on the dark gap
+    // 7 · Behind you, your bedroom door creaks open: a dark door, ajar, a thin warm line of light in the gap; quick push in
     { id: 'S7', start: at('L13') - .2, in: { type: 'dissolve', dur: .35 }, sfx: [{ t: .2 + C.L13.dur * .55, type: 'paper', v: 1.4 }, { t: .3, type: 'whoosh', v: .5 }],
       build: E => {
         const open = E.cue('L13') + C.L13.dur * .5;
         return layered(E, {
           light: [.0, .08, -.135], lightR: .05, lightCol: '#8fa6e8', key: .45, amb: .2, ambCol: '#4a5888', sky: { stops: [[0, '#02030a'], [1, '#0a0f24']] }, on: false,
           layers: [
-            { name: 'hall', z: -.12, trans: .5, glow: 1.6, glowCol: '#9fb6ff', draw: x => { x.fillStyle = '#1c2446'; x.fillRect(-.06, -.05, .12, .26); },
-              glowDraw: g => { const gr = g.createLinearGradient(0, -.05, 0, .21); gr.addColorStop(0, 'rgba(255,255,255,.1)'); gr.addColorStop(1, 'rgba(255,255,255,.5)'); g.fillStyle = gr; g.fillRect(-.06, -.05, .12, .26); } },
+            { name: 'hall', z: -.12, trans: .5, glow: 2.4, glowCol: '#ffb862', draw: x => { x.fillStyle = '#1a100a'; x.fillRect(-.06, -.05, .12, .26); },
+              glowDraw: g => { const gr = g.createLinearGradient(.03, 0, .06, 0); gr.addColorStop(0, 'rgba(255,255,255,.35)'); gr.addColorStop(1, 'rgba(255,255,255,1)'); g.fillStyle = gr; g.fillRect(.03, -.04, .03, .22); } },
             { name: 'wall', z: -.09, trans: .04, draw: x => { x.fillStyle = '#121731'; x.fillRect(-.25, -.45, .5, .9); x.save(); x.globalCompositeOperation = 'destination-out'; x.fillRect(-.05, -.04, .1, .22); x.restore(); doorFrame(x, { cx: 0, by: -.04, w: .1, h: .22, col: '#0b0f22' }); } },
-            { name: 'leaf', z: -.088, trans: .03, w: .1, h: .22, x: 0, y: .07, ax: -.05, draw: x => { x.fillStyle = '#171d3a'; x.fillRect(-.05, -.11, .1, .22); x.fillStyle = '#10142b'; x.fillRect(-.04, .01, .08, .085); x.fillRect(-.04, -.1, .08, .095); x.fillStyle = '#c9a46a'; x.beginPath(); x.arc(.038, 0, .004, 0, Math.PI * 2); x.fill(); } },
+            { name: 'leaf', z: -.088, trans: .03, w: .1, h: .22, x: 0, y: .07, ax: -.05, draw: x => { x.fillStyle = '#1b1512'; x.fillRect(-.05, -.11, .1, .22); x.fillStyle = '#0f0b0a';   // four sunk panels and a brass knob
+              for (const [px, py, ph] of [[-.04, .015, .08], [.004, .015, .08], [-.04, -.1, .1], [.004, -.1, .1]]) x.fillRect(px, py, .036, ph);
+              x.fillStyle = '#2a211c'; x.fillRect(-.05, .104, .1, .006); x.fillStyle = '#c9a46a'; x.beginPath(); x.arc(.04, 0, .004, 0, Math.PI * 2); x.fill(); } },
             { name: 'fg', z: -.03, trans: .02, draw: x => { x.fillStyle = '#04050c'; x.fillRect(-.25, -.45, .5, .41); x.beginPath(); x.ellipse(-.16, -.04, .1, .02, 0, 0, Math.PI * 2); x.fill(); } },
           ],
           glows: { hall: [[0, 0], [open, 0], [open + .8, 1]] },
-          update: (t, L) => { const k = ss(seg(t, open - .2, open + 1.4)); L.leaf.scale.x = Math.max(.05, 1 - .7 * k); },
+          update: (t, L) => { const k = ss(seg(t, open - .2, open + 1.4)); L.leaf.scale.x = 1 - .16 * k; },
           cam: [[0, [0, .06, .62, 0, .07, -.07]], [open - .2, [0, .06, .58, 0, .07, -.07]], [open + .6, [0, .065, .46, 0, .07, -.07]], [E.dur, [0, .065, .44, 0, .07, -.07]]],
           focus: -.09, aper: 16, grade: { sat: .7, contrast: .16, lift: [0, .004, .02] },
         });
       } },
 
-    // 8 · Your call: the fox waits at the edge of the forest (GO), your window has one candle (STAY); the choice is cut paper,
-    // both signs kept inside the frame's centre (the camera is at most ±.09 wide at the start of L15)
+    // 8 · Your call: the fox waits at the edge of the forest (GO), your window has one candle (STAY); the choice is cut paper
     { id: 'S8', start: at('L14') - .3, in: { type: 'dissolve', dur: .7 }, sfx: [{ t: 0, type: 'wind', d: DUR - at('L14') + .5, v: .35 }, { t: at('L15') - at('L14') + .5, type: 'paper' }, { t: end('L15') - at('L14') + .8, type: 'paper' }],
       build: E => {
         const go = E.cue('L15') + C.L15.dur * .55, stay = E.cue('L15') + C.L15.dur * .8, titleAt = E.cueEnd('L15') + .8;
-        const sign = (s, cx) => ({ name: s, z: -.05, trans: .25, w: .08, h: .04, x: cx, y: .2, shadow: false, recv: false, finish: { rim: .6 },
-          draw: x => { x.fillStyle = '#f1dbac'; x.fillRect(-.04, -.016, .08, .032); text(x, s, 0, -.0005, .022, '"Anton"', { fill: s === 'GO' ? '#e8743b' : '#2b3a6a' }); } });
+        const sign = (s, cx) => ({ name: s, z: -.05, trans: .25, w: .08, h: .036, x: cx, y: .205, shadow: false, recv: false, finish: { rim: .6 },
+          draw: x => { x.fillStyle = '#f1dbac'; x.fillRect(-.034, -.015, .068, .03); text(x, s, 0, -.0005, .018, '"Anton"', { fill: s === 'GO' ? '#e8743b' : '#2b3a6a' }); } });
         return layered(E, {
           light: [0, .12, -.13], lightR: .18, sky: { stops: DARK, stars: 170 }, on: false,
           layers: [
             { name: 'forest', z: -.115, trans: .4, glow: 2.2, draw: x => { x.fillStyle = '#22335f'; pines(x, { x0: -.25, x1: .02, base: .11, h: .1, n: 12, seed: 2 }); x.fillRect(-.25, -.45, .5, .56); },
               glowDraw: g => { g.fillStyle = '#fff'; for (const [px, py] of [[-.17, .13], [-.12, .145], [-.07, .125]]) { g.beginPath(); g.arc(px, py, .0025, 0, Math.PI * 2); g.fill(); } } },
-            { name: 'home', z: -.09, trans: .15, glow: 3, draw: x => house(x, { cx: .055, by: .1, w: .1, h: .08, roof: .05, cols: 2, rows: 2, col: '#141a35', chimney: .3, lit: [2] }),
-              glowDraw: g => house(null, { cx: .055, by: .1, w: .1, h: .08, roof: .05, cols: 2, rows: 2, lit: [2] }, g) },
+            { name: 'home', z: -.09, trans: .15, glow: 3, draw: x => house(x, { cx: .055, by: .1, w: .085, h: .065, roof: .04, cols: 2, rows: 2, col: '#141a35', chimney: .3, lit: [2] }),
+              glowDraw: g => house(null, { cx: .055, by: .1, w: .085, h: .065, roof: .04, cols: 2, rows: 2, lit: [2] }, g) },
             { name: 'field', z: -.07, trans: .08, draw: x => { x.fillStyle = '#0d1430'; foreground(x, { base: .098, seed: 15, reedsAt: [-.02, .04], reedsN: 16, stones: 4, amp: .003 }); } },
-            { name: 'fox', z: -.064, trans: .2, glow: 3.2, w: .1, h: .1, x: -.05, y: .13, draw: x => fox(x, { cx: 0, by: -.032, s: .05, lantern: true, flip: true }), glowDraw: g => fox(null, { cx: 0, by: -.032, s: .05, lantern: true, flip: true }, g) },
-            sign('GO', -.045), sign('STAY', .05),
-            { name: 'title', z: -.045, trans: .3, w: .24, h: .05, x: 0, y: .25, shadow: false, recv: false, finish: { rim: .6 },
-              draw: x => text(x, 'Lantern Fox Tales', 0, 0, .016, '"Cormorant"', { fill: '#f1dbac', weight: 600 }) },
+            { name: 'fox', z: -.064, trans: .2, glow: 3.2, w: .1, h: .1, x: -.05, y: .13, draw: x => fox(x, { cx: 0, by: -.032, s: .046, lantern: true, flip: true }), glowDraw: g => fox(null, { cx: 0, by: -.032, s: .046, lantern: true, flip: true }, g) },
+            sign('GO', -.042), sign('STAY', .042),
+            { name: 'title', z: -.045, trans: .3, w: .18, h: .04, x: 0, y: .245, shadow: false, recv: false, finish: { rim: .6 },
+              draw: x => text(x, 'Lantern Fox Tales', 0, 0, .013, '"Cormorant"', { fill: '#f1dbac', weight: 600 }) },
             { name: 'fg', z: -.025, trans: .03, draw: ground('#060914', .05, 17, [.1, .22]) },
           ],
           glows: { fox: [[0, 1]], home: [[0, 1]], forest: [[0, .8]] }, flicker: ['fox', 'home'],
