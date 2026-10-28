@@ -411,7 +411,7 @@ function reviewCard(q) {
     ? `<label for="note-${esc(q.id)}" class="note">Se va rifatto, cosa cambiare</label>
        <textarea id="note-${esc(q.id)}" placeholder="Per esempio: la voce più lenta nel finale"></textarea>
        <div class="row"><button class="btn primary" data-approve="${esc(q.id)}">Pubblica</button><button class="btn" data-redo="${esc(q.id)}">Rifai</button></div>`
-    : q.status === "redo" ? `<p class="decided">Rimandato al Copione alle ${fmtTime(q.decided_at)}${q.note ? `: ${esc(q.note)}` : ""}</p>`
+    : q.status === "redo" ? `<p class="decided">Da rifare (chiesto alle ${fmtTime(q.decided_at)})${q.note ? `: ${esc(q.note)}` : ""}</p><p class="note" style="margin:0">La Regia sistema il copione e le scene, poi la nuova versione arriva qui in circa mezz'ora.</p>`
     : publishedBlock(q);
   return `<article class="review"><div>${media}</div><div><h4>${esc(q.title)}</h4><ul class="chips">${plats}</ul>
     <p class="cap">${esc(q.caption || "")}</p>${actions}</div></article>`;
@@ -426,8 +426,9 @@ function publishedBlock(q) {
   const row = (key, name) => pub[key]?.url ? `<li><a href="${esc(pub[key].url)}" target="_blank" rel="noopener">${name}: uscito ↗</a></li>`
     : pub[key]?.draft ? `<li>${name}: nelle bozze</li>`
     : pub[key]?.error ? `<li>${name}: non riuscito, riprovo al prossimo giro</li>` : `<li>${name}: esce alle ${local}</li>`;
+  const now = q.status === "approved" ? `<div class="row"><button class="btn primary" data-now="${esc(q.id)}">Pubblica adesso</button></div>` : "";
   return `<p class="decided">${q.status === "published" ? "Pubblicato" : "Approvato"} alle ${fmtTime(q.decided_at)}</p>
-    <ul class="chips">${row("instagram", "Instagram")}${row("youtube", "YouTube")}${pub.tiktok ? row("tiktok", "TikTok") : ""}</ul>
+    <ul class="chips">${row("instagram", "Instagram")}${row("youtube", "YouTube")}${pub.tiktok ? row("tiktok", "TikTok") : ""}</ul>${now}
     ${pub.tiktok?.url ? "" : pub.tiktok?.draft ? `<p class="note" style="margin:0 0 8px">Su TikTok il video è nelle bozze: apri l'app, tocca la notifica, incolla la didascalia e premi Pubblica.</p>
     <div class="row"><button class="btn" data-copy="${esc(q.id)}">Copia didascalia</button></div>`
     : `<p class="note" style="margin:0 0 8px">TikTok per ora si pubblica a mano: apri il video, salvalo e caricalo dall'app con la didascalia.</p>
@@ -534,18 +535,30 @@ $("queue").addEventListener("click", async (e) => {
     try { await navigator.clipboard.writeText(q?.caption || ""); toast("Didascalia copiata"); } catch { toast("Non riesco a copiare: tieni premuto sul testo"); }
     return;
   }
+  const n = e.target.closest("[data-now]");
+  if (n) {
+    if (demo) { toast("Pubblicazione avviata (per finta: è una prova)"); return; }
+    n.disabled = true;
+    const r = await fetch("/publish/now", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: n.dataset.now }) });
+    n.disabled = false;
+    toast(r.ok ? "Pubblicazione avviata: tra qualche minuto è online" : "Non riesco ad avviare la pubblicazione: esce comunque all'orario");
+    load();
+    return;
+  }
   const b = e.target.closest("[data-approve],[data-redo]");
   if (!b) return;
   const id = b.dataset.approve || b.dataset.redo;
   const decision = b.dataset.approve ? "approved" : "redo";
   const note = document.getElementById("note-" + id)?.value || "";
   if (decision === "redo" && !note.trim()) { toast("Scrivi cosa cambiare, così il Copione sa da dove ripartire"); document.getElementById("note-" + id)?.focus(); return; }
-  if (demo) { const q = state.queue.find((x) => x.id === id); Object.assign(q, { status: decision, note, decided_at: new Date().toISOString() }); render(); toast(decision === "approved" ? "Pubblicato (per finta: è una prova)" : "Rimandato al Copione (per finta)"); return; }
+  if (demo) { const q = state.queue.find((x) => x.id === id); Object.assign(q, { status: decision, note, decided_at: new Date().toISOString() }); render(); toast(decision === "approved" ? "Approvato (per finta: è una prova)" : "Mandato alla Regia (per finta)"); return; }
   b.disabled = true;
   const r = await fetch("/approve", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, decision, note }) });
   b.disabled = false;
   if (!r.ok) { toast("Non sono riuscito a salvare la scelta: riprova"); return; }
-  toast(decision === "approved" ? "Approvato: esce all'orario di pubblicazione" : "Rimandato al Copione con la tua nota");
+  const res = await r.json().catch(() => ({}));
+  toast(decision === "approved" ? "Approvato: esce all'orario, oppure premi Pubblica adesso"
+    : res.started ? "La Regia sta rifacendo il video con la tua nota" : "Nota salvata, ma la Regia non è partita: controlla la routine");
   load();
 });
 

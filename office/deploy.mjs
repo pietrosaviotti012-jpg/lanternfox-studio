@@ -50,10 +50,13 @@ const bindings = [
   { type: "plain_text", name: "OFFICE_URL", text: url },
   { type: "plain_text", name: "PUBLISH_AT_UTC", text: "22" },   // the publishing routine runs at this hour (UTC)
 ];
+// Claude routines the buttons start ("Pubblica adesso", "Rifai"): ids are plain, tokens are secrets
+for (const w of ["PUBLISH", "REDO"]) if (env[`ROUTINE_${w}_ID`]) bindings.push({ type: "plain_text", name: `ROUTINE_${w}_ID`, text: env[`ROUTINE_${w}_ID`] });
 if (withSecrets) {
   bindings.push({ type: "secret_text", name: "PASSWORD", text: env.OFFICE_PASSWORD });
   bindings.push({ type: "secret_text", name: "STUDIO_SECRET", text: env.STUDIO_SECRET });
   if (env.PUBLISH_KEY) bindings.push({ type: "secret_text", name: "PUBLISH_KEY", text: env.PUBLISH_KEY });
+  for (const w of ["PUBLISH", "REDO"]) if (env[`ROUTINE_${w}_TOKEN`]) bindings.push({ type: "secret_text", name: `ROUTINE_${w}_TOKEN`, text: env[`ROUTINE_${w}_TOKEN`] });
 }
 const metadata = { main_module: "worker.js", compatibility_date: "2025-06-01", bindings,
   ...(withSecrets ? {} : { keep_bindings: ["secret_text"] }),

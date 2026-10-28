@@ -260,6 +260,20 @@ async function dispatch(env, workflow, inputs = {}) {
   return response.status;
 }
 
+// Claude routines started on demand through their /fire endpoint: PUBLISH ("Pubblica adesso") and REDO ("Rifai").
+// ROUTINE_<which>_ID is a plain variable, ROUTINE_<which>_TOKEN a secret; without them the button only records the choice.
+async function fireRoutine(env, which, text) {
+  const id = env[`ROUTINE_${which}_ID`], token = env[`ROUTINE_${which}_TOKEN`];
+  if (!id || !token) return 0;
+  const response = await fetch(`https://api.anthropic.com/v1/claude_code/routines/${id}/fire`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}`, "anthropic-beta": "experimental-cc-routine-2026-04-01",
+      "anthropic-version": "2023-06-01", "Content-Type": "application/json" },
+    body: JSON.stringify(text ? { text } : {}),
+  });
+  return response.status;
+}
+
 
 // ---------------------------------------------------------------- sveglia (Durable Object)
 // I Cron Trigger nuovi di Cloudflare a volte non scattano: la sveglia vera è un allarme del
@@ -386,8 +400,14 @@ export default {
       return json({ ok: true, published: done });
     }
 
-    if (request.method === "POST" && ["/events", "/push/send", "/timer/test"].includes(url.pathname)) {
+    if (request.method === "POST" && ["/events", "/push/send", "/timer/test", "/routine/test"].includes(url.pathname)) {
       if (!(await bearerOk(request, env))) return json({ error: "non autorizzato" }, 401);
+      // checks that a routine starts: PUBLISH by default (with nothing approved it does nothing), or REDO with {which, text}
+      if (url.pathname === "/routine/test") {
+        const body = await request.json().catch(() => ({}));
+        const which = body.which === "REDO" ? "REDO" : "PUBLISH";
+        return json({ status: await fireRoutine(env, which, which === "REDO" ? clip(body.text, 500) : "Prova del tasto Pubblica adesso") });
+      }
       if (url.pathname === "/events") {
         try {
           const events = [].concat(await request.json());
@@ -440,14 +460,32 @@ export default {
       item.status = decision;
       item.note = clip(note, 400);
       item.decided_at = new Date().toISOString();
-      // approved videos wait for the publishing routine's slot (PUBLISH_AT_UTC); "redo" goes back to the chain
-      const github = decision === "redo" ? await dispatch(env, "redo.yml", { id, note: item.note }) : 0;
+      // approved videos wait for the publishing routine's slot (PUBLISH_AT_UTC); "redo" starts the Regia routine with the note
+      const started = decision === "redo" ? await fireRoutine(env, "REDO", `id: ${id}\nnote: ${item.note}`) : 0;
+      const redoOk = started >= 200 && started < 300;
       state.departments.revisione = { status: "done", task: decision === "approved" ? `Approvato: ${item.title}` : `Da rifare: ${item.note || item.title}`,
         output: "", updated_at: item.decided_at };
+      if (decision === "redo") state.departments.regia = { status: redoOk ? "working" : "error",
+        task: redoOk ? `Rifaccio "${item.title}": ${clip(item.note, 160)}` : "Non riesco ad avviare il rifacimento: controlla la routine Regia", output: "", updated_at: item.decided_at };
       state.log.push({ at: item.decided_at, dept: "revisione", status: "done",
         text: decision === "approved" ? `Hai approvato "${item.title}": esce all'orario di pubblicazione` : `Hai chiesto di rifare "${item.title}"` });
       await saveState(env, state);
-      return json({ ok: true, github });
+      return json({ ok: true, started: decision === "redo" ? redoOk : undefined });
+    }
+    // "Pubblica adesso": an approved video goes out now instead of waiting for the evening slot
+    if (url.pathname === "/publish/now" && request.method === "POST") {
+      const { id } = await request.json();
+      const state = await loadState(env);
+      const item = state.queue.find((q) => q.id === id && q.status === "approved");
+      if (!item) return json({ error: "video non approvato o non trovato" }, 404);
+      const started = await fireRoutine(env, "PUBLISH", `Pubblica adesso: ${id}`);
+      const ok = started >= 200 && started < 300;
+      const now = new Date().toISOString();
+      state.departments.pubblicazione = { status: ok ? "working" : "error", task: ok ? `Pubblico adesso: ${item.title}` : "Non riesco ad avviare la pubblicazione: controlla la routine",
+        output: "", updated_at: now };
+      if (ok) state.log.push({ at: now, dept: "pubblicazione", status: "working", text: `Hai chiesto di pubblicare subito "${item.title}"` });
+      await saveState(env, state);
+      return json({ ok, status: started }, ok ? 200 : 502);
     }
     if (url.pathname.startsWith("/push/")) {
       if (url.pathname === "/push/key") return json({ key: (await vapidKeys(env)).publicKey });
