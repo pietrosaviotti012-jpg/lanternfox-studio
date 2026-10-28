@@ -19,7 +19,18 @@ script = json.load(open(os.path.join(prod, "script.json"), encoding="utf-8"))
 vo = os.path.join(prod, "vo"); os.makedirs(vo, exist_ok=True)
 hash_file = os.path.join(vo, "hash.json")
 hashes = json.load(open(hash_file)) if os.path.exists(hash_file) else {}
-voice = script.get("voice", {})
+voice = dict(script.get("voice", {}))
+# the narrator's timbre: a ~9 s reference clip in voices/ (synthetic Kokoro voices, see voices/make_refs.py).
+# script.voice.preset picks one (cupo, professore, fiaba, pov); without it the format in meta.json decides.
+VOICES = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "voices")
+BY_FORMAT = {"your-call": "pov", "what-if": "professore", "mystery": "cupo", "legend": "cupo", "fable": "fiaba", "tale": "fiaba"}
+if not voice.get("prompt"):
+    meta_path = os.path.join(prod, "meta.json")
+    fmt = json.load(open(meta_path, encoding="utf-8")).get("format", "") if os.path.exists(meta_path) else ""
+    preset = voice.get("preset") or BY_FORMAT.get(fmt) or next((v for k, v in BY_FORMAT.items() if k in fmt), None)
+    if preset and os.path.exists(os.path.join(VOICES, preset + ".wav")):
+        voice["prompt"] = os.path.join(VOICES, preset + ".wav")
+        print(f"voice: narrator '{preset}'", flush=True)
 
 def key(L):
     return hashlib.sha1(json.dumps([L["text"], L.get("say"), L.get("act", {}), voice, 2], sort_keys=True).encode()).hexdigest()[:12]

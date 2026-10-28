@@ -1,259 +1,260 @@
 {
-  "title": "Lantern Night · Part 1",
-  "series": "Lantern Night",
-  "format": "your-call",
-  "voice": {
-    "engine": "chatterbox"
+ "title": "Lantern Night · Part 1",
+ "series": "Lantern Night",
+ "format": "your-call",
+ "voice": {
+  "engine": "chatterbox",
+  "preset": "cupo"
+ },
+ "captions": "pop",
+ "hud": {
+  "tag": "LANTERN NIGHT",
+  "part": "PART 1"
+ },
+ "lead": 0.4,
+ "tail": 3.2,
+ "lines": [
+  {
+   "id": "L01",
+   "text": "It's 2:07 am, and every light in your town just went out.",
+   "say": "It's two oh seven a.m., and every light in your town just went out.",
+   "em": [
+    "out"
+   ],
+   "clock": "DAY 1 · 02:07 AM",
+   "gap": 0.35,
+   "act": {
+    "intensity": 0.55,
+    "pace": 0.32,
+    "speed": 0.97
+   }
   },
-  "captions": "pop",
-  "hud": {
-    "tag": "LANTERN NIGHT",
-    "part": "PART 1"
+  {
+   "id": "L02",
+   "text": "Streetlamps. Phones. Even the moon.",
+   "em": [
+    "moon"
+   ],
+   "gap": 0.45,
+   "act": {
+    "intensity": 0.5,
+    "pace": 0.32,
+    "speed": 0.95
+   }
   },
-  "lead": 0.4,
-  "tail": 3.2,
-  "lines": [
-    {
-      "id": "L01",
-      "text": "It's 2:07 am, and every light in your town just went out.",
-      "say": "It's two oh seven a.m., and every light in your town just went out.",
-      "em": [
-        "out"
-      ],
-      "clock": "DAY 1 · 02:07 AM",
-      "gap": 0.35,
-      "act": {
-        "intensity": 0.55,
-        "pace": 0.32,
-        "speed": 0.97
-      }
-    },
-    {
-      "id": "L02",
-      "text": "Streetlamps. Phones. Even the moon.",
-      "em": [
-        "moon"
-      ],
-      "gap": 0.45,
-      "act": {
-        "intensity": 0.5,
-        "pace": 0.32,
-        "speed": 0.95
-      }
-    },
-    {
-      "id": "L03",
-      "text": "But your neighbors aren't scared.",
-      "em": [
-        "aren't"
-      ],
-      "gap": 0.25,
-      "act": {
-        "intensity": 0.55,
-        "pace": 0.32,
-        "speed": 0.97
-      }
-    },
-    {
-      "id": "L04",
-      "text": "They're outside. Smiling. Holding lanterns.",
-      "em": [
-        "smiling",
-        "lanterns"
-      ],
-      "gap": 0.9,
-      "act": {
-        "intensity": 0.6,
-        "pace": 0.32,
-        "speed": 0.95,
-        "gain_db": 0.5
-      }
-    },
-    {
-      "id": "L05",
-      "text": "You watch from your window.",
-      "gap": 0.3,
-      "act": {
-        "intensity": 0.4,
-        "pace": 0.32,
-        "speed": 0.97,
-        "gain_db": -1
-      }
-    },
-    {
-      "id": "L06",
-      "text": "One by one, they walk toward the old forest.",
-      "em": [
-        "forest"
-      ],
-      "gap": 0.35,
-      "act": {
-        "intensity": 0.45,
-        "pace": 0.32,
-        "speed": 0.97
-      }
-    },
-    {
-      "id": "L07",
-      "text": "Nobody talks. Nobody looks back.",
-      "em": [
-        "nobody"
-      ],
-      "gap": 0.9,
-      "act": {
-        "intensity": 0.4,
-        "pace": 0.32,
-        "speed": 0.95,
-        "gain_db": -2
-      }
-    },
-    {
-      "id": "L08",
-      "text": "Your phone lights up. It's dead, but there's a message.",
-      "em": [
-        "dead"
-      ],
-      "clock": "DAY 1 · 02:19 AM",
-      "gap": 0.4,
-      "act": {
-        "intensity": 0.55,
-        "pace": 0.32,
-        "speed": 0.97
-      }
-    },
-    {
-      "id": "L09",
-      "text": "Don't follow the lanterns.",
-      "em": [
-        "don't"
-      ],
-      "gap": 1.1,
-      "act": {
-        "intensity": 0.7,
-        "pace": 0.32,
-        "speed": 0.95,
-        "gain_db": 1
-      },
-      "card": {
-        "app": "Messages",
-        "kind": "info",
-        "title": "Unknown",
-        "body": "Don't follow the lanterns.",
-        "hold": 2.6
-      }
-    },
-    {
-      "id": "L10",
-      "text": "Then a small light stops under your window.",
-      "em": [
-        "light"
-      ],
-      "gap": 0.35,
-      "act": {
-        "intensity": 0.4,
-        "pace": 0.32,
-        "speed": 0.95,
-        "gain_db": -2.5
-      }
-    },
-    {
-      "id": "L11",
-      "text": "A fox. Holding a lantern. Looking right at you.",
-      "em": [
-        "fox"
-      ],
-      "gap": 0.5,
-      "act": {
-        "intensity": 0.55,
-        "pace": 0.32,
-        "speed": 0.95
-      }
-    },
-    {
-      "id": "L12",
-      "text": "It tilts its head toward the trees, and waits.",
-      "em": [
-        "waits"
-      ],
-      "gap": 0.8,
-      "act": {
-        "intensity": 0.45,
-        "pace": 0.32,
-        "speed": 0.95,
-        "gain_db": -1
-      }
-    },
-    {
-      "id": "L13",
-      "text": "Behind you, your bedroom door creaks open.",
-      "em": [
-        "creaks"
-      ],
-      "clock": "DAY 1 · 02:23 AM",
-      "gap": 1.0,
-      "act": {
-        "intensity": 0.75,
-        "pace": 0.32,
-        "speed": 0.97,
-        "gain_db": 1.5
-      }
-    },
-    {
-      "id": "L14",
-      "text": "Follow the fox, or stay inside?",
-      "em": [
-        "fox",
-        "inside"
-      ],
-      "gap": 0.35,
-      "act": {
-        "intensity": 0.6,
-        "pace": 0.32,
-        "speed": 0.97
-      }
-    },
-    {
-      "id": "L15",
-      "text": "Your call. Comment GO or STAY.",
-      "em": [
-        "go",
-        "stay"
-      ],
-      "gap": 0.2,
-      "act": {
-        "intensity": 0.55,
-        "pace": 0.32,
-        "speed": 0.99
-      }
-    }
-  ],
-  "bpm": 60,
-  "seed": 23,
-  "music": [
-    {
-      "at": "S1",
-      "mood": "hush"
-    },
-    {
-      "at": "S3",
-      "mood": "calm"
-    },
-    {
-      "at": "S5",
-      "mood": "hush"
-    },
-    {
-      "at": "S6",
-      "mood": "warm"
-    },
-    {
-      "at": "S7",
-      "mood": "rise"
-    },
-    {
-      "at": "S8",
-      "mood": "end",
-      "offset": 4
-    }
-  ]
+  {
+   "id": "L03",
+   "text": "But your neighbors aren't scared.",
+   "em": [
+    "aren't"
+   ],
+   "gap": 0.25,
+   "act": {
+    "intensity": 0.55,
+    "pace": 0.32,
+    "speed": 0.97
+   }
+  },
+  {
+   "id": "L04",
+   "text": "They're outside. Smiling. Holding lanterns.",
+   "em": [
+    "smiling",
+    "lanterns"
+   ],
+   "gap": 0.9,
+   "act": {
+    "intensity": 0.6,
+    "pace": 0.32,
+    "speed": 0.95,
+    "gain_db": 0.5
+   }
+  },
+  {
+   "id": "L05",
+   "text": "You watch from your window.",
+   "gap": 0.3,
+   "act": {
+    "intensity": 0.4,
+    "pace": 0.32,
+    "speed": 0.97,
+    "gain_db": -1
+   }
+  },
+  {
+   "id": "L06",
+   "text": "One by one, they walk toward the old forest.",
+   "em": [
+    "forest"
+   ],
+   "gap": 0.35,
+   "act": {
+    "intensity": 0.45,
+    "pace": 0.32,
+    "speed": 0.97
+   }
+  },
+  {
+   "id": "L07",
+   "text": "Nobody talks. Nobody looks back.",
+   "em": [
+    "nobody"
+   ],
+   "gap": 0.9,
+   "act": {
+    "intensity": 0.4,
+    "pace": 0.32,
+    "speed": 0.95,
+    "gain_db": -2
+   }
+  },
+  {
+   "id": "L08",
+   "text": "Your phone lights up. It's dead, but there's a message.",
+   "em": [
+    "dead"
+   ],
+   "clock": "DAY 1 · 02:19 AM",
+   "gap": 0.4,
+   "act": {
+    "intensity": 0.55,
+    "pace": 0.32,
+    "speed": 0.97
+   }
+  },
+  {
+   "id": "L09",
+   "text": "Don't follow the lanterns.",
+   "em": [
+    "don't"
+   ],
+   "gap": 1.1,
+   "act": {
+    "intensity": 0.7,
+    "pace": 0.32,
+    "speed": 0.95,
+    "gain_db": 1
+   },
+   "card": {
+    "app": "Messages",
+    "kind": "info",
+    "title": "Unknown",
+    "body": "Don't follow the lanterns.",
+    "hold": 2.6
+   }
+  },
+  {
+   "id": "L10",
+   "text": "Then a small light stops under your window.",
+   "em": [
+    "light"
+   ],
+   "gap": 0.35,
+   "act": {
+    "intensity": 0.4,
+    "pace": 0.32,
+    "speed": 0.95,
+    "gain_db": -2.5
+   }
+  },
+  {
+   "id": "L11",
+   "text": "A fox. Holding a lantern. Looking right at you.",
+   "em": [
+    "fox"
+   ],
+   "gap": 0.5,
+   "act": {
+    "intensity": 0.55,
+    "pace": 0.32,
+    "speed": 0.95
+   }
+  },
+  {
+   "id": "L12",
+   "text": "It tilts its head toward the trees, and waits.",
+   "em": [
+    "waits"
+   ],
+   "gap": 0.8,
+   "act": {
+    "intensity": 0.45,
+    "pace": 0.32,
+    "speed": 0.95,
+    "gain_db": -1
+   }
+  },
+  {
+   "id": "L13",
+   "text": "Behind you, your bedroom door creaks open.",
+   "em": [
+    "creaks"
+   ],
+   "clock": "DAY 1 · 02:23 AM",
+   "gap": 1,
+   "act": {
+    "intensity": 0.75,
+    "pace": 0.32,
+    "speed": 0.97,
+    "gain_db": 1.5
+   }
+  },
+  {
+   "id": "L14",
+   "text": "Follow the fox, or stay inside?",
+   "em": [
+    "fox",
+    "inside"
+   ],
+   "gap": 0.35,
+   "act": {
+    "intensity": 0.6,
+    "pace": 0.32,
+    "speed": 0.97
+   }
+  },
+  {
+   "id": "L15",
+   "text": "Your call. Comment GO or STAY.",
+   "em": [
+    "go",
+    "stay"
+   ],
+   "gap": 0.2,
+   "act": {
+    "intensity": 0.55,
+    "pace": 0.32,
+    "speed": 0.99
+   }
+  }
+ ],
+ "bpm": 60,
+ "seed": 23,
+ "music": [
+  {
+   "at": "S1",
+   "mood": "hush"
+  },
+  {
+   "at": "S3",
+   "mood": "calm"
+  },
+  {
+   "at": "S5",
+   "mood": "hush"
+  },
+  {
+   "at": "S6",
+   "mood": "warm"
+  },
+  {
+   "at": "S7",
+   "mood": "rise"
+  },
+  {
+   "at": "S8",
+   "mood": "end",
+   "offset": 4
+  }
+ ]
 }
