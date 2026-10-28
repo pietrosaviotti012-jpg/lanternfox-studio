@@ -654,8 +654,22 @@ function render() {
     : `<li class="empty" style="display:block"><strong>Il diario è vuoto</strong>Qui ogni reparto scrive cosa ha fatto, con l'ora.</li>`;
 
   const pending = (state.queue || []).filter((q) => q.status === "pending");
+  const waitingComments = (state.community?.pending || []).filter((p) => p.status === "waiting");
   const count = $("queueCount");
-  count.hidden = !pending.length; count.textContent = pending.length;
+  count.hidden = !(pending.length + waitingComments.length); count.textContent = pending.length + waitingComments.length;
+  // critiques and complaints: Ada proposes a reply, the user sends it (as is or edited) or leaves it
+  const csig = JSON.stringify(waitingComments);
+  if (csig !== render.commentSig) {
+    render.commentSig = csig;
+    $("comments").innerHTML = waitingComments.length ? `<h3>Commenti da guardare</h3>` + waitingComments.map((p) => `
+      <article class="review" style="grid-template-columns:1fr"><div>
+        <ul class="chips"><li>${p.platform === "youtube" ? "YouTube" : "Instagram"}</li><li>${esc(p.author)}</li><li>${fmtDayTime(p.at)}</li></ul>
+        <p class="cap">“${esc(p.text)}”</p>
+        <label class="note" for="cm-${esc(p.id)}">Risposta proposta da Ada (puoi cambiarla)</label>
+        <textarea id="cm-${esc(p.id)}">${esc(p.proposal || "")}</textarea>
+        <div class="row"><button class="btn primary" data-cm-ok="${esc(p.id)}">Rispondi così</button><button class="btn" data-cm-no="${esc(p.id)}">Lascia stare</button></div>
+      </div></article>`).join("") : "";
+  }
   // the queue is redrawn only when it really changes: redrawing it every few seconds stopped the video
   // halfway and wiped a half-written note
   const queue = [...(state.queue || [])].reverse();
@@ -873,6 +887,21 @@ $("queue").addEventListener("click", async (e) => {
   const res = await r.json().catch(() => ({}));
   toast(decision === "approved" ? "Approvato: esce all'orario, oppure premi Pubblica adesso"
     : res.started ? "La Regia sta rifacendo il video con la tua nota" : "Nota salvata, ma la Regia non è partita: controlla la routine");
+  load();
+});
+
+// commenti da guardare: la decisione va all'ufficio, la risposta parte al prossimo giro di Ada
+$("comments").addEventListener("click", async (e) => {
+  const b = e.target.closest("[data-cm-ok],[data-cm-no]");
+  if (!b) return;
+  const id = b.dataset.cmOk || b.dataset.cmNo, ok = Boolean(b.dataset.cmOk);
+  const reply = ($("cm-" + id)?.value || "").trim();
+  if (ok && !reply) { toast("Scrivi la risposta, o premi Lascia stare"); return; }
+  b.disabled = true;
+  const r = await fetch("/community/decide", { method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id, decision: ok ? "approved" : "dismissed", reply }) });
+  b.disabled = false;
+  toast(!r.ok ? "Non sono riuscito a salvare: riprova" : ok ? "Risposta approvata: parte al prossimo giro dei commenti" : "Lasciato senza risposta");
   load();
 });
 

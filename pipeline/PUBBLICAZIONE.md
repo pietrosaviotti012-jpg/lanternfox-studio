@@ -21,7 +21,7 @@ Risposta: `{"items": [{id, title, caption, preview_url, cover_url, published: {i
 
 Per ogni video, salta le piattaforme dove `published.<piattaforma>` ha già `url` oppure `draft` (vuol dire che è stato fatto in un giro precedente).
 
-## 2. Instagram (connettore Composio, account `instagram_folia-ferly`, ig_user_id `40769843119273114`)
+## 2. Instagram (connettore Composio, account `instagram_sain-curr`, ig_user_id `40769843119273114`)
 1. `INSTAGRAM_POST_IG_USER_MEDIA` con `ig_user_id`, `media_type: "REELS"`, `video_url: preview_url`, `caption: caption`, `share_to_feed: true`, `cover_url: cover_url`. Restituisce l'`id` del contenitore.
 2. Controlla `INSTAGRAM_GET_POST_STATUS` con `creation_id` ogni 5 secondi, finché `status_code` è `FINISHED` (di solito in circa 30 secondi). Se è `ERROR`, segnala l'errore.
 3. `INSTAGRAM_POST_IG_USER_MEDIA_PUBLISH` con `ig_user_id`, `creation_id`, `max_wait_seconds: 120`: ottieni l'id del post.

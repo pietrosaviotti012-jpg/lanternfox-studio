@@ -187,6 +187,9 @@ function emptyState() {
     stats: null,  // { followers: {instagram, youtube, tiktok}, views_7d, best: {title, views}, updated_at }
     log: [],      // { at, dept, text }
     ideas: [],    // { id, text, at, status: sent|making|ready|error, video? }: the videos the user asked for from the Office
+    // community: seen = comment ids already handled; log = { at, platform, author, text, action: replied|dm|flagged|hidden|skipped, reply };
+    // pending = critiques the user decides on: { id, platform, author, text, proposal, at, status: waiting|approved|dismissed|sent }
+    community: { seen: [], log: [], pending: [] },
     clock: null,
   };
 }
@@ -205,6 +208,10 @@ async function saveState(env, state) {
   state.queue = state.queue.slice(-20);
   state.calendar = state.calendar.slice(-60);
   state.ideas = state.ideas.slice(-12);
+  const c = state.community;
+  const open = (p) => p.status === "waiting" || p.status === "approved";
+  c.seen = c.seen.slice(-600); c.log = c.log.slice(-60);
+  c.pending = c.pending.filter(open).concat(c.pending.filter((p) => !open(p)).slice(-10));
   await env.DATA.put("state", JSON.stringify(state));
 }
 
@@ -416,6 +423,76 @@ export default {
         <style>body{max-width:640px;margin:40px auto;padding:0 16px;font:17px/1.6 Georgia,serif;color:#1a1d2a;background:#fbf3e2}h1{font-size:1.6rem}</style></head><body>${body}<p style="color:#666;font-size:.9rem">Last updated 28 October 2026.</p></body></html>`);
     }
 
+    // —— community routine: YouTube comments through the user's Google project, the log, and the critiques the user decides on ——
+    if (url.pathname.startsWith("/community/") && url.pathname !== "/community/decide") {
+      if (!(await publishOk(request, env))) return json({ error: "non autorizzato" }, 401);
+      const state = await loadState(env);
+      const c = state.community;
+      const yt = async (path, init = {}) => {
+        const token = await youtubeToken(env);
+        if (!token) throw new Error("YouTube non è collegato");
+        const r = await fetch(`https://www.googleapis.com/youtube/v3/${path}`, { ...init, headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" } });
+        const j = r.status === 204 ? {} : await r.json().catch(() => ({}));
+        if (!r.ok) throw new Error(`YouTube ${r.status}: ${clip(JSON.stringify(j.error || j), 200)}`);
+        return j;
+      };
+      try {
+        // what the routine needs: comments already handled, replies the user approved, and tomorrow's story for STORY
+        if (url.pathname === "/community/context") {
+          const today = new Date().toISOString().slice(0, 10);
+          const planned = state.calendar.find((d) => d.date > today && d.status === "planned");
+          const next = [...state.queue].reverse().find((q) => q.status !== "published");
+          return json({ seen: c.seen, approved: c.pending.filter((p) => p.status === "approved"),
+            tomorrow: planned ? { title: planned.title } : next ? { title: next.title, caption: next.caption } : null });
+        }
+        if (url.pathname === "/community/youtube/comments") {
+          const ch = JSON.parse((await env.DATA.get("yt_channel")) || "null");
+          if (!ch?.id) throw new Error("YouTube non è collegato");
+          const j = await yt(`commentThreads?part=snippet,replies&allThreadsRelatedToChannelId=${ch.id}&order=time&maxResults=50&textFormat=plainText`);
+          const items = (j.items || []).map((t) => {
+            const s = t.snippet.topLevelComment.snippet;
+            return { id: t.snippet.topLevelComment.id, video: t.snippet.videoId, author: s.authorDisplayName, author_channel: s.authorChannelId?.value,
+              text: s.textOriginal, at: s.publishedAt, answered: (t.replies?.comments || []).some((r) => r.snippet.authorChannelId?.value === ch.id) };
+          }).filter((i) => i.author_channel !== ch.id && !c.seen.includes("yt:" + i.id));
+          return json({ channel: ch.title, items });
+        }
+        if (request.method !== "POST") return json({ error: "metodo non valido" }, 405);
+        const body = await request.json().catch(() => ({}));
+        if (url.pathname === "/community/youtube/reply") {
+          const j = await yt("comments?part=snippet", { method: "POST", body: JSON.stringify({ snippet: { parentId: body.id, textOriginal: clip(body.text, 1000) } }) });
+          return json({ ok: true, id: j.id });
+        }
+        if (url.pathname === "/community/youtube/hide") {
+          await yt(`comments/setModerationStatus?id=${encodeURIComponent(body.id)}&moderationStatus=heldForReview`, { method: "POST" });
+          return json({ ok: true });
+        }
+        // one entry per comment handled; "flagged" ones wait for the user in Approva
+        if (url.pathname === "/community/log") {
+          const now = new Date().toISOString();
+          const items = [].concat(body.items || []);
+          for (const e of items) {
+            const key = `${e.platform === "youtube" ? "yt" : "ig"}:${e.id}`;
+            if (!c.seen.includes(key)) c.seen.push(key);
+            const entry = { at: now, platform: e.platform, author: clip(e.author, 60), text: clip(e.text, 300), action: e.action, reply: clip(e.reply, 300) };
+            c.log.push(entry);
+            if (e.action === "flagged" && !c.pending.some((p) => p.id === key)) c.pending.push({ id: key, platform: e.platform, author: entry.author, text: entry.text, proposal: entry.reply, at: now, status: "waiting" });
+            const p = c.pending.find((x) => x.id === key && x.status === "approved");
+            if (p && e.action === "replied") p.status = "sent";
+          }
+          const n = (a) => items.filter((e) => e.action === a).length;
+          const text = [n("replied") && `${n("replied")} risposte`, n("dm") && `${n("dm")} messaggi STORY`, n("hidden") && `${n("hidden")} nascosti`,
+            n("flagged") && `${n("flagged")} da guardare`].filter(Boolean).join(", ") || "nessun commento nuovo";
+          const waiting = c.pending.some((p) => p.status === "waiting");
+          state.departments.community = { status: waiting ? "waiting" : "done", task: `Giro dei commenti: ${text}`, output: "", updated_at: now };
+          state.log.push({ at: now, dept: "community", status: "done", text: `Ada ha fatto il giro dei commenti: ${text}` });
+          await saveState(env, state);
+          if (n("flagged")) await pushAll(env, { title: "Un commento aspetta te", body: `${n("flagged")} da guardare in Approva`, url: "/#approva" });
+          return json({ ok: true });
+        }
+        return json({ error: "percorso sconosciuto" }, 404);
+      } catch (err) { return json({ ok: false, error: clip(err.message, 300) }, 502); }
+    }
+
     // —— YouTube: the routine asks, the Office uploads with the user's own Google project and returns the link ——
     if (url.pathname === "/publish/youtube" && request.method === "POST") {
       if (!(await publishOk(request, env))) return json({ error: "non autorizzato" }, 401);
@@ -589,6 +666,21 @@ export default {
       return json({ ok: true, started: decision === "redo" ? redoOk : undefined });
     }
     // "Chiedi un video": an idea of the user's goes to the Regia routine, which writes the story, draws it and starts the render
+    // the user's decision on a flagged comment: the proposed (or edited) reply goes out at the next round, or nothing
+    if (url.pathname === "/community/decide" && request.method === "POST") {
+      const { id, decision, reply } = await request.json();
+      const state = await loadState(env);
+      const p = state.community.pending.find((x) => x.id === id && x.status === "waiting");
+      if (!p || !["approved", "dismissed"].includes(decision)) return json({ error: "commento non trovato" }, 404);
+      p.status = decision;
+      if (reply) p.proposal = clip(reply, 300);
+      const now = new Date().toISOString();
+      if (!state.community.pending.some((x) => x.status === "waiting")) state.departments.community = { ...state.departments.community, status: "done", updated_at: now };
+      state.log.push({ at: now, dept: "community", status: "done",
+        text: decision === "approved" ? `Risposta a ${p.author} approvata: parte al prossimo giro` : `Commento di ${p.author} lasciato senza risposta` });
+      await saveState(env, state);
+      return json({ ok: true });
+    }
     if (url.pathname === "/idea" && request.method === "POST") {
       const text = clip(String((await request.json()).text || "").trim(), 600);
       if (text.length < 8) return json({ error: "scrivi un'idea un po' più lunga" }, 400);

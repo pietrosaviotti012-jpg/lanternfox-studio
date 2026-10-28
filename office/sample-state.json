@@ -146,5 +146,20 @@
       "at": "2026-10-28T09:41:35.445Z",
       "status": "making"
     }
-  ]
+  ],
+  "community": {
+    "seen": [],
+    "log": [],
+    "pending": [
+      {
+        "id": "ig:1",
+        "platform": "instagram",
+        "author": "nightowl_reads",
+        "text": "The voice sounds a bit robotic honestly",
+        "proposal": "Thank you for listening so closely 🦊 We are still tuning the narrator, and your ear helps. Tomorrow's tale should sound warmer.",
+        "at": "2026-10-28T10:59:53.759Z",
+        "status": "waiting"
+      }
+    ]
+  }
 }

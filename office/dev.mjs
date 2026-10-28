@@ -42,7 +42,7 @@ createServer((req, res) => {
     }).catch(() => { res.writeHead(502); res.end(); });
     return;
   }
-  if (url.pathname === "/approve" || url.pathname.startsWith("/push/")) {
+  if (url.pathname === "/approve" || url.pathname === "/community/decide" || url.pathname.startsWith("/push/")) {
     res.writeHead(200, { "Content-Type": "application/json" });
     return res.end(JSON.stringify({ ok: true, key: "", sent: 0 }));
   }
