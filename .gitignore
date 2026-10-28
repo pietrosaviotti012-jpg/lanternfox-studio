@@ -12,3 +12,4 @@ productions/*/vo/
 productions/*/out/
 productions/*/stills/
 productions/*/events.json
+!voices/*.wav
