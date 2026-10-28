@@ -276,3 +276,42 @@ export function foreground(x, o) {
     if (R() < .4) { x.beginPath(); x.ellipse(px + lean * hh, base + hh + .004, .0016, .006, lean, 0, TAU); x.fill(); }
   }
 }
+
+// —— Added for "What If Every Star Went Out Tonight?": stars as pinholes of light, a village of cottages ——
+
+// One star: a round pinhole with four thin points (cut paper on x in a dark tone, so it disappears when its glow is off; white on g)
+export function star(x, o, g) {
+  const { cx, cy, r, col = '#22305a', rays = 2.6 } = o;
+  const shape = (c, fill) => {
+    c.fillStyle = fill; c.beginPath(); c.arc(cx, cy, r, 0, TAU); c.fill();
+    if (r < .0016) return;
+    c.beginPath();
+    for (let i = 0; i < 8; i++) { const a = i * Math.PI / 4, l = i % 2 ? r * .55 : r * rays; c.lineTo(cx + Math.cos(a) * l, cy + Math.sin(a) * l); }
+    c.closePath(); c.fill();
+  };
+  if (x) shape(x, col);
+  if (g) shape(g, '#fff');
+}
+
+// A field of stars over a w × h sheet, between minY and maxY; n stars, sizes r0..r1 (few big, many small)
+export function starField(x, o, g) {
+  const { w = .33, h = .58, n = 90, seed = 7, minY = -1, maxY = 1, r0 = .0009, r1 = .0034, col } = o, R = mulberry(seed);
+  for (let i = 0; i < n; i++) {
+    const cx = (R() - .5) * w, cy = (R() - .5) * h, r = r0 + R() * R() * R() * (r1 - r0);
+    if (cy < minY || cy > maxY) continue;
+    star(x, { cx, cy, r, col }, g);
+  }
+}
+
+// A cottage: walls, pitched roof, chimney, one window (warm paper whose glow goes to g); bx, by = bottom centre, s = width
+export function cottage(x, o, g) {
+  const { cx, by, s, col = '#0e1532', lit = true, roof = .75 } = o, h = s * .62;
+  if (x) {
+    x.fillStyle = col; x.fillRect(cx - s / 2, by, s, h);
+    x.beginPath(); x.moveTo(cx - s * .6, by + h); x.lineTo(cx, by + h + s * roof * .5); x.lineTo(cx + s * .6, by + h); x.closePath(); x.fill();
+    x.fillRect(cx + s * .22, by + h + s * .05, s * .12, s * .3);
+    if (lit) { x.fillStyle = '#f0b060'; x.fillRect(cx - s * .14, by + h * .4, s * .28, h * .34);
+      x.fillStyle = col; x.fillRect(cx - s * .008, by + h * .4, s * .016, h * .34); }
+  }
+  if (g && lit) { g.fillStyle = '#fff'; g.fillRect(cx - s * .14, by + h * .4, s * .28, h * .34); }
+}

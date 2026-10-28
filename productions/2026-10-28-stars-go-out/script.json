@@ -1,0 +1,272 @@
+{
+  "title": "What If Every Star Went Out Tonight?",
+  "series": "What If…",
+  "voice": {
+    "engine": "chatterbox"
+  },
+  "captions": "pop",
+  "hud": {
+    "tag": "WHAT IF…",
+    "part": "NO. 1"
+  },
+  "lead": 0.5,
+  "tail": 3.4,
+  "lines": [
+    {
+      "id": "L01",
+      "text": "What if every star in the sky went out tonight?",
+      "em": [
+        "star",
+        "out"
+      ],
+      "gap": 0.35,
+      "act": {
+        "intensity": 0.6,
+        "pace": 0.4,
+        "speed": 0.9
+      }
+    },
+    {
+      "id": "L02",
+      "text": "Not the Sun. Just the others, at midnight sharp.",
+      "em": [
+        "midnight"
+      ],
+      "gap": 0.6,
+      "act": {
+        "intensity": 0.5,
+        "pace": 0.42,
+        "speed": 0.9
+      },
+      "clock": "00:00 · TONIGHT"
+    },
+    {
+      "id": "L03",
+      "text": "And you wouldn't notice a thing.",
+      "em": [
+        "notice"
+      ],
+      "gap": 0.3,
+      "act": {
+        "intensity": 0.65,
+        "pace": 0.4,
+        "speed": 0.88,
+        "gain_db": 1
+      }
+    },
+    {
+      "id": "L04",
+      "text": "Not tonight. Not next year either.",
+      "em": [
+        "either"
+      ],
+      "gap": 0.8,
+      "act": {
+        "intensity": 0.5,
+        "pace": 0.42,
+        "speed": 0.9
+      }
+    },
+    {
+      "id": "L05",
+      "text": "Because starlight is old light.",
+      "em": [
+        "old"
+      ],
+      "gap": 0.4,
+      "act": {
+        "intensity": 0.45,
+        "pace": 0.38,
+        "speed": 0.88,
+        "gain_db": -1
+      }
+    },
+    {
+      "id": "L06",
+      "text": "The closest star's light takes over four years to reach you.",
+      "em": [
+        "four",
+        "years"
+      ],
+      "gap": 0.7,
+      "act": {
+        "intensity": 0.5,
+        "pace": 0.42,
+        "speed": 0.9
+      }
+    },
+    {
+      "id": "L07",
+      "text": "So for years, the sky looks perfectly normal.",
+      "em": [
+        "normal"
+      ],
+      "gap": 1.0,
+      "act": {
+        "intensity": 0.4,
+        "pace": 0.4,
+        "speed": 0.9,
+        "gain_db": -1
+      },
+      "clock": "YEAR 1"
+    },
+    {
+      "id": "L08",
+      "text": "Then, one night, the first star blinks out.",
+      "em": [
+        "blinks",
+        "out"
+      ],
+      "gap": 1.0,
+      "act": {
+        "intensity": 0.6,
+        "pace": 0.38,
+        "speed": 0.88,
+        "gain_db": 0.5
+      },
+      "clock": "YEAR 4"
+    },
+    {
+      "id": "L09",
+      "text": "Sirius goes dark a few years later.",
+      "em": [
+        "Sirius"
+      ],
+      "gap": 0.4,
+      "act": {
+        "intensity": 0.5,
+        "pace": 0.42,
+        "speed": 0.9
+      },
+      "clock": "YEAR 8"
+    },
+    {
+      "id": "L10",
+      "text": "But the North Star keeps shining for centuries.",
+      "em": [
+        "centuries"
+      ],
+      "gap": 0.7,
+      "act": {
+        "intensity": 0.55,
+        "pace": 0.4,
+        "speed": 0.88
+      },
+      "clock": "YEAR 400"
+    },
+    {
+      "id": "L11",
+      "text": "The last ones fade thousands of years from now.",
+      "em": [
+        "thousands"
+      ],
+      "gap": 1.0,
+      "act": {
+        "intensity": 0.4,
+        "pace": 0.38,
+        "speed": 0.86,
+        "gain_db": -2
+      },
+      "clock": "YEAR 3,000"
+    },
+    {
+      "id": "L12",
+      "text": "Which means that right now,",
+      "em": [
+        "now"
+      ],
+      "gap": 0.35,
+      "act": {
+        "intensity": 0.45,
+        "pace": 0.36,
+        "speed": 0.86,
+        "gain_db": -2.5
+      },
+      "clock": "TONIGHT"
+    },
+    {
+      "id": "L13",
+      "text": "some of the stars you can see may already be gone.",
+      "em": [
+        "already",
+        "gone"
+      ],
+      "gap": 1.0,
+      "act": {
+        "intensity": 0.7,
+        "pace": 0.38,
+        "speed": 0.86,
+        "gain_db": 1.5
+      }
+    },
+    {
+      "id": "L14",
+      "text": "The only light you can be sure of is the one you carry.",
+      "em": [
+        "carry"
+      ],
+      "gap": 0.5,
+      "act": {
+        "intensity": 0.45,
+        "pace": 0.4,
+        "speed": 0.88,
+        "gain_db": -1
+      }
+    },
+    {
+      "id": "L15",
+      "text": "So which star would you stay up to watch go out?",
+      "em": [
+        "which",
+        "star"
+      ],
+      "gap": 0.3,
+      "act": {
+        "intensity": 0.55,
+        "pace": 0.42,
+        "speed": 0.9
+      }
+    }
+  ],
+  "bpm": 66,
+  "seed": 23,
+  "music": [
+    {
+      "at": "S1",
+      "mood": "hush"
+    },
+    {
+      "at": "S2",
+      "mood": "calm"
+    },
+    {
+      "at": "S3",
+      "mood": "rise"
+    },
+    {
+      "at": "S4",
+      "mood": "hush"
+    },
+    {
+      "at": "S5",
+      "mood": "rise"
+    },
+    {
+      "at": "S6",
+      "mood": "hush"
+    },
+    {
+      "at": "S7",
+      "mood": "rise"
+    },
+    {
+      "at": "S8",
+      "mood": "warm"
+    },
+    {
+      "at": "S8",
+      "mood": "end",
+      "offset": 8
+    }
+  ]
+}
