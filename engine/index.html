@@ -22,6 +22,16 @@ html, body { margin: 0; background: #000; overflow: hidden; }
 #hud .part { display: inline-block; margin-left: 12px; font-size: 34px; color: #ffcf4a; }
 #hud .clock { margin-top: 10px; font-size: 38px; text-shadow: 0 3px 12px rgba(0,0,0,.8); }
 /* cover (?cover=1): the still used as Reel cover: one big promise, readable as a thumbnail */
+#c { transform-origin: 50% 38%; will-change: transform; }
+/* particles over the scene (script.fx), under the text */
+#fx { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; pointer-events: none; }
+/* a phone notification (line.card): the alert of the Your Call model, appears with its line */
+#card { position: absolute; left: 110px; right: 110px; top: 300px; padding: 26px 30px; border-radius: 34px; background: rgba(28,28,34,.92);
+  color: #f2f2f2; font-family: -apple-system, "Segoe UI", Arial, sans-serif; box-shadow: 0 20px 60px rgba(0,0,0,.6); opacity: 0; transform: translateY(-40px); }
+#card .app { font-size: 26px; letter-spacing: .06em; text-transform: uppercase; color: #ff5b4f; font-weight: 700; }
+#card .app.info { color: #9ab4ff; }
+#card .title { margin-top: 10px; font-size: 40px; font-weight: 700; }
+#card .body { margin-top: 6px; font-size: 32px; color: #c9c9cf; }
 #cover { position: absolute; inset: 0; display: none; flex-direction: column; justify-content: center; align-items: center; padding: 0 70px;
   background: linear-gradient(180deg, rgba(0,0,0,.05) 0%, rgba(0,0,0,.15) 40%, rgba(0,0,0,.72) 100%); text-align: center; }
 #cover .kicker { font-family: Anton; font-size: 54px; letter-spacing: .05em; color: #ffcf4a; text-shadow: 0 4px 16px rgba(0,0,0,.8); margin-top: 640px; }
@@ -30,7 +40,7 @@ html, body { margin: 0; background: #000; overflow: hidden; }
 #cover .big b { font-weight: 400; color: #ffb862; }
 </style>
 <script type="importmap">{ "imports": { "three": "/node_modules/three/build/three.module.js", "three/addons/": "/node_modules/three/examples/jsm/" } }</script>
-</head><body><canvas id="c"></canvas><div id="sub"></div><div id="pop"></div><div id="hud"></div>
+</head><body><canvas id="c"></canvas><canvas id="fx" width="540" height="960"></canvas><div id="card"></div><div id="sub"></div><div id="pop"></div><div id="hud"></div>
 <div id="cover"><div class="kicker"></div><div class="big"></div></div>
 <script type="module" src="engine/main.js"></script>
 </body></html>

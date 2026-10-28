@@ -106,6 +106,70 @@ if (COVER) {
   box.querySelector('.big').innerHTML = esc(cv.text || '').replace(/\*([^*]+)\*/g, '<b>$1</b>');
 }
 window.COVER_T = (META.cover && META.cover.t) ?? null;
+
+// —— Motion the engine adds to every film (script.motion: false turns it off):
+//   punch-in: a quick zoom on each coloured (em) word; shake: a short tremor when a line with `hit: true` starts;
+//   drift: a slow push-in inside every shot, so no frame is ever still.
+//   script.fx: "embers" | "snow" | "dust" | "rain" | "fireflies" particles over the scene; line.card: a phone notification. ——
+const MOTION = script.motion !== false;
+const EMS = [], HITS = [];
+for (const L of script.lines) {
+  const ch = CHUNKS[L.id] || [];
+  for (const g of ch) for (const x of g) if (x.em) EMS.push(x.s);
+  if (L.hit) HITS.push(C[L.id].at);
+}
+const bump = (d, len) => d < 0 || d > len ? 0 : Math.sin(Math.PI * Math.min(1, d / (len * .25))) * Math.exp(-d / (len * .35));
+function camera(t, shotT, shotDur) {
+  if (!MOTION || COVER) return 'none';
+  let s = 1 + .035 * ss(clamp(shotT / Math.max(1, shotDur)));                  // drift
+  for (const w of EMS) s += .045 * bump(t - w + .02, .45);                        // punch-in
+  let dx = 0, dy = 0;
+  for (const h of HITS) { const a = 14 * Math.max(0, 1 - (t - h) / .5) * (t >= h ? 1 : 0);
+    dx += a * Math.sin(t * 83); dy += a * Math.cos(t * 67); }
+  return `translate(${dx.toFixed(1)}px, ${dy.toFixed(1)}px) scale(${s.toFixed(4)})`;
+}
+const fxc = document.getElementById('fx'), fxx = fxc.getContext('2d');
+const FX = script.fx || null;
+const rnd = (i, k) => { const v = Math.sin(i * 127.1 + k * 311.7) * 43758.5453; return v - Math.floor(v); };
+function particles(t) {
+  fxx.clearRect(0, 0, 540, 960);
+  if (!FX || COVER) return;
+  const N = { embers: 70, snow: 140, dust: 90, rain: 220, fireflies: 40 }[FX] || 0;
+  for (let i = 0; i < N; i++) {
+    const r1 = rnd(i, 1), r2 = rnd(i, 2), r3 = rnd(i, 3);
+    if (FX === 'rain') {
+      const y = ((r2 * 960 + t * (900 + 400 * r3)) % 1000) - 40, x = (r1 * 600 - 30 + y * .12) % 560;
+      fxx.strokeStyle = `rgba(190,205,235,${.18 + .2 * r3})`; fxx.lineWidth = 1; fxx.beginPath(); fxx.moveTo(x, y); fxx.lineTo(x + 3, y + 22); fxx.stroke();
+    } else if (FX === 'snow' || FX === 'dust') {
+      const sp = FX === 'snow' ? 40 + 50 * r3 : 6 + 10 * r3;
+      const y = ((r2 * 960 + t * sp) % 980) - 10, x = r1 * 540 + Math.sin(t * (.5 + r3) + i) * (FX === 'snow' ? 14 : 6);
+      fxx.fillStyle = FX === 'snow' ? `rgba(245,248,255,${.4 + .5 * r3})` : `rgba(255,230,190,${.12 + .2 * r3})`;
+      fxx.beginPath(); fxx.arc(x, y, FX === 'snow' ? 1 + 2.2 * r3 : .6 + 1.2 * r3, 0, 6.283); fxx.fill();
+    } else {
+      // embers rise and flicker; fireflies wander and pulse
+      const rise = FX === 'embers' ? 30 + 60 * r3 : 4;
+      const y = FX === 'embers' ? 980 - ((r2 * 980 + t * rise) % 1000) : r2 * 700 + 120 + Math.sin(t * .7 + i * 2) * 30;
+      const x = r1 * 540 + Math.sin(t * (.8 + r3) + i * 3) * (FX === 'embers' ? 10 : 26);
+      const a = FX === 'embers' ? (.35 + .5 * Math.abs(Math.sin(t * 6 * r3 + i))) * Math.min(1, y / 300) : .25 + .75 * Math.max(0, Math.sin(t * (1.5 + r3) + i * 5));
+      const g = fxx.createRadialGradient(x, y, 0, x, y, FX === 'embers' ? 4 : 7);
+      g.addColorStop(0, `rgba(255,${FX === 'embers' ? 170 : 230},${FX === 'embers' ? 80 : 120},${a})`); g.addColorStop(1, 'rgba(255,180,90,0)');
+      fxx.fillStyle = g; fxx.beginPath(); fxx.arc(x, y, FX === 'embers' ? 4 : 7, 0, 6.283); fxx.fill();
+    }
+  }
+}
+const card = document.getElementById('card');
+function cardAt(t) {
+  if (COVER) { card.style.opacity = 0; return; }
+  const L = script.lines.filter(L => L.card && t >= C[L.id].at - .1).pop();
+  if (!L) { card.style.opacity = 0; return; }
+  const c = L.card, start = C[L.id].at - .1, until = start + (c.hold ?? 3.2);
+  const k = Math.min(ss(seg(t, start, start + .25)), 1 - ss(seg(t, until, until + .3)));
+  if (card.dataset.id !== L.id) {
+    card.dataset.id = L.id;
+    card.innerHTML = `<div class="app${c.kind === 'info' ? ' info' : ''}">${esc(c.app || 'Emergency alert')}</div><div class="title">${esc(c.title || '')}</div>${c.body ? `<div class="body">${esc(c.body)}</div>` : ''}`;
+  }
+  card.style.opacity = k; card.style.transform = `translateY(${(-40 * (1 - k)).toFixed(1)}px)`;
+}
 function lines(text) {
   const s = text.replace(/[.,;:]+$/, '');
   if (s.length <= 30) return s;
@@ -132,6 +196,7 @@ window.render = async (t) => {
     g = await drawShot(i, t, pipe.rtA); gc([i]);
   }
   pipe.final({ ...g, mixB, mode: tr.type === 'iris' ? 1 : 0, center: tr.center, time: t, fade: (g.fade ?? 1) * ss(clamp((DUR - t) / 1.2))   /* no fade-in: frame 0 is the hook */ });
+  canvas.style.transform = camera(t, tl, p.dur); particles(t); cardAt(t);
   if (COVER) { sub.style.opacity = 0; pop.innerHTML = ''; return; }
   if (CAPS === 'pop') {
     // each chunk pops in (a quick scale from 1.18) and keeps its words until the next chunk starts

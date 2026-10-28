@@ -37,9 +37,12 @@ La chiusa è sempre una domanda o una scelta da commentare. La parola STORY rest
 ## 1. Ricerca (`ricerca`)
 Skill: `trend-spotter`, `content-research`, `reel-analyzer`, `virality`, `hook-mining`. Ogni giro guarda cosa funziona adesso nei video animati e AI brevi: ricerca web su YouTube Shorts, Instagram Reels e TikTok ("AI animated story", "what if", "mystery", "POV your choice"), Reddit e gli account modello (Your Call TV, Kallaway per i ganci).
 Scrive `research/<data>.md` con 3 idee, ognuna con: il formato, il gancio in una riga, e perché funziona (numeri visti, commenti). Massimo 15 minuti. Le idee non usate restano per i giorni dopo.
+Le idee forti diventano voci di `stories/BANCA.md`. Quello che vede di nuovo nelle immagini (effetti, ritmo, inquadrature che trattengono) va in fondo a `pipeline/VISIVO.md`, con la data e con "il motore lo sa fare / non ancora".
+Se il connettore Reddit di Composio è attivo, guarda i post più votati del mese in r/UnresolvedMysteries, r/nosleep, r/LetsNotMeet e r/Glitch_in_the_Matrix: solo per capire quali premesse funzionano, mai per copiarle.
 
 ## 2. Soggetto (`soggetto`)
 Skill: `series-planner`, `content-calendar`. Sceglie il video del giro: il formato tocca a rotazione (guarda `productions/` per vedere gli ultimi formati usati), e un formato che funziona (Statistiche) può tornare più spesso. Le serie (Your Call) continuano con la parte dopo, seguendo la scelta più commentata (si legge dal diario della Community).
+La storia la prende da **`stories/BANCA.md`**: prima le ⭐, poi le altre. Segui le regole in testa al file: niente testi copiati, persone reali solo se storiche, la leggenda dichiarata. Poi segna la storia come usata. La Ricerca aggiunge alla banca 3-5 voci nuove a ogni giro.
 Crea `productions/<data>-<slug>/meta.json` (titolo, `format`, serie, episodio, idea in una riga, `cover`) e aggiorna il calendario dell'ufficio (`{"calendar": {"date", "title", "status": "planned"}}`).
 `meta.cover`: `{ "kicker": "EYES DOWN · PART 1", "text": "Do *not* look at the sky", "t": 2.5 }` è la copertina del Reel: una promessa di 4-8 parole, le parole tra asterischi vengono colorate, `t` è il fotogramma di sfondo (facoltativo).
 
@@ -55,7 +58,8 @@ Skill: `going-viral`, `viral-hook-writer`, `reel-scripter`, `on-screen-text-writ
 
 ## 4. Regia (`regia`)
 Skill: `lemo-opuscar` (leggi `STYLE.md` di paper-lantern e `DIRECTOR.md`), il tabellone di `launch-video`. Scrive `shots.js` con il kit (`engine/kit/shot.js` + `engine/kit/motifs.js`, esempio completo: `productions/2026-10-28-lighthouse-fox/shots.js`):
-- 6-9 inquadrature, ognuna ancorata a una riga (`start: at('L04') - .4`), dissolvenze 0,6-1,2 s;
+- prima di cominciare leggi **`pipeline/VISIVO.md`**, la guida di ricerca e sviluppo visivo: un evento visivo ogni 1,5-2,5 s, `em`, `hit`, `card`, `fx`;
+- 10-18 inquadrature, ognuna ancorata a una riga (`start: at('L04') - .4`); sui cambi veloci tagli netti, sui momenti calmi dissolvenze di 0,5-0,8 s;
 - almeno quattro movimenti di camera diversi; le azioni forti sulle parole (`E.word('L07', 7)`);
 - soggetti tra il 15% e il 52% dell'altezza: in alto c'è l'etichetta di serie, tra il 53% e il 66% i sottotitoli pop, dal 66% in giù i pulsanti delle app;
 - per Your Call: un personaggio semplice e leggibile (il "tu" della storia, di carta), primi piani su dettagli che contano (il telefono, la finestra, la porta), luce che cambia con l'ora;
