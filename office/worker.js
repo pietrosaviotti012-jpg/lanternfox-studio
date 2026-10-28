@@ -550,7 +550,7 @@ export default {
       if (url.pathname === "/routine/test") {
         const body = await request.json().catch(() => ({}));
         const which = body.which === "REDO" ? "REDO" : "PUBLISH";
-        return json({ status: await fireRoutine(env, which, which === "REDO" ? clip(body.text, 500) : "Prova del tasto Pubblica adesso") });
+        return json({ status: await fireRoutine(env, which, which === "REDO" ? clip(body.text, 1500) : "Prova del tasto Pubblica adesso") });
       }
       if (url.pathname === "/events") {
         try {
@@ -662,7 +662,7 @@ export default {
       const item = state.queue.find((q) => q.id === id);
       if (!item) return json({ error: "video non trovato" }, 404);
       item.status = decision;
-      item.note = clip(note, 400);
+      item.note = clip(note, 1000);
       item.decided_at = new Date().toISOString();
       // approved videos wait for the publishing routine's slot (PUBLISH_AT_UTC); "redo" starts the Regia routine with the note
       const started = decision === "redo" ? await fireRoutine(env, "REDO", `id: ${id}\nnote: ${item.note}`) : 0;
