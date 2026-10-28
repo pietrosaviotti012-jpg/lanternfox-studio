@@ -314,6 +314,7 @@ export function cottage(x, o, g) {
       x.fillStyle = col; x.fillRect(cx - s * .008, by + h * .4, s * .016, h * .34); }
   }
   if (g && lit) { g.fillStyle = '#fff'; g.fillRect(cx - s * .14, by + h * .4, s * .28, h * .34); }
+}
 
 // —— Added for Lantern Night (Your Call): a town that can go dark, neighbours with lanterns, a forest edge, a phone, a door ——
 

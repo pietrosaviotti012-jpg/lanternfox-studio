@@ -67,7 +67,9 @@ for L in script["lines"]:
             sf.write(path, synth(L, attempt), SR)
         words, heard = check(path)
         got = norm_words(heard)
-        missing = [w for w in want if w not in got]
+        # a word also counts when Whisper splits or joins it ("Streetlamps" heard as "street lamps")
+        joined = "".join(got).replace("'", "")
+        missing = [w for w in want if w not in got and w.replace("'", "") not in joined]
         ok = len(missing) <= max(0, len(want) // 8)   # whisper may drop one short word in a long line
         if ok or L not in todo:
             break
