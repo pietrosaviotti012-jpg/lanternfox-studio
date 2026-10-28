@@ -183,23 +183,24 @@ export function SHOTS(C, DUR) {
         });
       } },
 
-    // 8 · Your call: the fox waits at the edge of the forest (GO), your window has one candle (STAY); the choice is cut paper
+    // 8 · Your call: the fox waits at the edge of the forest (GO), your window has one candle (STAY); the choice is cut paper,
+    // both signs kept inside the frame's centre (the camera is at most ±.09 wide at the start of L15)
     { id: 'S8', start: at('L14') - .3, in: { type: 'dissolve', dur: .7 }, sfx: [{ t: 0, type: 'wind', d: DUR - at('L14') + .5, v: .35 }, { t: at('L15') - at('L14') + .5, type: 'paper' }, { t: end('L15') - at('L14') + .8, type: 'paper' }],
       build: E => {
         const go = E.cue('L15') + C.L15.dur * .55, stay = E.cue('L15') + C.L15.dur * .8, titleAt = E.cueEnd('L15') + .8;
-        const sign = (s, cx) => ({ name: s, z: -.05, trans: .25, w: .1, h: .04, x: cx, y: .23, shadow: false, recv: false, finish: { rim: .6 },
+        const sign = (s, cx) => ({ name: s, z: -.05, trans: .25, w: .08, h: .04, x: cx, y: .2, shadow: false, recv: false, finish: { rim: .6 },
           draw: x => { x.fillStyle = '#f1dbac'; x.fillRect(-.04, -.016, .08, .032); text(x, s, 0, -.0005, .022, '"Anton"', { fill: s === 'GO' ? '#e8743b' : '#2b3a6a' }); } });
         return layered(E, {
           light: [0, .12, -.13], lightR: .18, sky: { stops: DARK, stars: 170 }, on: false,
           layers: [
             { name: 'forest', z: -.115, trans: .4, glow: 2.2, draw: x => { x.fillStyle = '#22335f'; pines(x, { x0: -.25, x1: .02, base: .11, h: .1, n: 12, seed: 2 }); x.fillRect(-.25, -.45, .5, .56); },
               glowDraw: g => { g.fillStyle = '#fff'; for (const [px, py] of [[-.17, .13], [-.12, .145], [-.07, .125]]) { g.beginPath(); g.arc(px, py, .0025, 0, Math.PI * 2); g.fill(); } } },
-            { name: 'home', z: -.09, trans: .15, glow: 3, draw: x => house(x, { cx: .1, by: .1, w: .11, h: .08, roof: .05, cols: 2, rows: 2, col: '#141a35', chimney: .3, lit: [2] }),
-              glowDraw: g => house(null, { cx: .1, by: .1, w: .11, h: .08, roof: .05, cols: 2, rows: 2, lit: [2] }, g) },
+            { name: 'home', z: -.09, trans: .15, glow: 3, draw: x => house(x, { cx: .055, by: .1, w: .1, h: .08, roof: .05, cols: 2, rows: 2, col: '#141a35', chimney: .3, lit: [2] }),
+              glowDraw: g => house(null, { cx: .055, by: .1, w: .1, h: .08, roof: .05, cols: 2, rows: 2, lit: [2] }, g) },
             { name: 'field', z: -.07, trans: .08, draw: x => { x.fillStyle = '#0d1430'; foreground(x, { base: .098, seed: 15, reedsAt: [-.02, .04], reedsN: 16, stones: 4, amp: .003 }); } },
-            { name: 'fox', z: -.064, trans: .2, glow: 3.2, w: .1, h: .1, x: -.08, y: .13, draw: x => fox(x, { cx: 0, by: -.032, s: .05, lantern: true, flip: true }), glowDraw: g => fox(null, { cx: 0, by: -.032, s: .05, lantern: true, flip: true }, g) },
-            sign('GO', -.08), sign('STAY', .1),
-            { name: 'title', z: -.045, trans: .3, w: .24, h: .05, x: 0, y: .27, shadow: false, recv: false, finish: { rim: .6 },
+            { name: 'fox', z: -.064, trans: .2, glow: 3.2, w: .1, h: .1, x: -.05, y: .13, draw: x => fox(x, { cx: 0, by: -.032, s: .05, lantern: true, flip: true }), glowDraw: g => fox(null, { cx: 0, by: -.032, s: .05, lantern: true, flip: true }, g) },
+            sign('GO', -.045), sign('STAY', .05),
+            { name: 'title', z: -.045, trans: .3, w: .24, h: .05, x: 0, y: .25, shadow: false, recv: false, finish: { rim: .6 },
               draw: x => text(x, 'Lantern Fox Tales', 0, 0, .016, '"Cormorant"', { fill: '#f1dbac', weight: 600 }) },
             { name: 'fg', z: -.025, trans: .03, draw: ground('#060914', .05, 17, [.1, .22]) },
           ],
