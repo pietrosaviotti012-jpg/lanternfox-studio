@@ -58,9 +58,19 @@ export function hangLantern(x, o, g) {
 // returns the lamp room centre (for beams and the backlight point)
 export function lighthouse(x, o, g) {
   const { cx, by, h, col = '#0e1532', cottage = true, lamp = true } = o;
-  const w0 = h * .26, w1 = h * .17, top = by + h * .78;
+  const w0 = h * .26, w1 = h * .17, top = by + h * .78, cw = h * .34, hx = cx + w0 * .35;
   if (x) {
     x.fillStyle = col;
+    // footing: a rocky knoll under tower and cottage, reaching down into the ground below so the building never floats
+    const fd = o.footing ?? h * .5;
+    if (fd) {
+      const R = mulberry(17), xl = cx - w0 * .85, xr = cottage ? hx + cw * 1.08 : cx + w0 * .85;
+      x.beginPath(); x.moveTo(xl, by + h * .004);
+      for (let i = 1; i <= 6; i++) x.lineTo(xl - fd * .38 * i / 6 + (R() - .5) * fd * .05, by + h * .004 - fd * i / 6);
+      x.lineTo(xr + fd * .38, by - fd);
+      for (let i = 5; i >= 0; i--) x.lineTo(xr + fd * .38 * i / 6 + (R() - .5) * fd * .05, by + h * .004 - fd * i / 6);
+      x.closePath(); x.fill();
+    }
     x.beginPath(); x.moveTo(cx - w0 / 2, by); x.lineTo(cx - w1 / 2, top); x.lineTo(cx + w1 / 2, top); x.lineTo(cx + w0 / 2, by); x.closePath(); x.fill();
     x.fillRect(cx - w1 * .72, top, w1 * 1.44, h * .025);                       // gallery
     for (let i = 0; i < 7; i++) x.fillRect(cx - w1 * .68 + i * w1 * .225, top + h * .025, h * .004, h * .03);   // railing
@@ -73,7 +83,7 @@ export function lighthouse(x, o, g) {
     for (const u of [.25, .5]) x.fillRect(cx - h * .012, by + h * u * .78, h * .024, h * .05);
     x.fillStyle = col;
     if (cottage) {
-      const cw = h * .34, ch = h * .14, hx = cx + w0 * .35;
+      const ch = h * .14;
       x.fillRect(hx, by, cw, ch);
       x.beginPath(); x.moveTo(hx - cw * .06, by + ch); x.lineTo(hx + cw * .5, by + ch + h * .09); x.lineTo(hx + cw * 1.06, by + ch); x.closePath(); x.fill();
       x.fillRect(hx + cw * .7, by + ch + h * .02, h * .02, h * .07);            // chimney
@@ -129,6 +139,23 @@ export function rain(x, o) {
   }
 }
 
+// Rain that tiles: the same drops repeat every tw × th, so a sheet of w = 3·tw, h = 3·th can be slid by up to one tile
+// (down and along the slant) and wrapped, and the frame is always full of rain. Use with rainFall() in update.
+export function rainTile(x, o) {
+  const { tw = .165, th = .29, n = 50, seed = 4, slant = .18, len = .02 } = o, R = mulberry(seed);
+  x.lineCap = 'round';
+  for (let i = 0; i < n; i++) {
+    const u = R() * tw, v = R() * th, l = len * (.5 + R()), lw = .0006 + R() * .0007;
+    for (let X = -tw * 2.5; X < tw * 2.5; X += tw) for (let Y = -th * 2.5; Y < th * 2.5; Y += th) {
+      x.lineWidth = lw; x.beginPath(); x.moveTo(X + u, Y + v); x.lineTo(X + u - slant * l, Y + v - l); x.stroke();
+    }
+  }
+}
+// Slides a rainTile sheet (placed at x: tw·.6, y: th/2) down and along the slant, wrapping every tile: call from update(t, L)
+export function rainFall(m, t, { vy = .55, slant = .18, tw = .165, th = .29 } = {}) {
+  m.position.x = m.userData.p0.x - ((vy * slant * t) % tw); m.position.y = m.userData.p0.y - ((vy * t) % th);
+}
+
 // A small sailing boat silhouette
 export function boat(x, o) {
   const { cx, by, s } = o;
@@ -160,7 +187,7 @@ export function keeper(x, o) {
 // Switchback stairs seen in section: flights going right, then left, then right… as one cut sheet.
 // flights × fh = total height; returns at(u) → [x, y, dir] for something climbing them (u: 0 bottom → 1 top)
 export function stairs(x, o) {
-  const { cx = 0, y0, flights = 4, fh = .1, w = .2, steps = 9, thick = .012, col } = o;
+  const { cx = 0, y0, flights = 4, fh = .1, w = .2, steps = 9, thick = .012, col, roof = 0 } = o;
   if (x) {
     if (col) x.fillStyle = col;
     for (let i = 0; i < flights; i++) {
@@ -170,7 +197,18 @@ export function stairs(x, o) {
       x.lineTo(xs + d * w, yb + fh - thick * 2.2); x.lineTo(xs, yb - thick); x.closePath(); x.fill();
       x.fillRect(xs + d * w - (d > 0 ? 0 : .02), yb + fh - thick * .4, .02, thick * .6);   // landing
     }
-    x.fillRect(cx - w / 2 - .012, y0 - .5, .012, flights * fh + .5); x.fillRect(cx + w / 2, y0 - .5, .012, flights * fh + .5);   // side walls
+    // o.roof = headroom above the top landing: a ceiling slab with joists and a hatch (a ladder goes up through it) over the last step
+    const top = y0 + flights * fh, wallTop = roof ? top + roof + .5 : top;
+    x.fillRect(cx - w / 2 - .012, y0 - .5, .012, wallTop - y0 + .5); x.fillRect(cx + w / 2, y0 - .5, .012, wallTop - y0 + .5);   // side walls
+    if (roof) {
+      const ry = top + roof, d = (flights - 1) % 2 ? -1 : 1, ex = cx + d * w / 2, hw = .045, slab = .022;
+      const hatch = d > 0 ? [ex - hw - .012, ex - .012] : [ex + .012, ex + hw + .012];
+      x.fillRect(cx - w / 2 - .012, ry, hatch[0] - (cx - w / 2 - .012), slab); x.fillRect(hatch[1], ry, cx + w / 2 + .012 - hatch[1], slab);
+      x.fillRect(cx - w / 2 - .012, ry + slab, w + .024, .006);                                               // floor boards of the room above
+      for (let i = 0; i < 7; i++) { const jx = cx - w / 2 + (i + .5) * w / 7; if (jx < hatch[0] - .004 || jx > hatch[1] + .004) x.fillRect(jx - .004, ry - .008, .008, .008); }   // joists
+      for (const s of [hatch[0] + .008, hatch[1] - .011]) x.fillRect(s, top - .002, .003, ry + slab + .02 - top);   // ladder rails
+      for (let yy = top + .012; yy < ry + slab + .015; yy += .014) x.fillRect(hatch[0] + .008, yy, hatch[1] - hatch[0] - .016, .0025);   // rungs
+    }
   }
   return u => { const t = Math.min(.9999, Math.max(0, u)) * flights, i = Math.floor(t), v = t - i, d = i % 2 ? -1 : 1;
     return [cx - d * w / 2 + d * w * v, y0 + i * fh + v * fh, d]; };
