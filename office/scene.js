@@ -211,10 +211,8 @@ const ends = (() => {
   for (const x of [-0.45, 0.45]) { const leg = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.4, 0.3), dark); leg.position.set(x, 0.2, 0); bench.add(leg); }
   bench.position.set(b.x - db.x * 0.55 + db.z * 1.05, 0.37, b.z - db.z * 0.55 + db.x * 1.05); bench.rotation.y = Math.atan2(db.x, db.z) + Math.PI / 2;
   scene.add(bench);
-  // il lampione dietro la piazzetta (verso le case), così la sua luce non cade sul cartello
-  const lamp = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.07, 1.7, 6), dark); lamp.position.set(b.x - 0.9, 0.37 + 0.85, b.z + 1.0); scene.add(lamp);
-  const endGlow = lanternGlow(lamp.position.x, 0.37 + 1.85, lamp.position.z);
-  return { glows: [startGlow, endGlow] };
+  // niente lampione qui: in quel punto sta di guardia il Generale
+  return { glows: [startGlow] };
 })();
 
 // alberi di carta sparsi (diventano trasparenti quando si entra in una casetta)
@@ -378,8 +376,9 @@ const chimneyTop = (id) => { const c = houses[id].chimney; return c.getWorldPosi
 // il Generale: sta di guardia nella piazzetta della fine, davanti a tutti; quando lo chiami risale il marciapiede a controllare
 const general = (() => {
   const tex = new THREE.CanvasTexture(paperCut("general", "#e8743b", 256)); tex.colorSpace = THREE.SRGBColorSpace;
-  const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true }));
-  s.scale.set(2.2, 2.2, 1);
+  // drawn last and over everything, so no roof, tree or bench ever hides him
+  const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: false }));
+  s.scale.set(2.2, 2.2, 1); s.renderOrder = 11;
   const b = walkPath.getPointAt(1), db = walkPath.getTangentAt(1);
   const home = new THREE.Vector3(b.x - 0.9, 1.2, b.z + 0.9);   // a sinistra dell'orso, sullo schermo (il cartello è a destra)
   s.position.copy(home); scene.add(s);
