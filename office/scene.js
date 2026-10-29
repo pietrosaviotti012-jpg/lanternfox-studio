@@ -890,7 +890,7 @@ function renderDays() {
     out.push(`<li class="${date === today ? "today" : ""}"><span class="d">${fmtDay(date)}<small>${date === today ? "oggi" : ""}</small></span>
       ${vids.length ? `<span class="vids">${vids.map((c) => `<span class="vid"><span>${esc(c.title)}</span><span class="pill ${c.status}">${label[c.status] || c.status}</span></span>`).join("")}</span>`
         : `<span><span class="note">${i < 0 ? "—" : "Il Soggetto li sceglie la mattina stessa"}</span></span><span class="pill ${st}">${label[st]}</span>`}
-      <span class="mine">${(state.notes || []).filter((n) => n.date === date).map((n) => `<span class="mynote">✎ ${esc(n.text)}
+      <span class="mine">${(state.notes || []).filter((n) => n.date === date).map((n) => `<span class="mynote" title="${n.read_by?.length ? "Letta da: " + esc(n.read_by.map((d) => BY_ID[d]?.name || d).join(", ")) : "Ancora nessun reparto l'ha letta"}">✎ ${esc(n.text)}${n.read_by?.length ? ` <small class="read">👁 ${n.read_by.length}</small>` : ""}
         <button class="x" data-unnote="${esc(n.id)}" aria-label="Togli la nota">×</button></span>`).join("")}
         <button class="addnote" data-note="${date}">+ Aggiungi una nota</button></span></li>`);
   }

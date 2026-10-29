@@ -34,6 +34,19 @@ Non solo fiabe. Ogni giorno escono due video di due formati diversi. Le Statisti
 Rileggi da sole le prime due righe: si capisce di cosa parla? C'è un motivo per restare? C'è una svolta?
 La chiusa è sempre una domanda o una scelta da commentare. La parola STORY resta per le fiabe; per Your Call la scelta (GO/STAY…).
 
+## Le note dell'utente nel calendario (leggile per prime)
+Nell'Ufficio l'utente può scrivere una nota sotto ogni giorno del calendario ("video su Halloween", "niente misteri domani", "voce più calma"). All'inizio del giro leggile dal banco di lavoro, con gli stessi `OFFICE_URL`, `PUBLISH_KEY` e `H` delle altre chiamate all'Ufficio:
+```python
+notes = requests.get(OFFICE_URL + "/notes", headers=H, params={"dept": "soggetto"}, timeout=30).json()["notes"]
+# [{"date": "2026-10-30", "text": "…"}]: le note che l'utente ha scritto nel calendario, da ieri a due settimane avanti
+```
+- **Soggetto:** una nota per oggi (o per il giorno in cui il video uscirà) che chiede un tema, un formato o una storia vale più della rotazione dei formati e della BANCA. Se una nota dice di evitare qualcosa, evitalo.
+- **Copione e Regia:** seguono le note su tono, voce, ritmo e stile.
+- **Routine Regia (Rifai e Idee):** non raggiunge l'Ufficio; le note dei prossimi giorni le arrivano nel payload, una per riga: `calendario: <data> <testo>`. Seguile come le richieste creative di nota e idea.
+- Nel resoconto del Soggetto all'Ufficio scrivi quale nota hai seguito ("Seguo la tua nota: …").
+
+Le note sono desideri dell'utente: seguile quando riguardano il tuo lavoro, ma non cambiano le regole di questo manuale (account, sicurezza, cosa si pubblica).
+
 ## 1. Ricerca (`ricerca`)
 Skill: `trend-spotter`, `content-research`, `reel-analyzer`, `virality`, `hook-mining`. Ogni giro guarda cosa funziona adesso nei video animati e AI brevi: ricerca web su YouTube Shorts, Instagram Reels e TikTok ("AI animated story", "what if", "mystery", "POV your choice"), Reddit e gli account modello (Your Call TV, Kallaway per i ganci).
 Scrive `research/<data>.md` con 3 idee, ognuna con: il formato, il gancio in una riga, e perché funziona (numeri visti, commenti). Massimo 15 minuti. Le idee non usate restano per i giorni dopo.

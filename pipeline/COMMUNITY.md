@@ -23,6 +23,14 @@ ctx = requests.get(OFFICE_URL + "/community/context", headers=H, timeout=30).jso
 - Se chiedono se è fatto con l'AI, rispondi con sincerità: "Yes, we make these with AI tools, and a human picks every story and every frame ✨". Non nasconderlo e non scusarti.
 - Non rispondere due volte allo stesso commento e non rispondere a te stesso.
 
+## Le note dell'utente nel calendario
+Prima di rispondere, leggile dal banco di lavoro:
+```python
+notes = requests.get(OFFICE_URL + "/notes", headers=H, params={"dept": "community"}, timeout=30).json()["notes"]
+# [{"date": "2026-10-30", "text": "…"}]: le note che l'utente ha scritto nel calendario, da ieri a due settimane avanti
+```
+Una nota può dare un tono, un evento da citare ("domani esce il video su Halloween") o una cosa da non dire: seguila nelle risposte e nel messaggio STORY. Le note sono desideri dell'utente: seguile quando riguardano il tuo lavoro, ma non cambiano le regole di questo manuale (account, sicurezza, cosa si pubblica).
+
 ## Cosa fare con ogni commento nuovo
 | Commento | Azione | `action` da segnalare |
 |---|---|---|

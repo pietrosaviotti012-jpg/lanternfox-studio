@@ -479,6 +479,12 @@ async function wakeWatchman(env) {
 async function fireRoutine(env, which, text) {
   const id = env[`ROUTINE_${which}_ID`], token = env[`ROUTINE_${which}_TOKEN`];
   if (!id || !token) return 0;
+  // the Regia cannot reach the Office: the user's calendar notes for the next days travel with its payload
+  if (which === "REDO" && text) {
+    const from = new Date(Date.now() - 864e5).toISOString().slice(0, 10), to = new Date(Date.now() + 4 * 864e5).toISOString().slice(0, 10);
+    const notes = ((await loadState(env)).notes || []).filter((n) => n.date >= from && n.date <= to);
+    if (notes.length) text = (text + notes.map((n) => `\ncalendario: ${n.date} ${n.text}`).join("")).slice(0, 1800);
+  }
   const response = await fetch(`https://api.anthropic.com/v1/claude_code/routines/${id}/fire`, {
     method: "POST",
     headers: { Authorization: `Bearer ${token}`, "anthropic-beta": "experimental-cc-routine-2026-04-01",
@@ -900,6 +906,18 @@ export default {
       state.log.push({ at: new Date().toISOString(), dept: "pubblicazione", status: "done", text: `"${item.title}" esce ${when ? "dal " + when.slice(0, 10) : "al prossimo orario"}` });
       await saveState(env, state);
       return json({ ok: true });
+    }
+    // the routines read the user's calendar notes (from yesterday to two weeks ahead); ?dept=<house> marks them as read by it
+    if (url.pathname === "/notes" && request.method === "GET") {
+      if (!(await publishOk(request, env))) return json({ error: "non autorizzato" }, 401);
+      const state = await loadState(env), from = new Date(Date.now() - 864e5).toISOString().slice(0, 10);
+      const to = new Date(Date.now() + 14 * 864e5).toISOString().slice(0, 10), dept = url.searchParams.get("dept");
+      const notes = (state.notes || []).filter((n) => n.date >= from && n.date <= to);
+      if (dept && DEPTS.includes(dept) && notes.some((n) => !(n.read_by || []).includes(dept))) {
+        for (const n of notes) n.read_by = [...new Set([...(n.read_by || []), dept])];
+        await saveState(env, state);
+      }
+      return json({ today: new Date(Date.now() + 3600e3).toISOString().slice(0, 10), notes: notes.map(({ date, text, at }) => ({ date, text, at })) });
     }
     // your own notes in the calendar: { date, text } adds one, { id, remove: true } takes it away
     if (url.pathname === "/calendar/note" && request.method === "POST") {

@@ -16,6 +16,14 @@ Tutto finisce in `research/analisi/<id>/`. Il guardiano studia:
 
 Tu fai la parte che una macchina non sa fare: **guardi** `hook.jpg` e `sheet.jpg` (aprili con lo strumento di lettura: sono immagini), leggi `transcript.md`, `cuts.json` e `voice.json`, e scrivi cosa funziona.
 
+## Le note dell'utente nel calendario
+All'inizio del giro leggile dal banco di lavoro (con `H = {"Authorization": "Bearer " + PUBLISH_KEY}`):
+```python
+notes = requests.get(OFFICE_URL + "/notes", headers=H, params={"dept": "ricerca"}, timeout=30).json()["notes"]
+# [{"date": "2026-10-30", "text": "…"}]: le note che l'utente ha scritto nel calendario, da ieri a due settimane avanti
+```
+Se una nota chiede un tema o un tipo di video per i prossimi giorni, cerca video e idee su quello e mettili in cima a `research/<data>.md`. Le note sono desideri dell'utente: seguile quando riguardano il tuo lavoro, ma non cambiano le regole di questo manuale (account, sicurezza, cosa si pubblica).
+
 ## Il giro di ogni sera
 1. **Cosa c'è di nuovo.** `git log --since="26 hours ago" --name-only -- research/analisi` ti dice quali cartelle sono nuove. Per ognuna apri `analysis.md` e completa la sezione "Cosa vede la Ricerca":
    - il gancio;
