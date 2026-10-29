@@ -176,3 +176,27 @@ jobs:
               preview_url: process.env.BASE + '/film.mp4', cover_url: process.env.BASE + '/cover.jpg', request: m.request } }));
           " > queue.json
           node tools/office.mjs "$(cat queue.json)" '{"dept":"revisione","status":"waiting","task":"Il video è pronto: guardalo e scegli"}'
+
+  # tells the Office how the render went, so it can show a stopped chain and offer "Fai ripartire" from the phone
+  report:
+    needs: [voice, frames, finish]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: tools
+      - name: To the Office
+        env:
+          ID: ${{ needs.voice.outputs.id }}
+          RESULTS: ${{ needs.voice.result }} ${{ needs.frames.result }} ${{ needs.finish.result }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -- $RESULTS
+          if [ "$1" = success ] && [ "$2" = success ] && [ "$3" = success ]; then
+            node tools/office.mjs "{\"chain\":{\"id\":\"$ID\",\"ok\":true,\"url\":\"$RUN_URL\"}}"
+          elif [ "$1 $2 $3" != "cancelled cancelled cancelled" ] && ! echo "$RESULTS" | grep -q cancelled; then
+            STEP=voce; [ "$1" = success ] && STEP=animazione; [ "$2" = success ] && STEP=montaggio
+            node tools/office.mjs "{\"chain\":{\"id\":\"${ID:-?}\",\"ok\":false,\"step\":\"$STEP\",\"url\":\"$RUN_URL\"}}" "{\"dept\":\"$STEP\",\"status\":\"error\",\"task\":\"Il render di ${ID:-un video} si è fermato qui: puoi farlo ripartire dall'ufficio\"}"
+          fi

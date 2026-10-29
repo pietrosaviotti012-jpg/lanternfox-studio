@@ -708,7 +708,11 @@ function render() {
   }
   // the queue is redrawn only when it really changes: redrawing it every few seconds stopped the video
   // halfway and wiped a half-written note
-  const queue = [...(state.queue || [])].reverse();
+  // a video leaves Approva one day after it went out on every platform (or after a "Rifai" that never came back)
+  const lastOut = (q) => Math.max(0, ...Object.values(q.published || {}).map((p) => Date.parse(p.at) || 0));
+  const queue = [...(state.queue || [])].reverse().filter((q) =>
+    !(q.status === "published" && Date.now() - (lastOut(q) || Date.parse(q.decided_at || q.created_at)) > 864e5) &&
+    !(q.status === "redo" && Date.now() - Date.parse(q.decided_at || q.created_at) > 864e5));
   const sig = JSON.stringify([queue, Boolean(demo), new Date().getUTCHours()]);
   if (sig !== render.queueSig) {
     render.queueSig = sig;
@@ -721,6 +725,7 @@ function render() {
 
   renderDays();
   renderStats();
+  renderControl();
   $("bellDot").hidden = Boolean(state.devices);
   if (selected) fillSheet(selected);
 }
@@ -847,6 +852,70 @@ function renderDays() {
   $("days").innerHTML = out.join("");
 }
 
+// —— control of the chain: what stopped, the day's shifts, the next video out, the Research's day, GitHub ——
+const utcToday = (hhmm) => { const [h, m] = hhmm.split(":").map(Number); const d = new Date(); d.setUTCHours(h, m, 0, 0); return d; };
+const inMin = (d) => { const m = Math.round((d - Date.now()) / 60000); return m < 60 ? `tra ${m} min` : `tra ${Math.floor(m / 60)} h ${String(m % 60).padStart(2, "0")}`; };
+function renderControl() {
+  const deps = state.departments || {}, now = Date.now();
+  // 1. a stopped chain, in red, with the button that starts it again
+  const fail = state.chain?.failed;
+  const broken = DEPTS.filter((d) => (deps[d.id] || {}).status === "error");
+  const front = ["ricerca", "soggetto", "copione", "regia"], pub = ["pubblicazione"];
+  let alert = "";
+  if (fail) alert += `<div class="alert"><b>⚠ Il render di "${esc(fail.id)}" si è fermato (${esc(fail.step)})</b>
+    <span class="note">Alle ${fmtTime(fail.at)}. <a href="${esc(fail.url)}" target="_blank" rel="noopener" style="color:var(--lamp)">Vedi su GitHub</a></span>
+    <div class="row"><button class="btn primary" data-op="rerender" data-target="${esc(fail.id)}">Fai ripartire il render</button></div></div>`;
+  for (const d of broken) {
+    if (fail && ["voce", "animazione", "musica", "montaggio"].includes(d.id)) continue;
+    const kind = front.includes(d.id) ? "produce" : pub.includes(d.id) ? "publish" : null;
+    alert += `<div class="alert"><b>⚠ ${esc(d.name)} si è fermato</b><span class="note">${esc(deps[d.id].task || "")}</span>
+      ${kind ? `<div class="row"><button class="btn primary" data-op="${kind}">${kind === "produce" ? "Fai ripartire la produzione" : "Riprova la pubblicazione"}</button></div>` : ""}</div>`;
+  }
+  const opsRunning = (state.ops || []).filter((o) => o.status === "waiting" || o.status === "running");
+  if (opsRunning.length) alert += `<div class="alert ok"><b>Ripartenza in corso</b><span class="note">${opsRunning.map((o) => `render di ${esc(o.target)}`).join(", ")}: il guardiano di GitHub passa ogni 15 minuti.</span></div>`;
+  $("alert").innerHTML = alert;
+  // 2. the next video out
+  const slots = [].concat(state.publish_at_utc ?? [16, 22]);
+  const ready = (state.queue || []).filter((q) => q.status === "approved");
+  const nextSlot = slots.map((h) => { const d = new Date(); d.setUTCHours(h, 0, 0, 0); if (d < now) d.setUTCDate(d.getUTCDate() + 1); return d; }).sort((a, b) => a - b)[0];
+  $("nextOut").hidden = !ready.length;
+  if (ready.length) $("nextOut").textContent = `Prossima uscita: "${ready[0].title}" alle ${fmtTime(nextSlot.toISOString())} (${inMin(nextSlot)})` + (ready.length > 1 ? `, poi altri ${ready.length - 1}` : "");
+  // 3. the day's shifts, in Italian time, with how each one went
+  const today = (state.today?.day === new Date(now + 3600e3).toISOString().slice(0, 10)) ? state.today.ids.length : 0;
+  const sched = state.schedule || [];
+  const upcoming = sched.map((s) => utcToday(s.utc)).filter((d) => d > now).sort((a, b) => a - b)[0];
+  $("dayplan").innerHTML = sched.map((s) => {
+    const at = utcToday(s.utc), past = at < now, isNext = upcoming && at.getTime() === upcoming.getTime();
+    let status = past ? "fatto" : isNext ? inMin(at) : "", cls = past ? "past" : isNext ? "next" : "", btn = "";
+    if (s.slot) {
+      if (today >= s.slot) status = "partito ✓";
+      else if (now > at.getTime() + 40 * 60000) { status = "non è partito"; cls = "miss";
+        btn = `<button class="btn" data-op="produce">Fallo partire</button>`; }
+    }
+    return `<li class="${cls}"><time>${fmtTime(at.toISOString())}</time><span><span class="who">${esc(s.who)}</span><span class="what">${esc(s.what)}</span></span>
+      <span>${btn || (status ? `<span class="pill ${status.includes("✓") || status === "fatto" ? "published" : ""}">${esc(status)}</span>` : "")}</span></li>`;
+  }).join("");
+  // 4. examples to study and what the Research did today
+  const ex = [...(state.examples || [])].reverse();
+  $("examples").innerHTML = ex.map((e) => `<li><span>${e.url ? `<a href="${esc(e.url)}" target="_blank" rel="noopener" style="color:var(--paper)">${esc(e.url.replace(/^https:\/\/(www\.)?/, "").slice(0, 46))}…</a>` : `Video caricato${e.name ? `: ${esc(e.name)}` : ""}`}</span>
+      ${e.note ? `<span class="note">${esc(e.note)}</span>` : ""}<span class="note">${fmtDayTime(e.at)}${e.result ? ` · ${linkify(e.result)}` : ""}</span>
+      <span class="pill ${e.status === "studied" ? "published" : e.status === "failed" ? "" : "made"}">${{ waiting: "In coda (entro 15 min)", running: "La Ricerca lo sta studiando", studied: "Studiato", failed: "Non riuscito" }[e.status] || e.status}</span></li>`).join("");
+  const r = state.research;
+  $("research").innerHTML = r ? `<div class="research"><p class="note">${esc(r.date)} · aggiornata alle ${fmtTime(r.at)}</p>
+      <p><b>Come studia:</b> ${esc(r.method || "")}</p>
+      <p><b>Video studiati (${r.studied.length})</b></p><ul>${r.studied.map((s) => `<li>${s.url ? `<a href="${esc(s.url)}" target="_blank" rel="noopener" style="color:var(--lamp)">${esc(s.title || s.url)}</a>` : esc(s.title)}: ${esc(s.notes)}${s.analysis ? ` (${linkify(s.analysis)})` : ""}</li>`).join("")}</ul>
+      <p><b>Idee raccolte per domani</b></p><ul>${r.ideas.map((i) => `<li>${esc(i)}</li>`).join("")}</ul></div>`
+    : `<div class="empty"><strong>La Ricerca non ha ancora fatto il giro di stasera</strong>Ogni sera alle ${fmtTime(utcToday("19:30").toISOString())} studia i video della giornata (i tuoi esempi e quelli che trova lei) e raccoglie le idee per il giorno dopo.</div>`;
+  // 5. GitHub: the minutes of the assembly line, and the last renders
+  const g = state.github;
+  $("gh").innerHTML = g ? `<div class="nums"><div class="num"><b>${g.minutes_month}</b><span>minuti usati questo mese</span></div>
+      <div class="num"><b>${g.runs_month}</b><span>lavori questo mese</span></div><div class="num"><b>${g.failed_24h}</b><span>fermi nelle ultime 24 ore</span></div></div>
+      <p class="note" style="margin-top:10px">Il repository è pubblico: per GitHub i minuti sono gratis e senza limite. Controllato alle ${fmtTime(g.checked_at)}.</p>
+      ${(g.last || []).length ? `<ul class="diary" style="margin-top:10px">${g.last.map((x) => `<li style="grid-template-columns:52px 1fr auto"><time>${fmtTime(x.at)}</time><span>${esc(x.title)}</span><a href="${esc(x.url)}" target="_blank" rel="noopener" class="pill ${x.conclusion === "success" ? "published" : ""}" style="text-decoration:none">${{ success: "ok", failure: "fermo", cancelled: "annullato", in_progress: "in corso", queued: "in coda" }[x.conclusion] || esc(x.conclusion)}</a></li>`).join("")}</ul>` : ""}`
+    : `<div class="empty"><strong>Il guardiano non è ancora passato</strong>Ogni 15 minuti controlla GitHub e aggiorna questi numeri.</div>`;
+}
+const linkify = (s) => esc(s).replace(/(https:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener" style="color:var(--lamp)">apri</a>');
+
 function renderStats() {
   const s = state.stats;
   if (!s) { $("stats").innerHTML = `<div class="empty"><strong>Ancora niente da contare</strong>Le statistiche arrivano la sera dopo il primo video pubblicato.</div>`; return; }
@@ -893,6 +962,7 @@ function fillSheet(id) {
     <div class="now"><b>${info.status === "idle" ? "Ultimo lavoro" : "Adesso"}</b>${info.task ? esc(info.task) : `<span class="note">Niente da fare, per ora.</span>`}
       ${(() => { const p = progress(id, info); return p ? `<div class="meter"><i style="width:${Math.round(p.k * 100)}%"></i></div><p class="note" style="margin-top:6px">Di solito ci mette ${TYPICAL[id]} min: ${etaText(p)}.</p>` : ""; })()}
       ${info.output ? `<p class="out">${esc(info.output)}</p>` : ""}${info.updated_at ? `<p class="note" style="margin-top:6px">Aggiornato alle ${fmtTime(info.updated_at)}</p>` : ""}</div>
+    ${id === "ricerca" ? `<div class="row" style="margin-top:14px"><button class="btn" data-goto="idea">${state?.research ? `Cosa ha studiato oggi (${state.research.studied.length} video)` : "Dagli un video da studiare"}</button></div>` : ""}
     ${isDesk ? `<div class="row" style="margin-top:14px"><button class="btn primary" data-goto="approva">${pending ? `Guarda ${pending === 1 ? "il video" : `i ${pending} video`} da approvare` : "Apri la coda di approvazione"}</button></div>` : ""}
     ${d.skills.length ? `<h3>Con quali strumenti lavora</h3><ul class="chips">${d.skills.map((s) => `<li>${esc(s)}</li>`).join("")}</ul>` : ""}`;
 }
@@ -973,6 +1043,40 @@ $("comments").addEventListener("click", async (e) => {
     body: JSON.stringify({ id, decision: ok ? "approved" : "dismissed", reply }) });
   b.disabled = false;
   toast(!r.ok ? "Non sono riuscito a salvare: riprova" : ok ? "Risposta approvata: parte al prossimo giro dei commenti" : "Lasciato senza risposta");
+  load();
+});
+
+// fai ripartire: i tasti nel riquadro rosso e nella giornata
+document.addEventListener("click", async (e) => {
+  const b = e.target.closest("[data-op]");
+  if (!b) return;
+  if (demo) { toast("Nella prova non riparte niente"); return; }
+  const kind = b.dataset.op, target = b.dataset.target || "";
+  const what = { rerender: `il render di "${target}"`, produce: "la produzione di un video nuovo", publish: "la pubblicazione" }[kind];
+  if (!confirm(`Faccio ripartire ${what}?`)) return;
+  b.disabled = true;
+  const r = await fetch("/ops/command", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ kind, target }) });
+  const j = await r.json().catch(() => ({}));
+  b.disabled = false;
+  toast(j.how || (r.ok ? "Ripartito" : "Non sono riuscito a farlo ripartire"));
+  load();
+});
+
+// un esempio da studiare: un link o un mp4 dal telefono
+$("exSend").addEventListener("click", async () => {
+  const link = $("exUrl").value.trim(), file = $("exFile").files[0], note = $("exNote").value.trim();
+  if (!link && !file) { toast("Incolla un link o scegli un video"); return; }
+  if (demo) { toast("Nella prova non si studia niente"); return; }
+  const b = $("exSend"); b.disabled = true; b.textContent = file ? "Carico il video…" : "Invio…";
+  let r;
+  if (file) {
+    if (file.size > 24e6) { toast("Il video è più grande di 24 MB: manda il link"); b.disabled = false; b.textContent = "Fallo studiare"; return; }
+    r = await fetch(`/examples?note=${encodeURIComponent(note)}&name=${encodeURIComponent(file.name)}`, { method: "POST", headers: { "Content-Type": file.type || "video/mp4" }, body: file });
+  } else r = await fetch("/examples", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ url: link, note }) });
+  const j = await r.json().catch(() => ({}));
+  b.disabled = false; b.textContent = "Fallo studiare";
+  if (r.ok) { $("exUrl").value = ""; $("exFile").value = ""; $("exNote").value = ""; toast("In coda: la Ricerca lo studia entro un quarto d'ora"); }
+  else toast(j.error || "Non sono riuscito a mandarlo");
   load();
 });
 

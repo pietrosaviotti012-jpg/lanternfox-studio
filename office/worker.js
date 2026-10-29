@@ -63,6 +63,17 @@ async function publishOk(request, env) {
 }
 const PLATFORMS = ["instagram", "youtube"];   // sent by the routine; TikTok by hand until the TikTok app passes review (then add "tiktok")
 const sent = (p) => p?.url || p?.draft;
+// who works when (UTC; the routines and GitHub's clock can start a few minutes late). Keep it in step with the routines.
+const SCHEDULE = [
+  { utc: "05:00", dept: "ricerca", who: "Produzione", what: "Video 1 di oggi: ricerca, storia, copione, regia, poi il render (circa 50 min)", slot: 1 },
+  { utc: "07:00", dept: "community", who: "Community", what: "Risponde ai commenti" },
+  { utc: "11:00", dept: "ricerca", who: "Produzione", what: "Video 2 di oggi (circa 50 min)", slot: 2 },
+  { utc: "13:00", dept: "community", who: "Community", what: "Risponde ai commenti" },
+  { utc: "16:00", dept: "pubblicazione", who: "Pubblicazione", what: "Esce il video approvato più vecchio" },
+  { utc: "19:00", dept: "community", who: "Community", what: "Risponde ai commenti" },
+  { utc: "19:30", dept: "ricerca", who: "Ricerca", what: "Studia i video della giornata e raccoglie le idee per domani" },
+  { utc: "22:00", dept: "pubblicazione", who: "Pubblicazione", what: "Esce il secondo video approvato" },
+];
 
 async function bearerOk(request, env) {
   const auth = request.headers.get("Authorization") || "";
@@ -187,6 +198,10 @@ function emptyState() {
     stats: null,  // { followers: {instagram, youtube, tiktok}, views_7d, best: {title, views}, updated_at }
     log: [],      // { at, dept, text }
     ideas: [],    // { id, text, at, status: sent|making|ready|error, video? }: the videos the user asked for from the Office
+    examples: [], // { id, url | file, note, at, status: waiting|studying|studied|failed, result }: videos to study, from the Idea tab
+    ops: [],      // { id, kind: rerender, target, at, status: waiting|done|failed, result }: commands the GitHub watchman runs
+    github: null, // { minutes_month, runs_month, failed_24h, last: [{name, title, conclusion, at, url}], checked_at }: from the watchman
+    research: null, // { date, method, studied: [{title, url, notes}], ideas: [string], at }: the Research department's day
     // community: seen = comment ids already handled; log = { at, platform, author, text, action: replied|dm|flagged|hidden|skipped, reply };
     // pending = critiques the user decides on: { id, platform, author, text, proposal, at, status: waiting|approved|dismissed|sent }
     community: { seen: [], log: [], pending: [] },
@@ -208,6 +223,8 @@ async function saveState(env, state) {
   state.queue = state.queue.slice(-20);
   state.calendar = state.calendar.slice(-60);
   state.ideas = state.ideas.slice(-12);
+  state.examples = state.examples.slice(-20);
+  state.ops = state.ops.slice(-20);
   const c = state.community;
   const open = (p) => p.status === "waiting" || p.status === "approved";
   c.seen = c.seen.slice(-600); c.log = c.log.slice(-60);
@@ -265,6 +282,18 @@ async function applyEvent(env, event) {
     state.calendar.sort((a, b) => a.date.localeCompare(b.date));
   }
   if (event.stats) state.stats = { ...(state.stats || {}), ...event.stats, updated_at: now };
+  if (event.github) state.github = { ...event.github, checked_at: now };
+  if (event.chain) {   // a render finished (ok) or stopped (step): a stop stays on screen until that video renders fine
+    const c = event.chain, ch = state.chain || {};
+    state.chain = c.ok ? { ...ch, failed: ch.failed?.id === c.id ? null : ch.failed, last_ok: { id: c.id, at: now, url: c.url } }
+      : { ...ch, failed: { id: clip(c.id, 80), step: clip(c.step, 30), url: clip(c.url, 200), at: now } };
+    if (!c.ok) await pushAll(env, { title: "La catena si è fermata", body: `${c.id}: ${c.step}. Puoi farla ripartire dall'ufficio`, url: "/", urgent: true });
+  }
+  if (event.op) {   // the watchman reports on a command or an example
+    const list = event.op.kind === "example" ? state.examples : state.ops;
+    const it = list.find((x) => x.id === event.op.id);
+    if (it) Object.assign(it, { status: event.op.status, result: clip(event.op.result, 600), done_at: now });
+  }
   if (event.status === "error" && event.dept) {
     await pushAll(env, { title: "Un reparto si è fermato", body: `${event.dept}: ${clip(event.task || event.output, 120)}`, url: "/", urgent: true });
   }
@@ -556,6 +585,35 @@ export default {
       return json({ ok: true, applied: events.length });
     }
 
+    // —— the GitHub watchman (office.yml, every 15 minutes): what to run, and the example videos to study ——
+    if (url.pathname === "/ops/pending") {
+      if (!(await bearerOk(request, env))) return json({ error: "non autorizzato" }, 401);
+      const state = await loadState(env);
+      const ops = state.ops.filter((o) => o.status === "waiting"), ex = state.examples.filter((e) => e.status === "waiting");
+      for (const x of [...ops, ...ex]) x.status = "running";
+      if (ops.length || ex.length) await saveState(env, state);
+      return json({ ops, examples: ex.map(({ id, url, file, note }) => ({ id, url, file: file ? `${env.OFFICE_URL}/examples/${id}/file` : null, note })) });
+    }
+    const exFile = url.pathname.match(/^\/examples\/([\w-]+)\/file$/);
+    if (exFile && (await bearerOk(request, env))) {
+      const body = await env.DATA.get("ex:" + exFile[1], "arrayBuffer");
+      return body ? new Response(body, { headers: { "Content-Type": "video/mp4" } }) : json({ error: "file non trovato" }, 404);
+    }
+    // the Research department's day (the evening routine, with the publishing key): what it studied, how, and the ideas
+    if (url.pathname === "/research" && request.method === "POST") {
+      if (!(await publishOk(request, env))) return json({ error: "non autorizzato" }, 401);
+      const b = await request.json().catch(() => ({}));
+      const state = await loadState(env), now = new Date().toISOString();
+      state.research = { date: clip(b.date, 10), method: clip(b.method, 600), at: now,
+        studied: [].concat(b.studied || []).slice(0, 12).map((s) => ({ title: clip(s.title, 120), url: clip(s.url, 300), notes: clip(s.notes, 400), analysis: clip(s.analysis, 300) })),
+        ideas: [].concat(b.ideas || []).slice(0, 10).map((i) => clip(i, 300)) };
+      for (const s of state.research.studied) { const e = state.examples.find((x) => x.url && s.url && x.url.split("?")[0] === s.url.split("?")[0]); if (e) Object.assign(e, { status: "studied", result: s.notes }); }
+      state.departments.ricerca = { status: "done", task: `Ha studiato ${state.research.studied.length} video e raccolto ${state.research.ideas.length} idee`, output: state.research.ideas.join("\n"), updated_at: now };
+      state.log.push({ at: now, dept: "ricerca", status: "done", text: `Orlo ha studiato ${state.research.studied.length} video e raccolto ${state.research.ideas.length} idee per domani` });
+      await saveState(env, state);
+      return json({ ok: true });
+    }
+
     if (request.method === "POST" && ["/events", "/push/send", "/timer/test", "/routine/test"].includes(url.pathname)) {
       if (!(await bearerOk(request, env))) return json({ error: "non autorizzato" }, 401);
       // checks that a routine starts: PUBLISH by default (with nothing approved it does nothing), or REDO with {which, text}
@@ -638,6 +696,7 @@ export default {
       state.devices = (await subscriptions(env)).length;
       state.publish_at_utc = String(env.PUBLISH_AT_UTC || "22").split(",").map(Number);   // the publishing slots (UTC hours)
       state.youtube = JSON.parse((await env.DATA.get("yt_channel")) || "null");
+      state.schedule = SCHEDULE; state.can_produce = Boolean(env.ROUTINE_PRODUCE_TOKEN);
       return json(state);
     }
     // "Collega YouTube": Google's consent page, then back here with a code that becomes the refresh token
@@ -690,6 +749,49 @@ export default {
     }
     // "Chiedi un video": an idea of the user's goes to the Regia routine, which writes the story, draws it and starts the render
     // the user's decision on a flagged comment: the proposed (or edited) reply goes out at the next round, or nothing
+    // —— control of the chain from the phone ——
+    // rerender: the watchman starts the render again within ~15 minutes; produce: a new video now (the Production routine,
+    // or the Regia one when the Production token is not there); publish: the publishing routine now
+    if (url.pathname === "/ops/command" && request.method === "POST") {
+      const { kind, target } = await request.json().catch(() => ({}));
+      const state = await loadState(env), now = new Date().toISOString();
+      let how = "", ok = true;
+      if (kind === "rerender") {
+        if (!/^[\w-]+$/.test(target || "")) return json({ error: "video non valido" }, 400);
+        state.ops.push({ id: "op-" + now.replace(/\D/g, "").slice(0, 14), kind, target, at: now, status: "waiting" });
+        how = "Il guardiano di GitHub lo fa ripartire entro un quarto d'ora";
+      } else if (kind === "produce") {
+        const s = env.ROUTINE_PRODUCE_TOKEN ? await fireRoutine(env, "PRODUCE", "Ripartenza dall'ufficio: produci il video di questo turno.")
+          : await fireRoutine(env, "REDO", "idea: un video nuovo del turno di oggi: scegli tu formato e storia da stories/BANCA.md, come farebbe la Produzione.\nrequest: restart-" + now.slice(0, 16));
+        ok = s >= 200 && s < 300; how = ok ? "La Produzione è ripartita: un video nuovo arriva in circa 40 minuti" : "Non riesco ad avviare la Produzione";
+      } else if (kind === "publish") {
+        const s = await fireRoutine(env, "PUBLISH", "Ripartenza dall'ufficio"); ok = s >= 200 && s < 300;
+        how = ok ? "La Pubblicazione è ripartita" : "Non riesco ad avviare la Pubblicazione";
+      } else return json({ error: "comando sconosciuto" }, 400);
+      state.log.push({ at: now, dept: "revisione", status: ok ? "working" : "error", text: `Hai fatto ripartire: ${how}` });
+      await saveState(env, state);
+      return json({ ok, how }, ok ? 200 : 502);
+    }
+    // an example to study (Idea tab): a link (Instagram, TikTok, YouTube) or an mp4 straight from the phone (up to 24 MB)
+    if (url.pathname === "/examples" && request.method === "POST") {
+      const now = new Date().toISOString(), id = "ex-" + now.replace(/\D/g, "").slice(0, 14);
+      let item;
+      if ((request.headers.get("Content-Type") || "").startsWith("video/")) {
+        const buf = await request.arrayBuffer();
+        if (buf.byteLength > 24e6) return json({ error: "il video è più grande di 24 MB: manda il link" }, 413);
+        await env.DATA.put("ex:" + id, buf, { expirationTtl: 14 * 86400 });
+        item = { id, file: true, note: clip(url.searchParams.get("note"), 300), name: clip(url.searchParams.get("name"), 80) };
+      } else {
+        const { url: link, note } = await request.json().catch(() => ({}));
+        if (!/^https:\/\/(www\.)?(instagram\.com|tiktok\.com|vm\.tiktok\.com|youtube\.com|youtu\.be)\//.test(link || "")) return json({ error: "serve un link di Instagram, TikTok o YouTube" }, 400);
+        item = { id, url: clip(link, 300), note: clip(note, 300) };
+      }
+      const state = await loadState(env);
+      state.examples.push({ ...item, at: now, status: "waiting" });
+      state.log.push({ at: now, dept: "ricerca", status: "working", text: "Nuovo esempio da studiare per la Ricerca" });
+      await saveState(env, state);
+      return json({ ok: true, id });
+    }
     if (url.pathname === "/community/decide" && request.method === "POST") {
       const { id, decision, reply } = await request.json();
       const state = await loadState(env);

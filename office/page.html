@@ -142,6 +142,26 @@
   .ideas .pill { justify-self: start; }
   .steps { margin: 14px 0 0; padding-left: 20px; color: var(--muted); font-size: .9rem; display: grid; gap: 4px; }
 
+  /* the chain stopped: what, where, and the button to start it again */
+  .alert { margin: 0 0 16px; padding: 14px 16px; border-radius: 14px; background: rgba(255,143,115,.12); border: 1px solid var(--alarm); }
+  .alert b { display: block; color: var(--alarm); font: 600 1.05rem var(--serif); margin-bottom: 4px; }
+  .alert .row { margin-top: 10px; }
+  .alert.ok { background: rgba(159,217,168,.08); border-color: rgba(159,217,168,.4); }
+  .alert.ok b { color: var(--ok); }
+  .next-out { margin: -8px 0 14px; padding: 10px 14px; border-radius: 12px; background: var(--lamp-soft); color: var(--lamp); font-size: .92rem; }
+  .next-out[hidden] { display: none; }
+  .dayplan { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+  .dayplan li { display: grid; grid-template-columns: 52px 1fr auto; gap: 10px; align-items: center; padding: 10px 12px; border-radius: 12px; background: #101b40; }
+  .dayplan time { font: 600 1rem var(--serif); font-variant-numeric: tabular-nums; }
+  .dayplan .who { display: block; font-weight: 700; }
+  .dayplan .what { font-size: .85rem; color: var(--muted); }
+  .dayplan li.past { opacity: .6; }
+  .dayplan li.next { box-shadow: inset 0 0 0 1px var(--lamp); }
+  .dayplan li.miss { box-shadow: inset 0 0 0 1px var(--alarm); opacity: 1; }
+  .dayplan .btn { padding: 7px 10px; font-size: .82rem; }
+  .research p { margin: 6px 0; font-size: .92rem; }
+  .research ul { margin: 6px 0 0; padding-left: 18px; font-size: .92rem; }
+  .research li { margin: 4px 0; }
   .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
   .btn { border: 1px solid #2a3a6a; background: var(--deep); padding: 11px 16px; border-radius: 12px; cursor: pointer; }
   .btn.primary { background: var(--lamp); color: var(--ink); border-color: var(--lamp); font-weight: 700; }
@@ -255,10 +275,15 @@
 
   <section role="tabpanel" id="p-oggi" aria-labelledby="t-oggi">
     <p class="demo-flag">Questa è una prova: si muove solo sul tuo schermo, nessun video viene creato o pubblicato.</p>
+    <div id="alert"></div>
     <span class="vno" id="videoNo" hidden></span>
     <h2 id="videoTitle">Nessuna storia oggi, per ora</h2>
     <p class="lead" id="videoLead">Ogni mattina la sveglia accende la prima lanterna e la storia passa di reparto in reparto fino alla tua scrivania.</p>
+    <p class="next-out" id="nextOut" hidden></p>
     <ol class="string" id="string" aria-label="Il percorso del video di oggi"></ol>
+    <h3>La giornata</h3>
+    <p class="note" style="margin:-4px 0 10px">Chi lavora e quando, con l'ora italiana. I turni partono a volte con qualche minuto di ritardo.</p>
+    <ul class="dayplan" id="dayplan"></ul>
     <h3>Come nasce un video</h3>
     <ol class="phases" id="phases"></ol>
     <div class="row" style="margin-top:18px">
@@ -281,6 +306,20 @@
     </ol>
     <h3>Le tue idee</h3>
     <ul class="ideas" id="ideas"></ul>
+
+    <h2 style="margin-top:34px">Un esempio da studiare</h2>
+    <p class="lead">Hai visto un video che funziona? Incolla il link di Instagram, TikTok o YouTube, oppure carica l'mp4 dal telefono (fino a 24 MB). La Ricerca lo scarica, lo trascrive, conta tagli e cambi di voce, guarda i fotogrammi e ne tira fuori cosa copiare.</p>
+    <label for="exUrl" class="note">Link del video</label>
+    <input id="exUrl" class="field" style="min-height:0" type="url" inputmode="url" placeholder="https://www.instagram.com/reel/…">
+    <label for="exFile" class="note">oppure il file dal telefono</label>
+    <input id="exFile" class="field" style="min-height:0" type="file" accept="video/mp4,video/quicktime,video/*">
+    <label for="exNote" class="note">Cosa ti piace (facoltativo)</label>
+    <textarea id="exNote" class="field" style="min-height:70px" maxlength="300" placeholder="Per esempio: la grafica delle persone e il cambio di voce"></textarea>
+    <div class="row"><button class="btn primary" id="exSend">Fallo studiare</button></div>
+    <ul class="ideas" id="examples" style="margin-top:14px"></ul>
+
+    <h2 style="margin-top:34px">La Ricerca di oggi</h2>
+    <div id="research"></div>
   </section>
 
   <section role="tabpanel" id="p-approva" aria-labelledby="t-approva" hidden>
@@ -300,6 +339,8 @@
     <h2>Numeri</h2>
     <p class="lead">Come vanno i profili. Si aggiornano ogni sera.</p>
     <div id="stats"></div>
+    <h3>GitHub, la catena di montaggio</h3>
+    <div id="gh"></div>
   </section>
 </main>
 

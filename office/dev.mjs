@@ -6,6 +6,8 @@ import { join } from "path";
 import { page, assets, HERE } from "./build.mjs";
 
 const PORT = Number(process.env.PORT || 8787);
+// the shifts, read from the Worker so the preview shows the same day
+const SCHEDULE = eval(readFileSync(join(HERE, "worker.js"), "utf8").match(/const SCHEDULE = (\[[\s\S]*?\n\]);/)[1]);
 const sample = JSON.parse(readFileSync(join(HERE, "sample-state.json"), "utf8"));
 
 createServer((req, res) => {
@@ -20,7 +22,7 @@ createServer((req, res) => {
     res.writeHead(200, { "Content-Type": "application/json" });
     // working houses started a few minutes ago, so the progress bars and the "verso le…" show something real
     for (const d of Object.values(sample.departments || {})) if (d.status === "working") d.updated_at = new Date(Date.now() - 4 * 60000).toISOString();
-    return res.end(JSON.stringify({ ...sample, publish_at_utc: [16, 22] }));
+    return res.end(JSON.stringify({ ...sample, publish_at_utc: [16, 22], schedule: SCHEDULE }));
   }
   if (url.pathname === "/idea") {   // the idea goes in the list, as if the Regia had started
     let body = "";

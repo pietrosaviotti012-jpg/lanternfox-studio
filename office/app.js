@@ -5,7 +5,7 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 // L'ordine è il percorso del video: dalla ricerca del mattino alle statistiche della sera.
 const DEPTS = [
   { id: "ricerca", name: "Ricerca", who: "Orlo, il gufo", animal: "owl", fur: "#b48a5a", at: [-10, -7.2],
-    does: "Cerca le storie e i formati che stanno funzionando adesso, e capisce perché.",
+    does: "Guarda i video virali come li guarderesti tu: li scarica, li trascrive, conta tagli e cambi di voce, studia i fotogrammi del gancio e di tutto il video, e la sera raggruppa le idee per il giorno dopo.",
     skills: ["trend-spotter", "content-research", "reel-analyzer", "agent-reach"] },
   { id: "soggetto", name: "Soggetto", who: "Tito, il riccio", animal: "hedgehog", fur: "#8a6a52", at: [-5, -7.2],
     does: "Sceglie la storia del giorno dall'archivio delle idee, dentro una serie riconoscibile.",

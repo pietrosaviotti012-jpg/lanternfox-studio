@@ -1,0 +1,118 @@
+# The watchman: every 15 minutes it does what the Office asked from the phone and tells the Office how GitHub is doing.
+#   - commands: "rerender" starts render.yml again for a production;
+#   - examples: videos to study (links or mp4 from the Idea tab, and research/inbox.txt from the Research routine)
+#     go through tools/analyze.py; the results are committed in research/analisi/;
+#   - health: minutes used this month, renders that failed in the last 24 hours.
+# The repository is public, so GitHub Actions minutes are free and unlimited: the count is there to keep an eye on it.
+name: office
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['research/inbox.txt']
+
+concurrency:
+  group: office
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  actions: write
+
+env:
+  OFFICE_URL: ${{ secrets.OFFICE_URL }}
+  STUDIO_SECRET: ${{ secrets.STUDIO_SECRET }}
+  GH_TOKEN: ${{ github.token }}
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    outputs:
+      examples: ${{ steps.pending.outputs.examples }}
+      inbox: ${{ steps.pending.outputs.inbox }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            tools
+            research
+      - name: What the Office asked
+        id: pending
+        run: |
+          curl -sf -H "Authorization: Bearer $STUDIO_SECRET" "$OFFICE_URL/ops/pending" > pending.json || echo '{"ops":[],"examples":[]}' > pending.json
+          cat pending.json
+          node -e "
+            const p = require('./pending.json');
+            for (const o of p.ops || []) console.log(JSON.stringify(o));
+          " > ops.jsonl
+          echo "examples=$(node -e "console.log(JSON.stringify(require('./pending.json').examples||[]))")" >> "$GITHUB_OUTPUT"
+          N=$( [ -s research/inbox.txt ] && grep -c 'http' research/inbox.txt || echo 0 ); echo "inbox=$N" >> "$GITHUB_OUTPUT"
+      - name: Commands
+        run: |
+          while read -r line; do
+            [ -z "$line" ] && continue
+            ID=$(echo "$line" | node -e "let d='';process.stdin.on('data',c=>d+=c).on('end',()=>console.log(JSON.parse(d).id))")
+            T=$(echo "$line" | node -e "let d='';process.stdin.on('data',c=>d+=c).on('end',()=>console.log(JSON.parse(d).target||''))")
+            if [ -f "productions/$T/script.json" ] || git ls-tree -d HEAD "productions/$T" >/dev/null 2>&1; then
+              gh workflow run render.yml -f production="productions/$T" && R=done || R=failed
+            else R=failed; fi
+            node tools/office.mjs "{\"op\":{\"id\":\"$ID\",\"status\":\"$R\",\"result\":\"render di $T: ${R/done/ripartito}\"}}"
+          done < ops.jsonl
+      - name: Health
+        run: |
+          SINCE=$(date -u +%Y-%m-01)
+          gh api --paginate "repos/${{ github.repository }}/actions/runs?created=>=$SINCE&per_page=100" -q '.workflow_runs[] | [.name, .display_title, .conclusion // .status, .run_started_at, .updated_at, .html_url] | @tsv' > runs.tsv || true
+          node -e "
+            const fs = require('fs');
+            const rows = fs.readFileSync('runs.tsv', 'utf8').trim().split('\n').filter(Boolean).map(l => l.split('\t'));
+            const mins = rows.reduce((m, r) => m + Math.max(0, (Date.parse(r[4]) - Date.parse(r[3])) / 60000), 0);
+            const day = Date.now() - 864e5;
+            const failed = rows.filter(r => r[2] === 'failure' && Date.parse(r[4]) > day);
+            const last = rows.filter(r => r[0] === 'render').slice(0, 6).map(r => ({ name: r[0], title: r[1].slice(0, 90), conclusion: r[2], at: r[4], url: r[5] }));
+            console.log(JSON.stringify({ github: { minutes_month: Math.round(mins), runs_month: rows.length, failed_24h: failed.length,
+              failed: failed.slice(0, 5).map(r => ({ name: r[0], title: r[1].slice(0, 90), at: r[4], url: r[5] })), last, free: true } }));
+          " > health.json
+          node tools/office.mjs "$(cat health.json)"
+
+  # heavier: only when there is something to study
+  study:
+    needs: watch
+    if: needs.watch.outputs.examples != '[]' || needs.watch.outputs.inbox != '0'
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: ffmpeg (static build)
+        run: |
+          curl -sL https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-linux64-gpl.tar.xz | tar -xJ -C /tmp
+          echo /tmp/ffmpeg-master-latest-linux64-gpl/bin >> "$GITHUB_PATH"
+      - name: Tools
+        run: pip install yt-dlp faster-whisper numpy soundfile
+      - name: Study the videos
+        env:
+          EXAMPLES: ${{ needs.watch.outputs.examples }}
+        run: |
+          node -e "for (const e of JSON.parse(process.env.EXAMPLES||'[]')) console.log([e.id, e.url||'', e.file||''].join('\t'))" > todo.tsv
+          [ -s research/inbox.txt ] && grep -o 'https\S*' research/inbox.txt | sed 's/^/inbox\t/; s/$/\t/' >> todo.tsv || true
+          while IFS=$'\t' read -r ID URL FILE; do
+            SRC="$URL"
+            if [ -n "$FILE" ]; then curl -sf -H "Authorization: Bearer $STUDIO_SECRET" "$FILE" -o "/tmp/$ID.mp4" && SRC="/tmp/$ID.mp4"; fi
+            if OUT=$(python tools/analyze.py "$SRC" 2>/tmp/err.txt | tail -1); then
+              REL=${OUT#"$PWD/"}; R="studiato: https://github.com/${{ github.repository }}/blob/main/$REL/analysis.md"; S=studied
+            else R="non riuscito: $(tail -c 200 /tmp/err.txt | tr '\n"' '  ')"; S=failed; fi
+            echo "$ID $S $R"
+            [ "$ID" != inbox ] && node tools/office.mjs "{\"op\":{\"kind\":\"example\",\"id\":\"$ID\",\"status\":\"$S\",\"result\":\"$R\"}}"
+          done < todo.tsv
+          : > research/inbox.txt
+      - name: Keep the studies
+        run: |
+          git config user.name "Lantern Fox Ricerca"; git config user.email "ricerca@lanternfox.tales"
+          git add research/analisi research/inbox.txt
+          git diff --cached --quiet || { git commit -m "Research: studied $(git diff --cached --name-only | grep -c analysis.md) video(s)"; git pull --rebase origin main && git push; }

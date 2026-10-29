@@ -164,5 +164,70 @@
         "status": "waiting"
       }
     ]
+  },
+  "chain": {
+    "failed": {
+      "id": "2026-10-29-clocks-stop",
+      "step": "animazione",
+      "url": "https://github.com",
+      "at": "2026-10-29T17:01:39.474Z"
+    }
+  },
+  "github": {
+    "minutes_month": 412,
+    "runs_month": 63,
+    "failed_24h": 1,
+    "checked_at": "2026-10-29T17:01:39.476Z",
+    "last": [
+      {
+        "title": "What If episode 2",
+        "conclusion": "failure",
+        "at": "2026-10-29T17:01:39.476Z",
+        "url": "https://github.com"
+      },
+      {
+        "title": "Lantern Night redo",
+        "conclusion": "success",
+        "at": "2026-10-29T17:01:39.476Z",
+        "url": "https://github.com"
+      }
+    ]
+  },
+  "examples": [
+    {
+      "id": "ex1",
+      "url": "https://www.instagram.com/reel/De5QPFnvk-i/",
+      "note": "grafica delle persone",
+      "at": "2026-10-29T17:01:39.476Z",
+      "status": "studied",
+      "result": "studiato: https://github.com/x/analysis.md"
+    },
+    {
+      "id": "ex2",
+      "url": "https://www.tiktok.com/@x/video/1",
+      "at": "2026-10-29T17:01:39.476Z",
+      "status": "waiting"
+    }
+  ],
+  "research": {
+    "date": "2026-10-29",
+    "method": "Scarica ogni video, lo trascrive, conta tagli e cambi di voce, guarda i fotogrammi.",
+    "at": "2026-10-29T17:01:39.476Z",
+    "studied": [
+      {
+        "title": "You Have 72 Hours · Part 2",
+        "url": "https://www.instagram.com/reel/De5QPFnvk-i/",
+        "notes": "barra delle risorse, voci diverse, scelta della maggioranza"
+      }
+    ],
+    "ideas": [
+      "Serie a conto alla rovescia: 72 ore in un faro durante la tempesta"
+    ]
+  },
+  "today": {
+    "day": "2026-10-29",
+    "ids": [
+      "2026-10-29-flannan-keepers"
+    ]
   }
 }
