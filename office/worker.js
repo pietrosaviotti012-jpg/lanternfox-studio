@@ -283,6 +283,7 @@ async function applyEvent(env, event) {
     const idea = item.request && state.ideas.find((i) => i.id === item.request);
     if (idea) Object.assign(idea, { status: "ready", video: item.id, title: item.title });
     state.queue = state.queue.filter((q) => q.id !== item.id).concat(item);
+    tidy(state, now);
     if (item.status === "pending") {
       await pushAll(env, { title: "Un video aspetta il tuo ok", body: item.title || "Nuova storia pronta", url: "/#approva", urgent: true });
     }
@@ -436,7 +437,29 @@ function calendarPut(state, day) {
 //   - commands still waiting for GitHub: he wakes the watchman.
 // What he saw and did stays in state.guard for the Home card.
 const RENDER_DEPTS = ["voce", "animazione", "musica", "montaggio", "qualita"];
+const CHAIN_DEPTS = ["ricerca", "soggetto", "copione", "regia", ...RENDER_DEPTS];
+// the Office's own slips: a house still "at work" on a video that is already finished (it never said "done"),
+// and GitHub commands or examples "in progress" for hours. Returns what it put right.
+function tidy(state, now) {
+  const fixed = [], t = Date.parse(now), vid = state.video?.id;
+  const finished = vid && state.queue.some((q) => q.id === vid);
+  for (const id of CHAIN_DEPTS) {
+    const d = state.departments[id];
+    if (finished && d?.status === "working" && Date.parse(d.updated_at || 0) <= Date.parse(state.queue.find((q) => q.id === vid).created_at || now)) {
+      state.departments[id] = { ...d, status: "done", task: d.task ? `${d.task} (finito)` : "Finito", updated_at: now };
+      fixed.push(`${id[0].toUpperCase() + id.slice(1)} risultava al lavoro, ma il video era già finito`);
+    }
+  }
+  for (const o of state.ops) if (["waiting", "running"].includes(o.status) && t - Date.parse(o.at) > 3 * 3600e3) {
+    o.status = "failed"; o.result = "nessuna risposta da GitHub dopo 3 ore"; fixed.push(`un comando per GitHub era fermo da ore`);
+  }
+  for (const e of state.examples) if (["waiting", "running"].includes(e.status) && t - Date.parse(e.at) > 6 * 3600e3) {
+    e.status = "failed"; e.result = "non studiato dopo 6 ore: rimandalo"; fixed.push(`un esempio da studiare era fermo da ore`);
+  }
+  return fixed;
+}
 async function guardRound(env, state, now) {
+  const repaired = tidy(state, now);
   const seen = [], done = [], deps = state.departments, t = Date.parse(now);
   const label = (id) => id[0].toUpperCase() + id.slice(1);
   const broken = Object.keys(RESTART).filter((id) => deps[id]?.status === "error");
@@ -457,9 +480,10 @@ async function guardRound(env, state, now) {
   const waiting = state.ops.filter((o) => o.status === "waiting").length;
   if (waiting) seen.push(`${waiting} ${waiting === 1 ? "comando aspetta" : "comandi aspettano"} GitHub`);
   const woke = await wakeWatchman(env);
-  state.guard = { at: now, seen, done, watchman: woke === 204,
-    text: seen.length ? `Ho trovato: ${seen.join("; ")}. ${done.length ? "Ho fatto ripartire: " + done.join("; ") + "." : ""}`
-      : "Ho controllato tutte le casette: nessuno è fermo, la catena è in ordine." };
+  state.guard = { at: now, seen, done, repaired, watchman: woke === 204,
+    text: (repaired.length ? `Ho sistemato l'ufficio: ${repaired.join("; ")}. ` : "")
+      + (seen.length ? `Ho trovato: ${seen.join("; ")}. ${done.length ? "Ho fatto ripartire: " + done.join("; ") + "." : ""}`
+      : "Ho controllato tutte le casette: nessuno è fermo, la catena è in ordine.") };
   state.log.push({ at: now, dept: "regia", status: seen.length ? "working" : "done", text: `Il Generale ha fatto il giro: ${state.guard.text}` });
   return state.guard;
 }
@@ -916,6 +940,17 @@ export default {
       if (when) item.publish_after = when; else delete item.publish_after;
       calendarPut(state, { date: outDate(env, item), title: item.title, status: "approved" });
       state.log.push({ at: new Date().toISOString(), dept: "pubblicazione", status: "done", text: `"${item.title}" esce ${when ? "dal " + when.slice(0, 10) : "al prossimo orario"}` });
+      await saveState(env, state);
+      return json({ ok: true });
+    }
+    // the user edits what goes out with a video not published yet: title and caption (the publishing routine reads them from here)
+    if (url.pathname === "/queue/edit" && request.method === "POST") {
+      const { id, title, caption } = await request.json().catch(() => ({}));
+      const state = await loadState(env), item = state.queue.find((q) => q.id === id && ["pending", "approved"].includes(q.status));
+      if (!item) return json({ error: "video non trovato o già pubblicato" }, 404);
+      if (typeof title === "string" && title.trim()) { calendarPut(state, { ...(state.calendar.find((c) => c.title === item.title) || { date: outDate(env, item), status: "approved" }), title: clip(title.trim(), 120) }); item.title = clip(title.trim(), 120); }
+      if (typeof caption === "string") item.caption = clip(caption, 2200);
+      state.log.push({ at: new Date().toISOString(), dept: "revisione", status: "done", text: `Hai modificato titolo e didascalia di "${item.title}"` });
       await saveState(env, state);
       return json({ ok: true });
     }

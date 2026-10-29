@@ -736,7 +736,7 @@ function render() {
     !(q.status === "published" && Date.now() - (lastOut(q) || Date.parse(q.decided_at || q.created_at)) > 864e5) &&
     !(q.status === "redo" && Date.now() - Date.parse(q.decided_at || q.created_at) > 864e5));
   const sig = JSON.stringify([queue, Boolean(demo), new Date().getUTCHours()]);
-  if (sig !== render.queueSig) {
+  if (sig !== render.queueSig && !document.querySelector("#queue details.edit[open]")) {   // not while you are editing a caption
     render.queueSig = sig;
     const notes = Object.fromEntries([...document.querySelectorAll("#queue textarea")].map((t) => [t.id, t.value]));
     $("queue").innerHTML = queue.length ? queue.map(reviewCard).join("")
@@ -866,7 +866,11 @@ function publishedBlock(q) {
   const row = (key, name) => pub[key]?.url ? `<li><a href="${esc(pub[key].url)}" target="_blank" rel="noopener">${name}: uscito ↗</a></li>`
     : pub[key]?.draft ? `<li>${name}: nelle bozze</li>`
     : pub[key]?.error ? `<li>${name}: non riuscito, riprovo al prossimo giro</li>` : `<li>${name}: esce ${local}</li>`;
-  const now = `<div class="row">${q.status === "approved" ? `<button class="btn primary" data-now="${esc(q.id)}">Pubblica adesso</button>
+  const edit = q.status === "approved" ? `<details class="edit"><summary>Modifica titolo e didascalia</summary>
+    <label class="note" for="t-${esc(q.id)}">Titolo</label><input id="t-${esc(q.id)}" class="field" style="min-height:0" maxlength="120" value="${esc(q.title)}">
+    <label class="note" for="c-${esc(q.id)}">Didascalia (con gli hashtag)</label><textarea id="c-${esc(q.id)}" class="field" maxlength="2200">${esc(q.caption || "")}</textarea>
+    <div class="row"><button class="btn primary" data-edit="${esc(q.id)}">Salva le modifiche</button></div></details>` : "";
+  const now = edit + `<div class="row">${q.status === "approved" ? `<button class="btn primary" data-now="${esc(q.id)}">Pubblica adesso</button>
     ${later ? `<button class="btn" data-when="${esc(q.id)}" data-after="">Al prossimo orario</button>`
       : `<button class="btn" data-when="${esc(q.id)}" data-after="${nextSlot(at.getTime() + 60e3).toISOString()}">Sposta al giro dopo</button>`}` : ""}${dlButton(q)}</div>`;
   return `<p class="decided">${q.status === "published" ? "Pubblicato" : "Approvato"} alle ${fmtTime(q.decided_at)}</p>
@@ -1082,6 +1086,17 @@ $("queue").addEventListener("click", async (e) => {
     n.disabled = false;
     toast(r.ok ? "Pubblicazione avviata: tra qualche minuto è online" : "Non riesco ad avviare la pubblicazione: esce comunque all'orario");
     load();
+    return;
+  }
+  const ed = e.target.closest("[data-edit]");   // title and caption of a video that has not gone out yet
+  if (ed) {
+    const id = ed.dataset.edit, title = document.getElementById("t-" + id).value, caption = document.getElementById("c-" + id).value;
+    if (demo) { toast("Nella prova non si salva niente"); return; }
+    ed.disabled = true;
+    const r = await fetch("/queue/edit", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, title, caption }) });
+    ed.disabled = false;
+    toast(r.ok ? "Salvato: esce con il nuovo titolo e la nuova didascalia" : "Non sono riuscito a salvare: riprova");
+    render.queueSig = null; load();
     return;
   }
   const w = e.target.closest("[data-when]");   // "Sposta al giro dopo" / "Al prossimo orario"
