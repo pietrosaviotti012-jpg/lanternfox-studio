@@ -2,7 +2,7 @@
 // freezes on "stopped", then the phone, the oven, the clocks in space. The snapback is the map: GPS is a ring of clocks, a millionth
 // of a second moves the blue dot 300 m, so every dot freezes, ships and planes are lost, the masts go dark. The turn: time never
 // stopped, only our counting (the moon keeps moving behind the frozen clock, the sun rises, the stars turn), and the fox with the
-// lantern walks home by them. The clock hands are their own sheets (clockHand), turned in update().
+// lantern walks home by them (the last shot, no question at the end). The clock hands are their own sheets (clockHand), turned in update().
 // Subjects sit between 15 % and 52 % of the frame height (the series tag is above, the pop captions below).
 // Starts are anchored to narration lines (C), effects to the line timings (E.cue / E.cueEnd / E.word).
 import { layered } from './engine/kit/shot.js';
@@ -19,7 +19,7 @@ const NOGLOW = { trans: 0, shadow: false, recv: false };
 const BLUE = '#5aa8ff';
 
 // the clock tower and its three hands (each hand is a sheet that turns around the face centre)
-const TOWER = { cx: 0, by: -.07, w: .075, h: .2 };
+const TOWER = { cx: 0, by: -.075, w: .075, h: .2 };
 const FACE = { cx: 0, cy: TOWER.by + TOWER.h - TOWER.w * .52, r: TOWER.w * .36 };
 const towerLayers = (z = -.085, col = '#16224a', face = FACE) => [
   { name: 'tower', z, trans: .2, glow: 2.2, glowCol: '#ffe2ae', draw: x => clockTower(x, { ...TOWER, col }), glowDraw: g => clockTower(null, TOWER, g) },
@@ -39,21 +39,22 @@ const clockAt = (t, tStop) => {
   return [2, 59, 60 - Math.ceil(tStop - t)];
 };
 
-// a town of houses along a ridge, windows lit
+// a town of houses along a ridge, windows lit; the houses are sunk a little into the ridge so none floats over a dip
 const town = (by, seed = 5, col = '#16224a', h = .04) => ({
-  draw: x => { x.fillStyle = col; dunes(x, { x0: -.25, x1: .25, base: by, amp: .004, seed, freq: 5 }); houses(x, { x0: -.24, x1: .24, by, h, seed, col }); },
-  glowDraw: g => houses(null, { x0: -.24, x1: .24, by, h, seed }, g), glow: 2.2,
+  draw: x => { x.fillStyle = col; dunes(x, { x0: -.25, x1: .25, base: by, amp: .004, seed, freq: 5 }); houses(x, { x0: -.24, x1: .24, by: by - .006, h, seed, col }); },
+  glowDraw: g => houses(null, { x0: -.24, x1: .24, by: by - .006, h, seed }, g), glow: 2.2,
 });
 const hill = (base, col = '#0e1532', seed = 3) => x => { x.fillStyle = col; dunes(x, { x0: -.25, x1: .25, base, amp: .01, seed, freq: 5, grass: 12 }); };
 const bank = (base, seed) => x => { x.fillStyle = '#080c1e'; foreground(x, { base, seed, reedsAt: [-.22, -.08] }); };
 const foxLayer = (o, z = -.055, name = 'fox') => ({ name, z, trans: .2, glow: 3, w: .2, h: .2, x: o.cx, y: o.by + .05,
   draw: x => fox(x, { ...o, cx: 0, by: -.05, lantern: true }), glowDraw: g => fox(null, { ...o, cx: 0, by: -.05, lantern: true }, g) });
+// a glowing word in the scene (Anton, cream paper that burns in g), faded in with reveal() and glows
+const bright = (name, z, s, x0, y0, size = .02, glowCol = '#ff6b5a') => ({ name, z, trans: .3, glow: 2.6, glowCol, w: .3, h: .06, x: x0, y: y0, shadow: false, recv: false,
+  draw: x => text(x, s, 0, 0, size, '"Anton"', { fill: '#f6e6c4' }), glowDraw: g => text(g, s, 0, 0, size, '"Anton"', { fill: '#fff' }) });
 const dotLayer = (name, z, x0, y0, r = .0045) => ({ name, z, ...NOGLOW, glow: 3.6, glowCol: BLUE, w: .04, h: .04, x: x0, y: y0,
   draw: x => mapDot(x, { r }), glowDraw: g => mapDot(null, { r }, g) });
 // fade a small text/sign sheet in at t0 (it rises a little as it appears)
 const reveal = (L, n, t, t0, d = .5) => { const k = ss(seg(t, t0, t0 + d)); L[n].visible = k > 0; L[n].material.color.setScalar(k); L[n].position.y = L[n].userData.p0.y - .006 * (1 - k); };
-const sign = (name, z, s, y, size = .022, col = '#f1dbac', o = {}) => ({ name, z, trans: .3, w: .26, h: .05, x: 0, y, shadow: false, recv: false, finish: { rim: .6 },
-  draw: x => text(x, s, 0, 0, size, '"Cormorant"', { fill: col, weight: 700, ...o }) });
 const seaNear = (col, line, base, r = .009) => x => {
   x.fillStyle = col; waterTop(x, { x0: -.25, x1: .25, base, amp: .002, len: .045 });
   x.save(); x.beginPath(); x.rect(-.25, -.45, .5, base + .445); x.clip();
@@ -74,7 +75,8 @@ export function SHOTS(C, DUR) {
           layers: [
             ...towerLayers(),
             { name: 'town', z: -.075, trans: .25, ...town(-.065, 5, '#101a3e', .045) },
-            foxLayer({ cx: .09, by: -.008, s: .05 }, -.07),
+            { name: 'knoll', z: -.0705, trans: .2, draw: x => { x.fillStyle = '#101a3e'; x.beginPath(); x.ellipse(.09, -.04, .05, .032, 0, 0, TAU); x.fill(); } },
+            foxLayer({ cx: .09, by: -.011, s: .05 }, -.07),
             { name: 'fg', z: -.03, trans: .04, draw: hill(-.14, '#080c1e', 2) },
           ],
           flicker: ['fox'],
@@ -85,7 +87,7 @@ export function SHOTS(C, DUR) {
       } },
 
     // 2 · Your phone, your oven: a dark kitchen; the phone on the table reads 3:00, the camera whips right to the oven clock
-    { id: 'S2', start: at('L02') - .2, sfx: [{ t: .15, type: 'click' }, { t: C.L02.dur * .3, type: 'whoosh', v: .4 }],
+    { id: 'S2', start: at('L02') - .2, sfx: [{ t: .15, type: 'click' }, { t: C.L02.dur * .3, type: 'paper', v: .4 }],
       build: E => {
         const ov = E.word('L02', 2);
         const digits = (name, cx, cy, size, col) => ({ name, z: -.088, ...NOGLOW, w: .09, h: .04, x: cx, y: cy, draw: x => text(x, '3:00', 0, 0, size, '"Anton"', { fill: col }) });
@@ -95,11 +97,11 @@ export function SHOTS(C, DUR) {
             { name: 'phone', z: -.09, trans: .1, glow: 2.6, glowCol: '#bcd6ff', draw: x => phone(x, { cx: -.07, cy: .07, w: .075, h: .14 }), glowDraw: g => phone(null, { cx: -.07, cy: .07, w: .075, h: .14 }, g) },
             digits('pdig', -.07, .09, .024, '#1b2140'),
             { name: 'oven', z: -.09, trans: .1, glow: 2.8, glowCol: '#7dffb0', draw: x => oven(x, { cx: .1, by: -.02, w: .12, h: .16 }), glowDraw: g => oven(null, { cx: .1, by: -.02, w: .12, h: .16 }, g) },
-            digits('odig', .1, .1176, .011, '#0f2a1c'),
+            digits('odig', .1, .1176, .016, '#0f2a1c'),
             { name: 'table', z: -.07, trans: .05, draw: x => { x.fillStyle = '#0b0f1e'; x.fillRect(-.25, -.3, .5, .3); x.fillRect(-.25, -.005, .5, .006); } },
           ],
           glows: { phone: [[0, 1]], oven: [[0, 0], [ov - .1, 0], [ov + .1, 1]] },
-          cam: [[0, [-.07, .07, .5, -.07, .075, -.07]], [ov - .15, [-.06, .07, .5, -.06, .075, -.07]], [ov + .25, [.09, .07, .48, .1, .08, -.07]], [E.dur, [.1, .075, .44, .1, .085, -.07]]],
+          cam: [[0, [-.06, .07, .5, -.06, .075, -.07]], [Math.max(.2, ov - .45), [-.04, .07, .5, -.04, .077, -.07]], [ov + .55, [.08, .072, .47, .09, .08, -.07]], [E.dur, [.1, .075, .44, .1, .085, -.07]]],
           focus: -.09, aper: 14,
         });
       } },
@@ -127,7 +129,7 @@ export function SHOTS(C, DUR) {
       build: E => layered(E, {
         light: [0, .1, -.13], lightR: .2, sky: { stops: NIGHT, stars: 80 }, on: false,
         layers: [...towerLayers()],
-        update: (t, L) => setHands(L, 3, 0, .2 * Math.sin(t * 31) * Math.exp(-((t % 1.4)) * 4)),
+        update: (t, L) => setHands(L, 3, 0, .15 * Math.sin(t * 9) * Math.exp(-t * 1.5)),
         cam: [[0, [-.01, FACE.cy - .01, .3, 0, FACE.cy, -.07]], [E.dur, [.01, FACE.cy, .26, 0, FACE.cy, -.07]]],
         focus: -.085, aper: 16,
       }) },
@@ -196,8 +198,10 @@ export function SHOTS(C, DUR) {
             { name: 'map', z: -.1, trans: .55, draw: x => streetMap(x, { w: .33, h: .58, seed: 3 }) },
             { name: 'path', z: -.095, trans: 0, shadow: false, recv: false,
               draw: x => { x.fillStyle = '#9a2a22'; for (let i = 1; i < 26; i++) { const u = i / 26; x.beginPath(); x.arc(lerp(A[0], B[0], u), lerp(A[1], B[1], u), .0011, 0, TAU); x.fill(); } } },
-            { name: 'meters', z: -.092, trans: .2, w: .12, h: .03, x: .035, y: .065, shadow: false, recv: false, draw: x => text(x, '300 m', 0, 0, .016, '"Anton"', { fill: '#9a2a22' }) },
-            { name: 'micro', z: -.09, trans: .2, w: .2, h: .04, x: 0, y: .17, shadow: false, recv: false, draw: x => text(x, '0.000001 s', 0, 0, .022, '"Anton"', { fill: '#1b2140' }) },
+            { name: 'meters', z: -.092, trans: .2, w: .12, h: .04, x: .045, y: .06, shadow: false, recv: false,
+              draw: x => { x.fillStyle = '#f4e8cc'; x.fillRect(-.034, -.016, .068, .032); text(x, '300 m', 0, 0, .024, '"Anton"', { fill: '#9a2a22' }); } },
+            { name: 'micro', z: -.09, trans: .2, w: .26, h: .05, x: 0, y: .17, shadow: false, recv: false,
+              draw: x => { x.fillStyle = '#f4e8cc'; x.fillRect(-.09, -.02, .18, .04); text(x, '0.000001 s', 0, 0, .028, '"Anton"', { fill: '#1b2140' }); } },
             dotLayer('dot', -.088, A[0], A[1], .005),
           ],
           update: (t, L) => {
@@ -212,7 +216,7 @@ export function SHOTS(C, DUR) {
     // 8 · Every blue dot freezes: the phone in a hand-held close-up, the map on its screen; the dot stops pulsing and goes grey
     { id: 'S8', start: at('L07') - .3, sfx: [{ t: .3 + C.L07.dur * .92, type: 'click' }],
       build: E => {
-        const frz = E.word('L07', 8);
+        const frz = E.word('L07', 8), lost = E.word('L07', 3);
         const P = { cx: 0, cy: .075, w: .1, h: .19 };
         return layered(E, {
           light: [0, .06, -.13], lightR: .2, sky: { stops: ROOM }, on: false,
@@ -220,42 +224,46 @@ export function SHOTS(C, DUR) {
             { name: 'phone', z: -.09, trans: .1, glow: 2.2, glowCol: '#cfe0ff', draw: x => phone(x, P), glowDraw: g => phone(null, P, g) },
             { name: 'screenMap', z: -.088, ...NOGLOW, w: .084, h: .16, x: 0, y: .075, draw: x => streetMap(x, { w: .084, h: .16, seed: 8, bg: false, ink: '#7d8fb8', water: '#9db7e0', park: '#b3d0a4' }) },
             dotLayer('dot', -.086, 0, .07, .0045),
+            { name: 'lost', z: -.085, trans: .2, w: .1, h: .04, x: 0, y: .135, shadow: false, recv: false,
+              draw: x => { x.fillStyle = '#f4e8cc'; x.fillRect(-.04, -.013, .08, .026); text(x, 'GPS LOST', 0, 0, .016, '"Anton"', { fill: '#9a2a22' }); } },
             { name: 'room', z: -.06, trans: .05, draw: x => { x.fillStyle = '#0b0f1e'; x.fillRect(-.25, -.3, .5, .28); } },
           ],
           glows: { dot: [[0, 1], [frz, 1], [frz + .4, .12]], phone: [[0, 1]] },
-          update: (t, L) => { const k = t < frz ? 1 + .3 * Math.sin(t * 6) : 1; L.dot.scale.set(k, k, 1); },
+          update: (t, L) => { const k = t < frz ? 1 + .3 * Math.sin(t * 6) : 1; L.dot.scale.set(k, k, 1); reveal(L, 'lost', t, lost, .35); },
           cam: [[0, [-.015, .07, .42, 0, .075, -.07]], [frz, [0, .075, .36, 0, .075, -.07]], [E.dur, [.005, .075, .34, 0, .075, -.07]]],
           focus: -.088, aper: 16,
         });
       } },
 
-    // 9 · Ships, planes, trucks: a night coast; the camera snaps from the boat to the plane to the truck on the road, then pulls
-    //     back as all three wander, lost
-    { id: 'S9', start: at('L08') - .25, sfx: [{ t: 0, type: 'waves', d: 4, v: .5 }, { t: C.L08.dur * .25, type: 'whoosh', v: .3 }],
+    // 9 · Ships, planes, trucks: a night coast seen in one slow pull-back; the boat rides in the water, the truck drives on the
+    //     shore road, the plane blinks overhead; on "lost" all three start to wander
+    { id: 'S9', start: at('L08') - .25, sfx: [{ t: 0, type: 'waves', d: 4, v: .5 }, { t: C.L08.dur * .6, type: 'whoosh', v: .3 }],
       build: E => {
-        const w1 = E.word('L08', 1), w2 = E.word('L08', 2), lost = E.word('L08', 5);
+        const lost = E.word('L08', 5);
+        const truck = (c, g) => { if (c) { c.fillStyle = '#0e1532'; c.fillRect(-.03, -.006, .055, .03); c.fillRect(.025, -.006, .022, .022);
+            c.beginPath(); for (const wx of [-.018, .012, .036]) { c.moveTo(wx + .006, -.006); c.arc(wx, -.006, .006, 0, TAU); } c.fill();
+            c.fillStyle = '#2c2a44'; c.fillRect(.043, .002, .006, .006); }
+          if (g) { g.fillStyle = '#fff'; g.fillRect(.043, .002, .006, .006); } };
         return layered(E, {
           light: [0, .1, -.13], lightR: .3, sky: { stops: NIGHT, stars: 120 }, on: false,
           layers: [
             { name: 'plane', z: -.12, trans: .1, glow: 4, glowCol: '#ff6b5a', w: .1, h: .06, x: .05, y: .15, draw: x => plane(x, { cx: 0, cy: 0, s: .07 }), glowDraw: g => plane(null, { cx: 0, cy: 0, s: .07 }, g) },
+            { name: 'boat', z: -.113, trans: .2, w: .12, h: .08, x: -.06, y: .037, draw: x => boat(x, { cx: 0, by: -.01, s: .06 }) },
             { name: 'far', z: -.11, trans: .4, draw: seaNear('#2f4680', '#3d5590', .03, .006) },
-            { name: 'boat', z: -.1, trans: .2, w: .12, h: .08, x: -.06, y: .045, draw: x => boat(x, { cx: 0, by: -.01, s: .06 }) },
             { name: 'sea', z: -.085, trans: .3, draw: seaNear('#22355f', '#2e4475', .0, .01) },
-            { name: 'road', z: -.07, trans: .12, glow: 3, glowCol: '#ffe2a8', w: .3, h: .12, x: 0, y: -.03,
-              draw: x => { x.fillStyle = '#0e1532'; x.fillRect(-.15, -.06, .3, .045); x.fillRect(.02, -.015, .055, .03); x.fillRect(.075, -.015, .022, .022);
-                x.fillStyle = '#2c2a44'; x.fillRect(.093, -.008, .006, .006); },
-              glowDraw: g => { g.fillStyle = '#fff'; g.fillRect(.093, -.008, .006, .006); } },
+            { name: 'shore', z: -.072, trans: .12, draw: x => { x.fillStyle = '#0e1532'; dunes(x, { x0: -.25, x1: .25, base: -.012, amp: .002, seed: 6, freq: 4 }); } },
+            { name: 'truck', z: -.07, trans: .12, glow: 3, glowCol: '#ffe2a8', w: .12, h: .05, x: .05, y: .002, draw: x => truck(x), glowDraw: g => truck(null, g) },
             { name: 'fg', z: -.03, trans: .04, draw: bank(-.2, 5) },
           ],
-          glows: { plane: [[0, 1]], road: [[0, 1]] },
+          glows: { plane: [[0, 1]], truck: [[0, 1]] },
           update: (t, L) => {
             L.plane.position.x = .05 + .01 * Math.sin(t * .9); L.plane.rotation.z = .12 * Math.sin(t * 1.3);
             L.plane.material.userData.u.uGlowLit.value = (t * 1.6) % 1 < .25 ? 1 : 0;
-            L.boat.rotation.z = (t > lost ? .25 : .08) * Math.sin(t * 1.7); L.boat.position.x = -.06 + (t > lost ? .01 * Math.sin(t * .8) : 0);
-            L.road.position.x = t > lost ? -.015 * ss(seg(t, lost, lost + 1.5)) : 0;
+            const w = ss(seg(t, lost, lost + 1));
+            L.boat.rotation.z = (.05 + .07 * w) * Math.sin(t * 1.7); L.boat.position.x = -.06 + .008 * w * Math.sin(t * .8);
+            L.truck.position.x = .05 - .03 * ss(seg(t, 0, E.dur)) + .006 * w * Math.sin(t * 1.1);
           },
-          cam: [[0, [-.06, .05, .4, -.06, .055, -.07]], [w1 - .05, [-.06, .05, .4, -.06, .055, -.07]], [w1 + .15, [.05, .14, .4, .05, .145, -.07]], [w2 - .05, [.05, .14, .4, .05, .145, -.07]],
-            [w2 + .15, [.05, -.02, .4, .05, -.015, -.07]], [lost - .1, [.05, -.015, .42, .05, -.01, -.07]], [lost + .6, [0, .05, .66, 0, .055, -.07]], [E.dur, [0, .05, .7, 0, .055, -.07]]],
+          cam: [[0, [-.01, .06, .46, -.01, .065, -.07]], [E.dur, [0, .025, .64, 0, .03, -.07]]],
           focus: -.09, aper: 12,
         });
       } },
@@ -273,10 +281,11 @@ export function SHOTS(C, DUR) {
             { name: 'ridge', z: -.095, trans: .25, draw: hill(.03, '#16224a', 4) },
             { name: 'town', z: -.08, trans: .2, ...town(-.03, 11, '#101a3e', .04) },
             { name: 'fg', z: -.03, trans: .04, draw: hill(-.13, '#080c1e', 7) },
+            bright('nosvc', -.09, 'NO SERVICE', .02, .195, .024),
           ],
-          glows: { town: [[0, 1], [drop + .5, 1], [drop + 1.6, .25]] },
-          update: (t, L) => MASTS.forEach((m, i) => { const blink = (t * .9 + i * .33) % 1 < .45 ? 1 : .15, out = t > drop + i * .35 ? 0 : 1;
-            L[m.name].material.userData.u.uGlowLit.value = blink * out; }),
+          glows: { town: [[0, 1], [drop + .5, 1], [drop + 1.6, .25]], nosvc: [[0, 0], [drop, 0], [drop + .3, 1]] },
+          update: (t, L) => { MASTS.forEach((m, i) => { const blink = (t * .9 + i * .33) % 1 < .45 ? 1 : .15, out = t > drop + i * .35 ? 0 : 1;
+            L[m.name].material.userData.u.uGlowLit.value = blink * out; }); reveal(L, 'nosvc', t, drop, .3); },
           cam: [[0, [0, -.02, .62, 0, .04, -.07]], [drop, [0, .0, .56, 0, .06, -.07]], [E.dur, [0, .02, .62, 0, .055, -.07]]],
           focus: -.1, aper: 12,
         });
@@ -336,38 +345,18 @@ export function SHOTS(C, DUR) {
         return layered(E, {
           light: [.05, .05, -.13], lightR: .26, sky: { stops: DAWN.map(([u, c], i) => [u, i < 2 ? c : '#5a5878']), stars: 140 }, on: false,
           layers: [
-            { name: 'home', z: -.1, trans: .2, glow: 2.6, draw: x => { x.fillStyle = '#1d2347'; dunes(x, { x0: -.25, x1: .25, base: .02, amp: .006, seed: 4, freq: 4 }); cottage(x, { cx: .08, by: .018, s: .04, col: '#1d2347' }); },
-              glowDraw: g => cottage(null, { cx: .08, by: .018, s: .04 }, g) },
+            { name: 'home', z: -.1, trans: .2, glow: 2.6, draw: x => { x.fillStyle = '#1d2347'; dunes(x, { x0: -.25, x1: .25, base: .02, amp: .006, seed: 4, freq: 4 }); cottage(x, { cx: .08, by: .011, s: .04, col: '#1d2347' }); },
+              glowDraw: g => cottage(null, { cx: .08, by: .011, s: .04 }, g) },
             { name: 'hill', z: -.075, trans: .15, draw: hill(-.03, '#0e1532', 5) },
-            foxLayer({ cx: -.05, by: -.032, s: .07 }, -.07),
+            { name: 'path', z: -.0705, trans: .15, draw: x => { x.fillStyle = '#0e1532'; dunes(x, { x0: -.25, x1: .25, base: -.034, amp: .0012, seed: 2, freq: 3 }); } },
+            foxLayer({ cx: -.05, by: -.0335, s: .07 }, -.07),
             { name: 'fg', z: -.025, trans: .04, draw: bank(-.2, 3) },
           ],
           glows: { home: [[0, .35], [hm - .2, .35], [hm + .5, 1.2]], fox: [[0, 1]] }, flicker: ['fox'],
-          move: { fox: [[0, [-.03, 0, 0]], [E.dur, [.07, .006, 0]]] },
-          update: (t, L) => { L.fox.position.y += .0015 * Math.abs(Math.sin(t * 7)); },
+          move: { fox: [[0, [-.03, 0, 0]], [E.dur, [.07, 0, 0]]] },
+          update: (t, L) => { L.fox.rotation.z = .015 * Math.sin(t * 7); },
           cam: [[0, [-.06, .03, .5, -.06, .035, -.07]], [E.dur, [.04, .04, .56, .04, .045, -.07]]],
           focus: -.07, aper: 14,
-        });
-      } },
-
-    // 14 · Your call: the fox close by its lantern, the stopped clock tower far behind; "MINUTE or HOUR?" lights up above and holds
-    { id: 'S14', start: at('L14') - .3, in: { type: 'dissolve', dur: .5 }, sfx: [{ t: .3, type: 'chime' }, { t: end('L14') - at('L14') + 1, type: 'paper' }],
-      build: E => {
-        const q = E.word('L14', 5);
-        return layered(E, {
-          light: [0, .06, -.13], lightR: .2, lightCol: '#ffc878', sky: { stops: NIGHT, stars: 150 }, on: false,
-          layers: [
-            ...towerLayers(-.115, '#22336a'),
-            { name: 'hill2', z: -.1, trans: .25, draw: hill(-.055, '#22336a', 8) },
-            { name: 'hill', z: -.075, trans: .15, draw: hill(-.075, '#0e1532', 5) },
-            foxLayer({ cx: -.03, by: -.076, s: .11 }, -.062),
-            sign('ask', -.05, 'MINUTE  or  HOUR?', .185, .021),
-            { name: 'fg', z: -.02, trans: .04, draw: bank(-.2, 6) },
-          ],
-          glows: { fox: [[0, 1]] }, flicker: ['fox'],
-          update: (t, L) => { setHands(L, 3, 0, 0); reveal(L, 'ask', t, q, .6); },
-          cam: [[0, [.01, -.035, .48, 0, -.02, -.07]], [q, [0, -.0, .55, 0, .03, -.07]], [E.dur, [0, .03, .64, 0, .07, -.07]]],
-          focus: [[0, -.062], [q, -.062], [q + 1, -.05]], aper: 14,
         });
       } },
   ];
