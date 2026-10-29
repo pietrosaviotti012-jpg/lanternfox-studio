@@ -37,8 +37,11 @@ if not voice.get("prompt"):
 def key(L):
     return hashlib.sha1(json.dumps([L["text"], L.get("say"), L.get("act", {}), L.get("vfx"), voice, 2], sort_keys=True).encode()).hexdigest()[:12]
 
+# Whisper writes small numbers as digits ("One millionth" heard as "1 millionth"): both sides become digits
+NUMBERS = {w: str(i) for i, w in enumerate("zero one two three four five six seven eight nine ten eleven twelve".split())}
+
 def norm_words(s):
-    return re.sub(r"[^a-z0-9' ]", " ", s.lower().replace("—", " ")).split()
+    return [NUMBERS.get(w, w) for w in re.sub(r"[^a-z0-9' ]", " ", s.lower().replace("—", " ")).split()]
 
 todo = [L for L in script["lines"] if hashes.get(L["id"]) != key(L) or not os.path.exists(os.path.join(vo, L["id"] + ".wav"))]
 model = None
