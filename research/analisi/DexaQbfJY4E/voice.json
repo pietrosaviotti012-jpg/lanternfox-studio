@@ -1,0 +1,79 @@
+[
+ {
+  "t": 5.4,
+  "text": "Then your phone screams.",
+  "change": [
+   "brighter (phone, radio, another voice?)"
+  ]
+ },
+ {
+  "t": 30.6,
+  "text": "Then the power cuts, and the sky makes a sound, low, deep, everywhere at once.",
+  "change": [
+   "louder"
+  ]
+ },
+ {
+  "t": 42.3,
+  "text": "He walks into the middle of the road, arms open.",
+  "change": [
+   "darker (deep, muffled, another voice?)"
+  ]
+ },
+ {
+  "t": 61.7,
+  "text": "A shadow slides across the blinds, bigger than the house.",
+  "change": [
+   "louder"
+  ]
+ },
+ {
+  "t": 65.5,
+  "text": "It stops, right outside.",
+  "change": [
+   "quieter (whisper?)"
+  ]
+ },
+ {
+  "t": 67.7,
+  "text": "You don't breathe.",
+  "change": [
+   "quieter (whisper?)"
+  ]
+ },
+ {
+  "t": 69.0,
+  "text": "Then it moves on.",
+  "change": [
+   "darker (deep, muffled, another voice?)"
+  ]
+ },
+ {
+  "t": 70.8,
+  "text": "8.02 a.m. Your messages still won't send, but somehow a new one comes in.",
+  "change": [
+   "brighter (phone, radio, another voice?)"
+  ]
+ },
+ {
+  "t": 76.4,
+  "text": "No sender.",
+  "change": [
+   "brighter (phone, radio, another voice?)"
+  ]
+ },
+ {
+  "t": 82.7,
+  "text": "The alert said stay inside.",
+  "change": [
+   "brighter (phone, radio, another voice?)"
+  ]
+ },
+ {
+  "t": 88.6,
+  "text": "Stay, and three bottles of water won't last.",
+  "change": [
+   "darker (deep, muffled, another voice?)"
+  ]
+ }
+]

@@ -1,0 +1,32 @@
+# Transcript (en)
+
+- `  0.0` **[HOOK]** It's 1.14 a.m. You're lying in bed, scrolling, like every other night.
+- `  5.4` Then your phone screams.
+- `  7.5` Emergency alert! Do not look at the sky!
+- ` 10.8` Outside, every phone on your street goes off at once.
+- ` 14.4` Something is hanging over the city, bigger than the city.
+- ` 18.1` And your neighbors are already standing in the road, staring up at it, smiling.
+- ` 23.3` You have three bottles of water, half a box of cereal, phone at 41%,
+- ` 28.0` and no idea how long this lasts.
+- ` 30.6` Then the power cuts, and the sky makes a sound, low, deep, everywhere at once.
+- ` 37.6` Your neighbor turns around, his eyes are white, he's still smiling.
+- ` 42.3` He walks into the middle of the road, arms open.
+- ` 45.7` Then the house next to his empties, then the next.
+- ` 49.1` You pull every blind, a towel over the door window.
+- ` 52.4` Mom, are you inside?
+- ` 54.1` You, yes, don't look up, not delivered.
+- ` 57.8` 5.40 a.m. The sun should be up, it isn't.
+- ` 61.7` A shadow slides across the blinds, bigger than the house.
+- ` 65.5` It stops, right outside.
+- ` 67.7` You don't breathe.
+- ` 69.0` Then it moves on.
+- ` 70.8` 8.02 a.m. Your messages still won't send, but somehow a new one comes in.
+- ` 76.4` No sender.
+- ` 77.4` Evacuation buses, Elmwood High School, 9 a.m.
+- ` 80.9` Keep your eyes closed.
+- ` 82.7` The alert said stay inside.
+- ` 84.5` This one says leave.
+- ` 86.3` 400 meters, blind.
+- ` 88.6` Stay, and three bottles of water won't last.
+- ` 91.8` Go, and you might end up smiling too.
+- ` 94.6` Comment, go, or stay.
