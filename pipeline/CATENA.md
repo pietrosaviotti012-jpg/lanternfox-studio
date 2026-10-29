@@ -42,6 +42,7 @@ Se il connettore Reddit di Composio è attivo, guarda i post più votati del mes
 
 ## 2. Soggetto (`soggetto`)
 Skill: `series-planner`, `content-calendar`. Sceglie il video del giro: il formato tocca a rotazione (guarda `productions/` per vedere gli ultimi formati usati), e un formato che funziona (Statistiche) può tornare più spesso. Le serie (Your Call) continuano con la parte dopo, seguendo la scelta più commentata (si legge dal diario della Community).
+Il formato si sceglie fra le schede di **`pipeline/formati/`**: sono le ricette dei video virali studiati, con gli elementi di scena obbligatori. Copione e Regia seguono la scheda scelta. Le idee della sera prima sono in `research/<data>.md`.
 La storia la prende da **`stories/BANCA.md`**: prima le ⭐, poi le altre. Segui le regole in testa al file: niente testi copiati, persone reali solo se storiche, la leggenda dichiarata. Poi segna la storia come usata. La Ricerca aggiunge alla banca 3-5 voci nuove a ogni giro.
 Crea `productions/<data>-<slug>/meta.json` (titolo, `format`, serie, episodio, idea in una riga, `cover`) e aggiorna il calendario dell'ufficio (`{"calendar": {"date", "title", "status": "planned"}}`).
 `meta.cover`: `{ "kicker": "EYES DOWN · PART 1", "text": "Do *not* look at the sky", "t": 2.5 }` è la copertina del Reel: una promessa di 4-8 parole, le parole tra asterischi vengono colorate, `t` è il fotogramma di sfondo (facoltativo).
