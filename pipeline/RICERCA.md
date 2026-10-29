@@ -30,6 +30,7 @@ Tu fai la parte che una macchina non sa fare: **guardi** `hook.jpg` e `sheet.jpg
    - Scrivi i link in `research/inbox.txt`, uno per riga.
    - Il guardiano li studia entro un quarto d'ora dal push, e domani sera li trovi pronti.
    - Non mettere video già studiati: controlla le cartelle in `research/analisi/`.
+   - Preferisci i reel di Instagram (`instagram.com/reel/...`): YouTube blocca i server di GitHub ("Sign in to confirm you're not a bot") e quei link non si studiano. Un video YouTube molto forte scrivilo solo in `research/<data>.md`: l'utente può caricarne l'mp4 dall'ufficio.
 3. **Raggruppa le idee.** Scrivi `research/<data>.md` con:
    - i video studiati, una riga ciascuno con cosa insegnano;
    - gli schemi che si ripetono;
