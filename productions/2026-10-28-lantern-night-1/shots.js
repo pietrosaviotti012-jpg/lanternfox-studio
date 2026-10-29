@@ -19,14 +19,16 @@ const moonDisc = (cx, cy, r) => ({
 // a power cut: on, a stutter, off (keyframes for glows)
 const cut = (t, k = 1) => [[0, k], [t - .3, k], [t - .22, .25 * k], [t - .14, k], [t - .04, k], [t + .04, 0]];
 const ground = (col, base, seed, reedsAt = [-.2, -.1]) => x => { x.fillStyle = col; foreground(x, { base, seed, reedsAt, reedsN: 18, stones: 5 }); };
-// the procession: small lantern carriers along a path that climbs to the forest (u: 0 → 1)
-const PATH = u => [lerp(-.09, .1, u), .085 + .05 * u * u];
+// the procession: small lantern carriers walking up the ridge of the hill to the forest (u: 0 → 1);
+// RIDGE is the hill's top edge in S4 (the same quadratic curve), so their feet always stay on it
+const RIDGE = x => { const s = (x + .25) / .5; return .07 * (1 - s) ** 2 + .17 * s * (1 - s) + .14 * s * s; };
+const PATH = u => { const px = lerp(-.09, .1, u), k = 1 - .45 * u; return [px, RIDGE(px) + .01 * k - .0012, k]; };
 
 export function SHOTS(C, DUR) {
   const at = id => C[id].at, end = id => C[id].end;
   return [
     // 1 · The hook: a lit town at night, then every window, the lamps and the moon go out at once on "out"
-    { id: 'S1', start: 0, sfx: [{ t: 0, type: 'wind', d: end('L02') + .5, v: .4 }, { t: end('L01') - .32, type: 'click' }, { t: end('L01') - .2, type: 'click', v: .7 }],
+    { id: 'S1', start: 0, sfx: [{ t: 0, type: 'wind', d: end('L02') + .5, v: .55 }, { t: end('L01') - .34, type: 'crack', v: .7 }, { t: end('L01') - .25, type: 'thunder', v: .6 }],
       build: E => {
         const out = E.cueEnd('L01') - .3;
         return layered(E, {
@@ -65,7 +67,7 @@ export function SHOTS(C, DUR) {
       }) },
 
     // 3 · But your neighbours aren't scared: one by one their lanterns light up along the dark street, and they smile
-    { id: 'S3', start: at('L03') - .3, in: { type: 'dissolve', dur: .5 }, sfx: [{ t: .2, type: 'shimmer', v: .5 }],
+    { id: 'S3', start: at('L03') - .3, in: { type: 'dissolve', dur: .5 }, sfx: [{ t: 0, type: 'wind', d: end('L04') - at('L03') + 1, v: .45 }, { t: .4, type: 'whoosh', v: .45 }, { t: end('L04') - at('L03') - .2, type: 'thunder', v: .3 }],
       build: E => {
         const t0 = E.cue('L03') + .2, P = [[-.1, .062, .07], [-.035, .056, .085], [.04, .06, .078], [.105, .065, .07]];
         return layered(E, {
@@ -86,7 +88,7 @@ export function SHOTS(C, DUR) {
       } },
 
     // 4 · You at your window: the lanterns walk up the hill into the old forest; nobody looks back
-    { id: 'S4', start: at('L05') - .35, in: { type: 'dissolve', dur: .8 }, sfx: [{ t: 0, type: 'wind', d: end('L07') - at('L05') + 1, v: .5 }, { t: .6, type: 'steps', n: 12, every: .75, v: .45, pan: .3 }],
+    { id: 'S4', start: at('L05') - .35, in: { type: 'dissolve', dur: .8 }, sfx: [{ t: 0, type: 'wind', d: end('L07') - at('L05') + 1, v: .5 }, { t: .6, type: 'steps', n: 12, every: .75, v: .55, pan: .3 }, { t: end('L07') - at('L05') + .2, type: 'thunder', v: .35 }],
       build: E => {
         const N = 7, t0 = 0, t1 = E.cueEnd('L07') + .6;
         return layered(E, {
@@ -103,9 +105,9 @@ export function SHOTS(C, DUR) {
           ],
           glows: Object.fromEntries(Array.from({ length: N }, (_, i) => ['p' + i, [[0, 1]]])), flicker: Array.from({ length: N }, (_, i) => 'p' + i),
           update: (t, L) => {
-            for (let i = 0; i < N; i++) {   // each walker sets off a little later and fades into the trees at the top of the path
-              const u = seg(t, t0 + i * .9 - 2, t1 + i * .9 - 2), [px, py] = PATH(u), m = L['p' + i];
-              m.position.set(px, py, -.105); m.scale.setScalar(1 - .45 * u); m.material.userData.u.uGlowLit.value *= 1 - ss(seg(u, .85, 1)); m.visible = u > 0 && u < 1;
+            for (let i = 0; i < N; i++) {   // each walker sets off a little later, feet on the ridge, and fades into the trees at the top
+              const u = seg(t, t0 + i * .9 - 2, t1 + i * .9 - 2), [px, py, k] = PATH(u), m = L['p' + i];
+              m.position.set(px, py, -.105); m.scale.setScalar(k); m.material.userData.u.uGlowLit.value *= 1 - ss(seg(u, .85, 1)); m.visible = u > 0 && u < 1;
             }
           },
           cam: [[0, [-.06, .07, .5, -.04, .085, -.07]], [E.cue('L06'), [-.02, .075, .44, 0, .085, -.07]], [E.dur, [.01, .08, .38, .02, .085, -.07]]],
@@ -114,7 +116,7 @@ export function SHOTS(C, DUR) {
       } },
 
     // 5 · The dead phone lights up softly on the nightstand; the message itself is the L09 card: "Don't follow the lanterns."
-    { id: 'S5', start: at('L08') - .3, in: { type: 'dissolve', dur: .6 }, sfx: [{ t: .3, type: 'click' }, { t: at('L09') - at('L08') + .3, type: 'chime', v: .6 }],
+    { id: 'S5', start: at('L08') - .3, in: { type: 'dissolve', dur: .6 }, sfx: [{ t: .3, type: 'crack', v: .5 }, { t: at('L09') - at('L08') + .1, type: 'whoosh', v: .6 }, { t: at('L09') - at('L08') + .25, type: 'crack', v: .45 }],
       build: E => {
         const on = E.cue('L08') + .5, msg = E.cue('L09') - .15;
         return layered(E, {
@@ -138,7 +140,7 @@ export function SHOTS(C, DUR) {
       } },
 
     // 6 · A small light under your window: the fox, looking right at you; then it turns its head toward the trees and waits
-    { id: 'S6', start: at('L10') - .3, in: { type: 'dissolve', dur: .7 }, sfx: [{ t: .3, type: 'shimmer', v: .7 }],
+    { id: 'S6', start: at('L10') - .3, in: { type: 'dissolve', dur: .7 }, sfx: [{ t: 0, type: 'wind', d: end('L12') - at('L10') + 1, v: .45 }, { t: .5, type: 'whoosh', v: .5 }, { t: end('L12') - at('L10') + .1, type: 'thunder', v: .35 }],
       build: E => {
         const lit = E.cue('L10') + C.L10.dur * .55, turn = E.cue('L12') + C.L12.dur * .35;
         return layered(E, {
@@ -160,8 +162,8 @@ export function SHOTS(C, DUR) {
       } },
 
     // 7 · Behind you, your bedroom door creaks open: a dark door, ajar, a thin warm line of light in the gap; quick push in,
-    //     a low boom on the creak and three slow steps in the silence after
-    { id: 'S7', start: at('L13') - .2, in: { type: 'dissolve', dur: .35 }, sfx: [{ t: .2 + C.L13.dur * .55, type: 'paper', v: 1.4 }, { t: .2 + C.L13.dur * .5, type: 'thunder', v: .45 }, { t: .3, type: 'whoosh', v: .5 }, { t: end('L13') - at('L13') + .3, type: 'steps', n: 3, every: .55, v: .7 }],
+    //     a heavy boom on the creak and three slow steps in the silence after
+    { id: 'S7', start: at('L13') - .2, in: { type: 'dissolve', dur: .35 }, sfx: [{ t: .2 + C.L13.dur * .55, type: 'paper', v: 1.4 }, { t: .2 + C.L13.dur * .5, type: 'thunder', v: .75 }, { t: .3, type: 'whoosh', v: .5 }, { t: end('L13') - at('L13') + .3, type: 'steps', n: 3, every: .55, v: .7 }],
       build: E => {
         const open = E.cue('L13') + C.L13.dur * .5;
         return layered(E, {
@@ -182,8 +184,9 @@ export function SHOTS(C, DUR) {
         });
       } },
 
-    // 8 · Your call: the fox waits at the edge of the forest (GO), your window has one candle (STAY); the choice is cut paper
-    { id: 'S8', start: at('L14') - .3, in: { type: 'dissolve', dur: .7 }, sfx: [{ t: 0, type: 'wind', d: DUR - at('L14') + .5, v: .35 }, { t: at('L15') - at('L14') + .5, type: 'paper' }, { t: end('L15') - at('L14') + .8, type: 'paper' }],
+    // 8 · Your call: the fox waits at the edge of the forest (GO), your window has one candle (STAY); a boom on the choice,
+    //     then three steps behind you
+    { id: 'S8', start: at('L14') - .3, in: { type: 'dissolve', dur: .7 }, sfx: [{ t: 0, type: 'wind', d: DUR - at('L14') + .5, v: .35 }, { t: at('L15') - at('L14') + .5, type: 'thunder', v: .5 }, { t: end('L15') - at('L14') + .6, type: 'steps', n: 3, every: .6, v: .6, pan: -.4 }],
       build: E => {
         const go = E.cue('L15') + C.L15.dur * .55, stay = E.cue('L15') + C.L15.dur * .8, titleAt = E.cueEnd('L15') + .8;
         const sign = (s, cx) => ({ name: s, z: -.05, trans: .25, w: .08, h: .036, x: cx, y: .205, shadow: false, recv: false, finish: { rim: .6 },

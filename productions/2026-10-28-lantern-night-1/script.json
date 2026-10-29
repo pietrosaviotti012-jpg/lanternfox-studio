@@ -242,22 +242,6 @@
   {
    "at": "S1",
    "mood": "storm"
-  },
-  {
-   "at": "S3",
-   "mood": "hush"
-  },
-  {
-   "at": "S4",
-   "mood": "storm"
-  },
-  {
-   "at": "S5",
-   "mood": "hush"
-  },
-  {
-   "at": "S6",
-   "mood": "storm"
   }
  ]
 }
