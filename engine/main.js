@@ -8,6 +8,7 @@ import { Pipe } from './post.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { dispose } from './stage.js';
 import { ss, seg, clamp } from './lib.js';
+import { makeUI } from './ui.js';
 
 export const W = 1080, H = 1920;
 const Q = new URLSearchParams(location.search), SSAA = +(Q.get('ssaa') || 2);
@@ -157,6 +158,7 @@ function particles(t) {
     }
   }
 }
+const ui = makeUI({ script, C, esc, ss, seg, COVER });
 const card = document.getElementById('card');
 function cardAt(t) {
   if (COVER) { card.style.opacity = 0; return; }
@@ -196,7 +198,7 @@ window.render = async (t) => {
     g = await drawShot(i, t, pipe.rtA); gc([i]);
   }
   pipe.final({ ...g, mixB, mode: tr.type === 'iris' ? 1 : 0, center: tr.center, time: t, fade: (g.fade ?? 1) * ss(clamp((DUR - t) / 1.2))   /* no fade-in: frame 0 is the hook */ });
-  canvas.style.transform = camera(t, tl, p.dur); particles(t); cardAt(t);
+  canvas.style.transform = camera(t, tl, p.dur); particles(t); cardAt(t); ui(t);
   if (COVER) { sub.style.opacity = 0; pop.innerHTML = ''; return; }
   if (CAPS === 'pop') {
     // each chunk pops in (a quick scale from 1.18) and keeps its words until the next chunk starts

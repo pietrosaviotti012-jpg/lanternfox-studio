@@ -14,6 +14,29 @@ Questa è la guida viva di quello che piace a chi guarda. La **Regia** la legge 
 9. **Il primo fotogramma è già pieno**: soggetto grande, luce accesa, testo a schermo. Niente dissolvenza dal nero.
 10. **Il finale invita a commentare**: l'ultima immagine tiene ferma la scelta (GO o STAY) oppure la domanda per 2-3 secondi.
 
+## Gli elementi di scena dei modelli virali (dal 2026-10-29, `engine/ui.js`)
+Le ricette dei formati sono in `pipeline/formati/`. Gli elementi:
+- **per tutto il video**:
+  - `bar`: la barra delle risorse in alto, `[{label, value, alert}]`, che si aggiorna con `bar` sulle righe;
+  - `choice`: la scelta finale, `{question, a: {word, sub}, b: {word, sub}, note, at}`;
+  - `next`: il cartello finale, `{title: "PART 2", sub}`;
+- **per riga** (ognuno resta fino alla riga dopo, o per `hold` secondi):
+  - `phone`, con `app` uguale a uno di questi:
+    - `steps` {from, value, sub};
+    - `health` {title, value};
+    - `map` {title, to};
+    - `messages` {from, text | thread: [{me, text}]};
+    - `lock` {date, time, notes: [{app, text}]};
+  - `tv` {title, rule, text, ticker}: l'allerta in tv;
+  - `cctv` {cam, time}: il monitor di sicurezza;
+  - `peephole: true`: lo spioncino;
+  - `timer` {from: "63:59:22"} oppure {wait: "10:00", label};
+  - `tint: true`: il rosso della paura;
+  - `name` {name, role}: il nome di chi entra in scena;
+  - `quote: true`: la frase detta da un altro personaggio, in corsivo rosso;
+  - `vfx`: un'altra voce, cioè `radio`, `phone`, `whisper`, `child` o `robot`.
+- **nelle scene**: `person(x, {cx, by, s, face: 'calm'|'scared'|'surprised'|'sleeping', coat, hat, arms: 'down'|'up'})`, il personaggio con la testa tonda e gli occhi grandi.
+
 ## Cosa sa fare il motore (riassunto per la Regia)
 - In `script.json`:
   - `captions` (`pop` / `line`), `hud` {tag, part}, `fx`, `motion: false` (spegne drift, punch e scossa);

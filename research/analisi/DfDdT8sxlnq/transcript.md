@@ -1,0 +1,33 @@
+# Transcript (en)
+
+- `  0.1` **[HOOK]** Imagine you're watching TV on the 23rd floor, when the sirens start.
+- `  4.5` Emergency alert.
+- `  6.5` Stay inside.
+- `  8.0` Do not use the stairs.
+- ` 10.0` Trucks leave Harbor Plaza at dawn on day 5.
+- ` 13.0` Then the city is sealed.
+- ` 15.0` Then the power went out.
+- ` 17.0` Everywhere.
+- ` 19.0` Everyone in your building rushed to the stairs.
+- ` 22.0` You heard them.
+- ` 23.5` Then the screaming stopped.
+- ` 25.5` Nobody came out.
+- ` 27.5` At 2.58 in the morning, the elevator dings.
+- ` 31.5` The whole city has no power.
+- ` 34.5` But the elevator does.
+- ` 38.7` The next night, it came back.
+- ` 40.7` And this time, it talks.
+- ` 43.7` Hello? 23?
+- ` 46.7` I watched the cameras.
+- ` 48.7` Everyone on your floor ran except you.
+- ` 51.7` The elevator is safe.
+- ` 53.7` Get in.
+- ` 55.7` I'll bring you down.
+- ` 57.7` It's a kid.
+- ` 58.7` Just one thing.
+- ` 60.7` It stops on 13.
+- ` 62.7` Your building doesn't have a 13th floor.
+- ` 65.7` When the doors open on 13, don't make a sound.
+- ` 69.7` Doors closing.
+- ` 73.9` Do you get in the elevator?
+- ` 75.9` Follow for part 2.

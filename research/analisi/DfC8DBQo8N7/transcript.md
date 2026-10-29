@@ -1,0 +1,24 @@
+# Transcript (en)
+
+- `  0.0` **[HOOK]** You never left your bed last night.
+- `  3.4` But your phone says you walked 4,212 steps.
+- `  9.2` You fell asleep at 11.40.
+- ` 11.8` But at 3.12 a.m., your heart rate jumps to 140.
+- ` 16.8` And the steps start out of your bedroom, out your front door,
+- ` 21.8` down the hall to apartment 4B, where you stood for 31 minutes.
+- ` 29.0` In the morning, you asked the landlord about 4B.
+- ` 32.8` He stopped smiling.
+- ` 34.3` Nobody's lived in 4B for nine years.
+- ` 38.9` Your best friend, Maya, says you're sleepwalking.
+- ` 42.0` So tonight, you lock the door, chair under the handle,
+- ` 46.6` and you don't sleep.
+- ` 48.7` 312 a.m., your phone buzzes.
+- ` 52.6` One step, you haven't moved.
+- ` 55.6` Two, three, four.
+- ` 60.0` And out in the hall, footsteps, one for every number.
+- ` 65.9` Then the count stops.
+- ` 68.5` So do the footsteps right outside your door.
+- ` 74.2` Your phone buzzes again.
+- ` 76.4` A text from a contact you never saved, 4B.
+- ` 81.3` You missed our walk.
+- ` 84.7` So do you open the door or do you text back?

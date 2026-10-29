@@ -35,7 +35,7 @@ if not voice.get("prompt"):
         print(f"voice: narrator '{preset}'", flush=True)
 
 def key(L):
-    return hashlib.sha1(json.dumps([L["text"], L.get("say"), L.get("act", {}), voice, 2], sort_keys=True).encode()).hexdigest()[:12]
+    return hashlib.sha1(json.dumps([L["text"], L.get("say"), L.get("act", {}), L.get("vfx"), voice, 2], sort_keys=True).encode()).hexdigest()[:12]
 
 def norm_words(s):
     return re.sub(r"[^a-z0-9' ]", " ", s.lower().replace("—", " ")).split()
@@ -61,7 +61,16 @@ def synth(L, attempt):
         a, b = os.path.join(d, "a.wav"), os.path.join(d, "b.wav")
         sf.write(a, x, model.sr)
         speed = float(act.get("speed", .9)); gain = float(act.get("gain_db", 0))
-        subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", a, "-af", f"atempo={speed},volume={gain}dB", "-ar", str(SR), "-ac", "1", b], check=True)
+        # another voice for the same narrator (pipeline/formati/): a radio, a phone, a whisper, a child, a machine
+        vfx = {
+            "radio": "highpass=f=450,lowpass=f=2800,acompressor=threshold=-20dB:ratio=6,volume=3dB",
+            "phone": "highpass=f=320,lowpass=f=3300,volume=2dB",
+            "whisper": "highpass=f=260,treble=g=6,volume=-5dB",
+            "child": f"asetrate={model.sr}*1.28,aresample={model.sr},atempo=0.82",
+            "robot": "afftfilt=real='hypot(re,im)*sin(0)':imag='hypot(re,im)*cos(0)':win_size=512:overlap=0.75,highpass=f=200,volume=4dB",
+        }.get(L.get("vfx", ""), "")
+        af = ",".join(x for x in (vfx, f"atempo={speed}", f"volume={gain}dB") if x)
+        subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", a, "-af", af, "-ar", str(SR), "-ac", "1", b], check=True)
         y, _ = sf.read(b, dtype="float32")
     nz = np.where(np.abs(y) > np.abs(y).max() * .02)[0]
     return y[max(0, nz[0] - int(.03 * SR)): nz[-1] + int(.12 * SR)] if len(nz) else y
@@ -85,7 +94,8 @@ for L in script["lines"]:
         # a word also counts when Whisper splits or joins it ("Streetlamps" heard as "street lamps")
         joined = "".join(got).replace("'", "")
         missing = [w for w in want if w not in got and w.replace("'", "") not in joined]
-        ok = len(missing) <= max(0, len(want) // 8)   # whisper may drop one short word in a long line
+        # whisper may drop one short word in a long line; a filtered voice (radio, child…) is harder to hear, so more slack
+        ok = len(missing) <= max(0, len(want) // (3 if L.get("vfx") else 8))
         if ok or L not in todo:
             break
         print(f"  {L['id']} retry ({attempt + 1}): heard “{heard}”", flush=True)

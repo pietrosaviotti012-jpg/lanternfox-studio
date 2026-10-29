@@ -1,0 +1,46 @@
+[
+ {
+  "t": 46.6,
+  "text": "and you don't sleep.",
+  "change": [
+   "brighter (phone, radio, another voice?)"
+  ]
+ },
+ {
+  "t": 48.7,
+  "text": "312 a.m., your phone buzzes.",
+  "change": [
+   "louder"
+  ]
+ },
+ {
+  "t": 65.9,
+  "text": "Then the count stops.",
+  "change": [
+   "brighter (phone, radio, another voice?)"
+  ]
+ },
+ {
+  "t": 74.2,
+  "text": "Your phone buzzes again.",
+  "change": [
+   "louder",
+   "brighter (phone, radio, another voice?)"
+  ]
+ },
+ {
+  "t": 81.3,
+  "text": "You missed our walk.",
+  "change": [
+   "quieter (whisper?)",
+   "brighter (phone, radio, another voice?)"
+  ]
+ },
+ {
+  "t": 84.7,
+  "text": "So do you open the door or do you text back?",
+  "change": [
+   "darker (deep, muffled, another voice?)"
+  ]
+ }
+]

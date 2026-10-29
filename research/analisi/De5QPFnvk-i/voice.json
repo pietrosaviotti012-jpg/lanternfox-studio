@@ -1,0 +1,80 @@
+[
+ {
+  "t": 18.4,
+  "text": "Please.",
+  "change": [
+   "brighter (phone, radio, another voice?)"
+  ]
+ },
+ {
+  "t": 20.4,
+  "text": "It's already inside.",
+  "change": [
+   "louder",
+   "brighter (phone, radio, another voice?)"
+  ]
+ },
+ {
+  "t": 24.4,
+  "text": "Suddenly, the little girl starts pounding on the door of both fists.",
+  "change": [
+   "louder"
+  ]
+ },
+ {
+  "t": 28.4,
+  "text": "Noah waits 10 minutes before checking the security monitor.",
+  "change": [
+   "darker (deep, muffled, another voice?)"
+  ]
+ },
+ {
+  "t": 38.4,
+  "text": "And another set leading toward it.",
+  "change": [
+   "darker (deep, muffled, another voice?)"
+  ]
+ },
+ {
+  "t": 40.4,
+  "text": "Noah checks his emergency radio.",
+  "change": [
+   "darker (deep, muffled, another voice?)"
+  ]
+ },
+ {
+  "t": 48.4,
+  "text": "Then the radio crumbles.",
+  "change": [
+   "brighter (phone, radio, another voice?)"
+  ]
+ },
+ {
+  "t": 54.4,
+  "text": "Do not open the basement stairwell door.",
+  "change": [
+   "quieter (whisper?)"
+  ]
+ },
+ {
+  "t": 62.4,
+  "text": "Then three slow knocks echo from the other side.",
+  "change": [
+   "quieter (whisper?)"
+  ]
+ },
+ {
+  "t": 66.4,
+  "text": "From inside the basement.",
+  "change": [
+   "darker (deep, muffled, another voice?)"
+  ]
+ },
+ {
+  "t": 70.4,
+  "text": "Someone is standing behind him.",
+  "change": [
+   "louder"
+  ]
+ }
+]

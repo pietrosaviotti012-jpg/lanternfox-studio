@@ -1,0 +1,37 @@
+[
+ {
+  "t": 23.5,
+  "text": "Then the screaming stopped.",
+  "change": [
+   "brighter (phone, radio, another voice?)"
+  ]
+ },
+ {
+  "t": 31.5,
+  "text": "The whole city has no power.",
+  "change": [
+   "brighter (phone, radio, another voice?)"
+  ]
+ },
+ {
+  "t": 40.7,
+  "text": "And this time, it talks.",
+  "change": [
+   "brighter (phone, radio, another voice?)"
+  ]
+ },
+ {
+  "t": 53.7,
+  "text": "Get in.",
+  "change": [
+   "quieter (whisper?)"
+  ]
+ },
+ {
+  "t": 69.7,
+  "text": "Doors closing.",
+  "change": [
+   "darker (deep, muffled, another voice?)"
+  ]
+ }
+]

@@ -13,3 +13,5 @@ productions/*/out/
 productions/*/stills/
 productions/*/events.json
 !voices/*.wav
+research/analisi/*/video.mp4
+research/analisi/*/audio.wav

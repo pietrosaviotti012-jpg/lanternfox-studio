@@ -609,3 +609,53 @@ export function oven(x, o, g) {
   if (g) { g.fillStyle = '#fff'; g.fillRect(cx - dw / 2, dy - dh / 2, dw, dh); }
   return [cx, dy];
 }
+
+// A person in the style of the viral survival stories (research/analisi/): a big round head with big eyes, so fear reads
+// at a glance, and one strong colour on the clothes. Front view. y goes up: by = feet, s = height.
+// o.face: 'calm' | 'scared' | 'surprised' | 'sleeping'; o.coat, o.hat (beanie colour or false), o.skin; o.arms: 'down' | 'up'
+export function person(x, o) {
+  const { cx, by, s, face = 'calm', coat = '#f2b632', hat = false, skin = '#efe6d8', pants = '#2d3550', arms = 'down', dark = '#16181f' } = o;
+  if (!x) return {};
+  const hr = s * .16, hy = by + s * .78;
+  // legs and shoes
+  x.fillStyle = pants; x.fillRect(cx - s * .085, by + s * .02, s * .07, s * .3); x.fillRect(cx + s * .015, by + s * .02, s * .07, s * .3);
+  x.fillStyle = dark; x.fillRect(cx - s * .1, by, s * .09, s * .035); x.fillRect(cx + s * .01, by, s * .09, s * .035);
+  // coat: a rounded puffer with two seams
+  x.fillStyle = coat;
+  x.beginPath(); x.moveTo(cx - s * .15, by + s * .3); x.lineTo(cx + s * .15, by + s * .3); x.quadraticCurveTo(cx + s * .17, by + s * .52, cx + s * .12, by + s * .63);
+  x.lineTo(cx - s * .12, by + s * .63); x.quadraticCurveTo(cx - s * .17, by + s * .52, cx - s * .15, by + s * .3); x.closePath(); x.fill();
+  x.strokeStyle = 'rgba(0,0,0,.18)'; x.lineWidth = s * .006;
+  for (const yy of [.4, .5]) { x.beginPath(); x.moveTo(cx - s * .15, by + s * yy); x.lineTo(cx + s * .15, by + s * yy); x.stroke(); }
+  // arms
+  x.fillStyle = coat;
+  for (const d of [-1, 1]) {
+    x.save(); x.translate(cx + d * s * .14, by + s * .6); x.rotate(d * (arms === 'up' ? -2.5 : -.18));
+    x.fillRect(-s * .035, -s * .26, s * .07, s * .26); x.fillStyle = skin; x.beginPath(); x.arc(0, -s * .27, s * .035, 0, TAU); x.fill(); x.restore();
+  }
+  // head
+  x.fillStyle = skin; x.beginPath(); x.arc(cx, hy, hr, 0, TAU); x.fill();
+  if (hat) {
+    x.fillStyle = hat; x.beginPath(); x.arc(cx, hy + hr * .15, hr * 1.02, 0, Math.PI); x.fill();
+    x.fillRect(cx - hr * 1.05, hy + hr * .05, hr * 2.1, hr * .28);
+  }
+  // face (y up: positive offsets go towards the top of the head)
+  const ex = hr * .36, ey = hy + hr * .05;
+  x.fillStyle = dark; x.strokeStyle = dark; x.lineCap = 'round'; x.lineWidth = hr * .08;
+  if (face === 'sleeping') {
+    for (const d of [-1, 1]) { x.beginPath(); x.arc(cx + d * ex, ey, hr * .13, Math.PI * 1.1, Math.PI * 1.9); x.stroke(); }
+  } else {
+    const big = face === 'scared' || face === 'surprised';
+    for (const d of [-1, 1]) {
+      if (big) { x.fillStyle = '#fff'; x.beginPath(); x.arc(cx + d * ex, ey, hr * .2, 0, TAU); x.fill(); x.fillStyle = dark; }
+      x.beginPath(); x.arc(cx + d * ex + (face === 'scared' ? d * -hr * .04 : 0), ey, hr * (big ? .07 : .09), 0, TAU); x.fill();
+      if (face === 'scared') {   // brows up and inward: worry
+        x.beginPath(); x.moveTo(cx + d * ex * .5, ey + hr * .32); x.lineTo(cx + d * ex * 1.4, ey + hr * .22); x.stroke();
+      }
+    }
+  }
+  const my = hy - hr * .42;
+  if (face === 'surprised') { x.beginPath(); x.arc(cx, my, hr * .12, 0, TAU); x.fill(); }
+  else if (face === 'scared') { x.beginPath(); x.moveTo(cx - hr * .22, my); for (let i = 1; i <= 4; i++) x.lineTo(cx - hr * .22 + i * hr * .11, my + (i % 2 ? hr * .06 : 0)); x.stroke(); }
+  else if (face === 'calm') { x.beginPath(); x.moveTo(cx - hr * .14, my); x.lineTo(cx + hr * .14, my); x.stroke(); }
+  return { head: [cx, hy], r: hr };
+}

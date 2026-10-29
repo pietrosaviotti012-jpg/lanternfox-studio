@@ -1,0 +1,41 @@
+# Transcript (en)
+
+- `  0.4` **[HOOK]** Yesterday, most of you chose shut.
+- `  2.4` **[HOOK]** Noah keeps the door locked.
+- `  4.4` The man is begging for help.
+- `  6.4` The little girl is crying.
+- `  8.4` But Noah remembers one thing.
+- ` 10.4` Radioactive fallout can be invisible.
+- ` 12.4` And opening the door could put his life at risk.
+- ` 14.4` Then the man stops begging.
+- ` 16.4` He leans toward the door and whispers something that makes Noah freeze.
+- ` 18.4` Please.
+- ` 20.4` It's already inside.
+- ` 22.4` Noah backs away.
+- ` 24.4` Suddenly, the little girl starts pounding on the door of both fists.
+- ` 26.4` Then everything goes silent.
+- ` 28.4` Noah waits 10 minutes before checking the security monitor.
+- ` 30.4` The hallway is empty.
+- ` 32.4` The man and little girl are gone.
+- ` 34.4` But there's something strange on the floor.
+- ` 36.4` A trail of footprints leading away from the door.
+- ` 38.4` And another set leading toward it.
+- ` 40.4` Noah checks his emergency radio.
+- ` 42.4` The broadcast says radiation levels outside are still dangerous.
+- ` 44.4` Eight hours have passed since he entered the shelter.
+- ` 46.4` He still has 64 hours to go.
+- ` 48.4` Then the radio crumbles.
+- ` 50.4` The man's voice comes through.
+- ` 52.4` If anyone is sheltering inside the supermarket, listen carefully.
+- ` 54.4` Do not open the basement stairwell door.
+- ` 56.4` Noah moves closer.
+- ` 58.4` The voice continues.
+- ` 60.4` Whatever is knocking on your door, it isn't always human.
+- ` 62.4` Then three slow knocks echo from the other side.
+- ` 64.4` Not from the hallway.
+- ` 66.4` From inside the basement.
+- ` 68.4` Noah turns around.
+- ` 70.4` Someone is standing behind him.
+- ` 72.4` What should he do?
+- ` 74.4` Comment, hide or confront.
+- ` 76.4` The majority decides part three.
