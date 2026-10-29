@@ -1,0 +1,284 @@
+{
+ "title": "The Flannan Isles Keepers",
+ "series": "True Mysteries",
+ "format": "mystery",
+ "voice": {
+  "engine": "chatterbox",
+  "preset": "cupo"
+ },
+ "captions": "pop",
+ "hud": {
+  "tag": "TRUE MYSTERY",
+  "part": "CASE 1"
+ },
+ "fx": "dust",
+ "lead": 0.4,
+ "tail": 3.4,
+ "lines": [
+  {
+   "id": "L01",
+   "text": "In December 1900, three lighthouse keepers vanished from an island with nowhere to go.",
+   "say": "In December nineteen hundred, three lighthouse keepers vanished from an island with nowhere to go.",
+   "em": [
+    "vanished"
+   ],
+   "clock": "1900 · FLANNAN ISLES",
+   "gap": 0.3,
+   "act": {
+    "intensity": 0.55,
+    "pace": 0.32,
+    "speed": 0.97
+   }
+  },
+  {
+   "id": "L02",
+   "text": "A bare rock in the Atlantic. No way off.",
+   "em": [
+    "rock"
+   ],
+   "gap": 0.3,
+   "act": {
+    "intensity": 0.45,
+    "pace": 0.32,
+    "speed": 0.95,
+    "gain_db": -1
+   }
+  },
+  {
+   "id": "L03",
+   "text": "Then their light went dark. For eleven days, nobody came.",
+   "em": [
+    "eleven"
+   ],
+   "hit": true,
+   "gap": 0.8,
+   "act": {
+    "intensity": 0.65,
+    "pace": 0.32,
+    "speed": 0.95,
+    "gain_db": 0.5
+   }
+  },
+  {
+   "id": "L04",
+   "text": "December fifteenth: a passing ship sees the light is out.",
+   "em": [
+    "out"
+   ],
+   "clock": "15 DEC 1900",
+   "gap": 0.3,
+   "act": {
+    "intensity": 0.45,
+    "pace": 0.32,
+    "speed": 0.97,
+    "gain_db": -1
+   },
+   "card": {
+    "app": "Ship's log · Archtor",
+    "kind": "info",
+    "title": "Flannan light not seen.",
+    "body": "Poor weather. Reported on arrival at Leith.",
+    "hold": 3.2
+   }
+  },
+  {
+   "id": "L05",
+   "text": "December twenty-sixth. The relief boat. No flag.",
+   "em": [
+    "flag"
+   ],
+   "clock": "26 DEC 1900",
+   "gap": 0.3,
+   "act": {
+    "intensity": 0.45,
+    "pace": 0.32,
+    "speed": 0.97
+   }
+  },
+  {
+   "id": "L06",
+   "text": "A whistle. A flare. Silence.",
+   "em": [
+    "silence"
+   ],
+   "gap": 0.6,
+   "act": {
+    "intensity": 0.5,
+    "pace": 0.32,
+    "speed": 0.95,
+    "gain_db": -1.5
+   }
+  },
+  {
+   "id": "L07",
+   "text": "Joseph Moore climbs up alone.",
+   "em": [
+    "alone"
+   ],
+   "gap": 0.3,
+   "act": {
+    "intensity": 0.4,
+    "pace": 0.32,
+    "speed": 0.95,
+    "gain_db": -2
+   }
+  },
+  {
+   "id": "L08",
+   "text": "The gate is shut. The clock has stopped.",
+   "em": [
+    "stopped"
+   ],
+   "gap": 0.5,
+   "act": {
+    "intensity": 0.5,
+    "pace": 0.32,
+    "speed": 0.94,
+    "gain_db": -1
+   }
+  },
+  {
+   "id": "L09",
+   "text": "The lamps are filled and ready.",
+   "em": [
+    "ready"
+   ],
+   "gap": 0.3,
+   "act": {
+    "intensity": 0.4,
+    "pace": 0.32,
+    "speed": 0.95,
+    "gain_db": -2.5
+   }
+  },
+  {
+   "id": "L10",
+   "text": "One set of oilskins still hangs by the door.",
+   "em": [
+    "one"
+   ],
+   "gap": 0.5,
+   "act": {
+    "intensity": 0.45,
+    "pace": 0.32,
+    "speed": 0.94,
+    "gain_db": -2
+   }
+  },
+  {
+   "id": "L11",
+   "text": "One man ran into the storm in his shirtsleeves.",
+   "em": [
+    "shirtsleeves"
+   ],
+   "hit": true,
+   "gap": 0.8,
+   "act": {
+    "intensity": 0.75,
+    "pace": 0.32,
+    "speed": 0.95,
+    "gain_db": 1.5
+   }
+  },
+  {
+   "id": "L12",
+   "text": "At the landing, iron railings are bent flat.",
+   "em": [
+    "bent"
+   ],
+   "gap": 0.3,
+   "act": {
+    "intensity": 0.6,
+    "pace": 0.32,
+    "speed": 0.96,
+    "gain_db": 0.5
+   }
+  },
+  {
+   "id": "L13",
+   "text": "The official answer: a giant wave.",
+   "em": [
+    "wave"
+   ],
+   "gap": 0.5,
+   "act": {
+    "intensity": 0.5,
+    "pace": 0.32,
+    "speed": 0.95
+   }
+  },
+  {
+   "id": "L14",
+   "text": "The famous meal left on the table? Legend, from a poem.",
+   "em": [
+    "legend"
+   ],
+   "gap": 0.5,
+   "act": {
+    "intensity": 0.45,
+    "pace": 0.32,
+    "speed": 0.96,
+    "gain_db": -1
+   }
+  },
+  {
+   "id": "L15",
+   "text": "Why did one man leave his coat behind?",
+   "em": [
+    "coat"
+   ],
+   "gap": 0.4,
+   "act": {
+    "intensity": 0.55,
+    "pace": 0.32,
+    "speed": 0.94
+   }
+  },
+  {
+   "id": "L16",
+   "text": "A wave, or something else? Tell us below.",
+   "em": [
+    "wave",
+    "else"
+   ],
+   "gap": 0.2,
+   "act": {
+    "intensity": 0.55,
+    "pace": 0.32,
+    "speed": 0.97
+   }
+  }
+ ],
+ "bpm": 60,
+ "seed": 31,
+ "music": [
+  {
+   "at": "S1",
+   "mood": "storm"
+  },
+  {
+   "at": "S4",
+   "mood": "hush"
+  },
+  {
+   "at": "S7",
+   "mood": "hush"
+  },
+  {
+   "at": "S10",
+   "mood": "rise"
+  },
+  {
+   "at": "S11",
+   "mood": "storm"
+  },
+  {
+   "at": "S12",
+   "mood": "hush"
+  },
+  {
+   "at": "S13",
+   "mood": "end"
+  }
+ ]
+}

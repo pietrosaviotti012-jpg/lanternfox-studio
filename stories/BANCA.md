@@ -11,7 +11,7 @@ La Ricerca aggiunge ogni giorno 3-5 voci nuove (dalle mode del momento, da Reddi
 
 ## Misteri e leggende vere
 - ⭐ **La Mary Celeste (1872)**: "In 1872, a ship was found drifting in the Atlantic. The table was set. The crew was gone." (In realtà la tavola apparecchiata è una leggenda: dillo con eleganza.)
-- ⭐ **I guardiani del faro delle Isole Flannan (1900)**: tre uomini spariti, una tavola rovesciata e un orologio fermo. Si lega alla nostra serie del faro.
+- ⭐ **I guardiani del faro delle Isole Flannan (1900)**: tre uomini spariti, una tavola rovesciata e un orologio fermo. Si lega alla nostra serie del faro. → `productions/2026-10-29-flannan-keepers`
 - ⭐ **Roanoke e "CROATOAN" (1590)**: una colonia intera sparita, una sola parola incisa su un palo.
 - **La danza del 1518 a Strasburgo**: centinaia di persone ballano per giorni senza potersi fermare.
 - **I bambini verdi di Woolpit (XII secolo)**: due bambini dalla pelle verde escono da una buca e parlano una lingua sconosciuta.
@@ -21,6 +21,8 @@ La Ricerca aggiunge ogni giorno 3-5 voci nuove (dalle mode del momento, da Reddi
 - **Il manoscritto Voynich**: un libro illustrato che nessuno al mondo sa leggere.
 - **Gef, la mangusta parlante (anni '30)**: una famiglia dell'Isola di Man giura che una mangusta parla con loro.
 - **L'interferenza di Max Headroom (1987)**: qualcuno buca il segnale tv di Chicago, e non è mai stato trovato.
+- **Le luci di Marfa (Texas, dal 1880 circa)**: luci che fluttuano sul deserto; dire che la spiegazione più probabile sono i fari delle auto. (dal 2026-10-29)
+- **La nave Octavius (leggenda, 1775)**: una baleniera trovata alla deriva con l'equipaggio congelato e il diario di bordo fermo a 13 anni prima. Raccontarla come leggenda: le fonti sono tarde. (dal 2026-10-29)
 
 ## What if
 - ⭐ What if every star went out tonight? → `productions/2026-10-28-stars-go-out`
@@ -31,12 +33,14 @@ La Ricerca aggiunge ogni giorno 3-5 voci nuove (dalle mode del momento, da Reddi
 - What if you woke up and everyone had forgotten you?
 - What if the ocean drained overnight?
 - What if animals could talk, for one day only?
+- ⭐ What if every clock in the world stopped at the same second? (Il primo a cadere è il GPS: si lega all'orologio fermo delle Flannan.) (dal 2026-10-29)
 
 ## Your Call (seconda persona, scelta finale)
 - ⭐ **Lantern Night** (serie): la parte 2 segue GO o STAY. → `productions/2026-10-28-lantern-night-1`
 - ⭐ **The Last Train**: "It's 11:58 pm. The last train arrives. It's completely empty, except for one seat with your name on it." TAKE IT or WAIT.
 - ⭐ **Room 0**: in hotel, il tuo ascensore ha un pulsante in più, "0". PRESS or LEAVE.
 - **The Snow Rule**: nel tuo paese, durante la neve, nessuno apre la porta. Stanotte qualcuno bussa con la voce di tua madre. OPEN or STAY.
+- **The Keeper's Shift** (dal 2026-10-29): sei il guardiano di ricambio, sbarchi su un'isola col faro spento e trovi una sola cerata appesa. ENTER or SIGNAL THE SHIP.
 - **The Map**: trovi in soffitta una mappa della tua città con una casa in più. Stasera c'è una luce accesa. GO or BURN THE MAP.
 
 ## Gialli e storie con colpo di scena

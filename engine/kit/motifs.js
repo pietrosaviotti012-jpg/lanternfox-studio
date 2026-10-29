@@ -419,3 +419,76 @@ export function doorFrame(x, o) {
   if (col) x.fillStyle = col;
   x.fillRect(cx - w / 2 - w * .08, by, w * .08, h + w * .08); x.fillRect(cx + w / 2, by, w * .08, h + w * .08); x.fillRect(cx - w / 2 - w * .08, by + h, w * 1.16, w * .08);
 }
+
+// —— Added for "The Flannan Isles Keepers" (True Mysteries): a wall clock, oilskins on a peg, a flagpole, a railing that bends, a lamp lens ——
+
+// A round wall clock: case, face (cream paper), hour marks, two hands at h:m. The face can glow in g (moonlight on it).
+export function wallClock(x, o, g) {
+  const { cx, cy, r, h = 3, m = 0, col = '#1a1410', face = '#e9d6ae', ink = '#2a2020' } = o;
+  if (x) {
+    x.fillStyle = col; x.beginPath(); x.arc(cx, cy, r * 1.14, 0, TAU); x.fill();
+    x.fillRect(cx - r * .08, cy + r * 1.1, r * .16, r * .25);                                   // hook
+    x.fillStyle = face; x.beginPath(); x.arc(cx, cy, r, 0, TAU); x.fill();
+    x.fillStyle = ink;
+    for (let i = 0; i < 12; i++) { const a = i * TAU / 12, l = i % 3 ? r * .08 : r * .16, w = i % 3 ? r * .03 : r * .055;
+      x.save(); x.translate(cx + Math.sin(a) * r * .84, cy + Math.cos(a) * r * .84); x.rotate(-a); x.fillRect(-w / 2, -l / 2, w, l); x.restore(); }
+    const hand = (a, l, w) => { x.save(); x.translate(cx, cy); x.rotate(-a); x.beginPath(); x.moveTo(-w / 2, -l * .15); x.lineTo(-w * .3, l); x.lineTo(w * .3, l); x.lineTo(w / 2, -l * .15); x.closePath(); x.fill(); x.restore(); };
+    hand((h % 12 + m / 60) * TAU / 12, r * .5, r * .075); hand(m * TAU / 60, r * .78, r * .05);
+    x.beginPath(); x.arc(cx, cy, r * .06, 0, TAU); x.fill();
+  }
+  if (g) { g.fillStyle = 'rgba(255,255,255,.5)'; g.beginPath(); g.arc(cx, cy, r, 0, TAU); g.fill(); }
+}
+
+// Oilskins (a long fisherman's coat with a hood) hanging from a peg; cx, top = the peg. Two empty pegs with peg(x, …).
+export function oilskin(x, o) {
+  const { cx, top, s, col = '#e8743b', fold = '#b9552a' } = o;
+  x.fillStyle = '#1a1410'; x.fillRect(cx - s * .03, top - s * .01, s * .06, s * .05);            // the peg
+  x.fillStyle = col;
+  x.beginPath(); x.moveTo(cx, top - s * .02);
+  x.quadraticCurveTo(cx - s * .14, top - s * .02, cx - s * .2, top - s * .2);                     // hood and shoulder
+  x.lineTo(cx - s * .26, top - s * .95); x.quadraticCurveTo(cx, top - s * 1.0, cx + s * .26, top - s * .95);
+  x.lineTo(cx + s * .2, top - s * .2); x.quadraticCurveTo(cx + s * .14, top - s * .02, cx, top - s * .02); x.closePath(); x.fill();
+  x.fillStyle = fold;                                                                               // folds and the front seam
+  x.fillRect(cx - s * .008, top - s * .2, s * .016, s * .76);
+  for (const u of [-.13, .12]) { x.beginPath(); x.moveTo(cx + u * s, top - s * .3); x.lineTo(cx + u * s * 1.5 - s * .01, top - s * .94); x.lineTo(cx + u * s * 1.5 + s * .01, top - s * .94); x.closePath(); x.fill(); }
+  x.beginPath(); x.ellipse(cx, top - s * .12, s * .1, s * .07, 0, 0, TAU); x.fill();                // hood opening
+}
+export function peg(x, o) { const { cx, top, s, col = '#1a1410' } = o; x.fillStyle = col; x.fillRect(cx - s * .03, top - s * .01, s * .06, s * .05); x.fillRect(cx - s * .012, top + s * .02, s * .024, s * .03); }
+
+// A flagpole with a yard arm and halyard; flag: false (empty, the point of the shot) or a colour
+export function flagpole(x, o) {
+  const { cx, by, h, col = '#0e1532', flag = false } = o;
+  x.fillStyle = col; x.fillRect(cx - h * .008, by, h * .016, h); x.fillRect(cx - h * .1, by + h * .82, h * .2, h * .01);
+  x.beginPath(); x.arc(cx, by + h, h * .016, 0, TAU); x.fill();
+  x.strokeStyle = col; x.lineWidth = h * .003; x.beginPath(); x.moveTo(cx + h * .012, by + h * .99); x.lineTo(cx + h * .012, by + h * .1); x.stroke();
+  if (flag) { x.fillStyle = flag; x.fillRect(cx + h * .012, by + h * .75, h * .22, h * .14); }
+}
+
+// An iron railing along a path; bend 0 → straight, 1 → the posts bent flat toward +x by the sea (seeded unevenness)
+export function railing(x, o) {
+  const { x0, x1, by, h, n = 8, bend = 0, seed = 5, col = '#0e1532' } = o, R = mulberry(seed);
+  x.strokeStyle = col; x.lineCap = 'round'; x.lineWidth = h * .07;
+  const tops = [];
+  for (let i = 0; i < n; i++) {
+    const px = lerp(x0, x1, i / (n - 1)), b = bend * (.55 + R() * .45), a = b * 1.35;
+    const tx = px + Math.sin(a) * h, ty = by + Math.cos(a) * h;
+    x.beginPath(); x.moveTo(px, by); x.quadraticCurveTo(px + Math.sin(a) * h * .25, by + h * .5 * Math.cos(a * .5), tx, ty); x.stroke();
+    tops.push([tx, ty]);
+  }
+  x.lineWidth = h * .055; x.beginPath(); tops.forEach(([tx, ty], i) => i ? x.lineTo(tx, ty + (R() - .5) * h * .1 * bend) : x.moveTo(tx, ty)); x.stroke();
+}
+
+// The lighthouse lamp seen up close: a beehive lens of glass rings on a brass pedestal; the rings burn in g
+export function lensLamp(x, o, g) {
+  const { cx, by, s, col = '#1a1410', glass = '#3a3040' } = o, rings = 7, top = by + s * .3;
+  if (x) {
+    x.fillStyle = col; x.fillRect(cx - s * .16, by, s * .32, s * .05); x.fillRect(cx - s * .07, by + s * .05, s * .14, s * .25);
+    x.fillRect(cx - s * .2, top - s * .02, s * .4, s * .03);
+  }
+  for (let i = 0; i < rings; i++) {
+    const y = top + i * s * .085, w = s * (.36 - Math.abs(i - 3) * .03), hh = s * .07;
+    if (x) { x.fillStyle = glass; x.fillRect(cx - w / 2, y + s * .008, w, hh); x.fillStyle = col; x.fillRect(cx - w / 2, y, w, s * .008); }
+    if (g) { g.fillStyle = i === 3 ? '#fff' : 'rgba(255,255,255,.7)'; g.fillRect(cx - w / 2, y + s * .008, w, hh); }
+  }
+  if (x) { x.fillStyle = col; x.beginPath(); x.moveTo(cx - s * .16, top + rings * s * .085); x.quadraticCurveTo(cx, top + rings * s * .085 + s * .12, cx + s * .16, top + rings * s * .085); x.closePath(); x.fill(); }
+}
