@@ -19,12 +19,21 @@ Quindi **tutte** le chiamate all'Ufficio si fanno da lì, in Python, con `OFFICE
 import requests
 OFFICE_URL, PUBLISH_KEY = "…", "…"   # i valori del prompt della routine
 H = {"Authorization": "Bearer " + PUBLISH_KEY, "User-Agent": "lanternfox-routine"}
-queue = requests.get(OFFICE_URL + "/publish/queue", headers=H, timeout=30).json()
+# "Pubblica adesso: <id>" nel prompt: chiedi solo quella storia; giro programmato: la coda normale
+NOW_ID = None   # oppure l'id del blocco "Pubblica adesso"
+queue = requests.get(OFFICE_URL + "/publish/queue", headers=H, params={"for": NOW_ID} if NOW_ID else {}, timeout=30).json()
 print([(i["id"], i["title"], list(i["published"])) for i in queue["items"]])
 ```
 Risposta: `{"items": [{id, title, caption, preview_url, cover_url, published: {instagram?, youtube?, tiktok?}}]}`. Se `items` è vuoto, hai finito: scrivi "Niente da pubblicare oggi" e chiudi.
 
 Per la storia scelta, salta le piattaforme dove `published.<piattaforma>` ha già `url` oppure `draft`: vuol dire che è stata fatta in un giro precedente.
+
+**Mai due volte lo stesso video.** Una storia con "Pubblica adesso" sparisce dalla coda del giro programmato per 2 ore. In più, **prima di Instagram (e di TikTok)** chiedi il permesso all'Ufficio:
+```python
+ok = requests.post(OFFICE_URL + "/publish/done", headers=H, params={"claim": 1}, json={"id": ID, "platform": "instagram"}, timeout=30)
+# 200 {"ok": true}: pubblica.  409 {"ok": false, "error": "già pubblicato…" | "un altro giro lo sta già pubblicando"}: NON pubblicare, passa oltre.
+```
+YouTube chiede il permesso da solo: se `/publish/youtube` risponde 409, non riprovare e non segnalarlo come errore.
 
 ## 2. Instagram (connettore Composio, account `instagram_sain-curr`, ig_user_id `40769843119273114`)
 1. `INSTAGRAM_POST_IG_USER_MEDIA` con `ig_user_id`, `media_type: "REELS"`, `video_url: preview_url`, `caption: caption`, `share_to_feed: true`, `cover_url: cover_url`. Restituisce l'`id` del contenitore.

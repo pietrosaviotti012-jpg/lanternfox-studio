@@ -63,6 +63,18 @@ async function publishOk(request, env) {
 }
 const PLATFORMS = ["instagram", "youtube"];   // sent by the routine; TikTok by hand until the TikTok app passes review (then add "tiktok")
 const sent = (p) => p?.url || p?.draft;
+// a video goes out once per platform, even when "Pubblica adesso" and the scheduled run meet:
+//   - "Pubblica adesso" reserves the video for 2 hours (item.now_at): the scheduled run does not see it in its queue;
+//   - before each platform the routine claims it (/publish/claim): refused if it is already out there,
+//     or if another run claimed it in the last 30 minutes; YouTube is checked the same way by the Office itself.
+const RESERVE_MS = 2 * 3600e3, CLAIM_MS = 30 * 60e3;
+function claim(item, platform, now) {
+  if (sent(item.published?.[platform])) return "già pubblicato su questa piattaforma";
+  const c = item.claims?.[platform];
+  if (c && Date.parse(now) - Date.parse(c) < CLAIM_MS) return "un altro giro lo sta già pubblicando";
+  item.claims = { ...(item.claims || {}), [platform]: now };
+  return null;
+}
 // who works when (UTC; the routines and GitHub's clock can start a few minutes late). Keep it in step with the routines.
 const SCHEDULE = [
   { utc: "05:00", dept: "ricerca", who: "Produzione", what: "Video 1 di oggi: ricerca, storia, copione, regia, poi il render (circa 50 min)", slot: 1 },
@@ -629,8 +641,12 @@ export default {
     if (url.pathname === "/publish/youtube" && request.method === "POST") {
       if (!(await publishOk(request, env))) return json({ error: "non autorizzato" }, 401);
       const { id } = await request.json().catch(() => ({}));
-      const item = (await loadState(env)).queue.find((q) => q.id === id && q.status === "approved");
+      const state = await loadState(env), item = state.queue.find((q) => q.id === id && q.status === "approved");
       if (!item) return json({ error: "video non approvato o non trovato" }, 404);
+      if (sent(item.published?.youtube)) return json({ ok: false, already: true, url: item.published.youtube.url, error: "già pubblicato su YouTube" }, 409);
+      const why = claim(item, "youtube", new Date().toISOString());   // the upload claims YouTube by itself
+      if (why) return json({ ok: false, error: why }, 409);
+      await saveState(env, state);
       try { return json({ ok: true, url: await youtubeUpload(env, item) }); }
       catch (err) { return json({ ok: false, error: clip(err.message, 300) }, 502); }
     }
@@ -640,14 +656,25 @@ export default {
       if (!(await publishOk(request, env))) return json({ error: "non autorizzato" }, 401);
       const state = await loadState(env);
       if (url.pathname === "/publish/queue") {
-        const items = state.queue.filter((q) => q.status === "approved" && PLATFORMS.some((p) => !sent(q.published?.[p])));
+        // ?for=<id>: the "Pubblica adesso" run, which sees only its video; otherwise the scheduled run, which skips reserved ones
+        const only = url.searchParams.get("for"), t = Date.now();
+        const items = state.queue.filter((q) => q.status === "approved" && PLATFORMS.some((p) => !sent(q.published?.[p]))
+          && (only ? q.id === only : !(q.now_at && t - Date.parse(q.now_at) < RESERVE_MS)));
         return json({ platforms: PLATFORMS, items: items.map(({ id, title, caption, preview_url, cover_url, published }) => ({ id, title, caption, preview_url, cover_url, published: published || {} })) });
       }
       if (request.method !== "POST") return json({ error: "metodo non valido" }, 405);
       const { id, platform, url: link, error, draft } = await request.json();
+      if (url.searchParams.get("claim")) {   // /publish/done?claim=1: "may I publish this video on this platform now?"
+        const it = state.queue.find((q) => q.id === id && q.status === "approved");
+        if (!it || !PLATFORMS.concat("tiktok").includes(platform)) return json({ ok: false, error: "video o piattaforma non validi" }, 400);
+        const why = claim(it, platform, new Date().toISOString());
+        if (!why) await saveState(env, state);
+        return json(why ? { ok: false, error: why } : { ok: true }, why ? 409 : 200);
+      }
       const item = state.queue.find((q) => q.id === id);
       if (!item || !PLATFORMS.concat("tiktok").includes(platform)) return json({ error: "video o piattaforma non validi" }, 400);
       const now = new Date().toISOString();
+      if (item.claims) delete item.claims[platform];
       item.published = { ...(item.published || {}), [platform]: error ? { error: clip(error, 300), at: now } : draft ? { draft: true, at: now } : { url: clip(link, 400), at: now } };
       const name = { instagram: "Instagram", youtube: "YouTube", tiktok: "TikTok" }[platform];
       state.log.push({ at: now, dept: "pubblicazione", status: error ? "error" : "done", text: error ? `${name}: non pubblicato (${clip(error, 120)})` : draft ? `${name}: "${item.title}" è nelle bozze, da pubblicare dall'app` : `Uscito su ${name}: "${item.title}"` });
@@ -918,9 +945,11 @@ export default {
       const state = await loadState(env);
       const item = state.queue.find((q) => q.id === id && q.status === "approved");
       if (!item) return json({ error: "video non approvato o non trovato" }, 404);
+      const now = new Date().toISOString();
+      if (item.now_at && Date.now() - Date.parse(item.now_at) < 10 * 60e3) return json({ ok: true, already: true });   // a second tap
       const started = await fireRoutine(env, "PUBLISH", `Pubblica adesso: ${id}`);
       const ok = started >= 200 && started < 300;
-      const now = new Date().toISOString();
+      if (ok) item.now_at = now;
       state.departments.pubblicazione = { status: ok ? "working" : "error", task: ok ? `Pubblico adesso: ${item.title}` : "Non riesco ad avviare la pubblicazione: controlla la routine",
         output: "", updated_at: now };
       if (ok) state.log.push({ at: now, dept: "pubblicazione", status: "working", text: `Hai chiesto di pubblicare subito "${item.title}"` });
