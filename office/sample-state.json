@@ -107,14 +107,19 @@
   ],
   "calendar": [
     {
-      "date": "2026-10-26",
-      "title": "La luna che non riusciva a dormire",
+      "date": "2026-10-29",
+      "title": "True Mysteries: The Flannan Isles Keepers",
       "status": "made"
     },
     {
-      "date": "2026-10-27",
-      "title": "Il guardiano del faro e la volpe",
+      "date": "2026-10-29",
+      "title": "What If: Every Clock Stopped",
       "status": "planned"
+    },
+    {
+      "date": "2026-10-28",
+      "title": "Lantern Night, part 1",
+      "status": "published"
     }
   ],
   "stats": null,

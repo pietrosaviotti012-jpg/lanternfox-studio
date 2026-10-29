@@ -276,9 +276,7 @@ async function applyEvent(env, event) {
     }
   }
   if (event.calendar) {
-    for (const day of [].concat(event.calendar)) {
-      state.calendar = state.calendar.filter((c) => c.date !== day.date).concat(day);
-    }
+    for (const day of [].concat(event.calendar)) calendarPut(state, day);
     state.calendar.sort((a, b) => a.date.localeCompare(b.date));
   }
   if (event.stats) state.stats = { ...(state.stats || {}), ...event.stats, updated_at: now };
@@ -367,7 +365,7 @@ async function restart(env, state, kind, target, now) {
   const op = (o) => state.ops.push({ id: "op-" + now.replace(/\D/g, "").slice(0, 14), at: now, status: "waiting", ...o });
   if (kind === "rerender") {
     if (!/^[\w-]+$/.test(target || "")) return { error: "video non valido" };
-    op({ kind, target }); return { ok: true, how: "Il guardiano di GitHub lo fa ripartire entro un quarto d'ora" };
+    op({ kind, target }); return { ok: true, how: `Il guardiano di GitHub lo fa ripartire ${env.GH_DISPATCH_TOKEN ? "tra un minuto" : "entro un quarto d'ora"}` };
   }
   if (kind === "produce") {
     const ok = fired(env.ROUTINE_PRODUCE_TOKEN ? await fireRoutine(env, "PRODUCE", "Ripartenza dall'ufficio: produci il video di questo turno.")
@@ -383,10 +381,8 @@ async function restart(env, state, kind, target, now) {
   let ok, how;
   if (which === "RENDER") {
     if (!video) return { ok: false, how: `${name}: non so quale video rifare` };
-    const failed = state.chain?.failed, run = failed?.id === video && (/actions\/runs\/(\d+)/.exec(failed.url || "") || [])[1];
-    op({ kind: "rerender", target: video, ...(run ? { run } : {}), dept: target }); ok = true;
-    how = run ? `${name}: il guardiano rifà solo i pezzi fermi del render di "${video}" entro un quarto d'ora`
-      : `${name}: il guardiano rifà il render di "${video}" entro un quarto d'ora (la voce già registrata resta)`;
+    op({ kind: "rerender", target: video, dept: target }); ok = true;
+    how = `${name}: il guardiano rifà il render di "${video}" ${env.GH_DISPATCH_TOKEN ? "tra un minuto" : "entro un quarto d'ora"} (le righe di voce già buone restano)`;
   } else if (which === "PRODUCE") {
     const text = `Ripartenza dall'ufficio dal reparto ${name}. ${video ? `Se productions/ contiene già il video "${video}", non ricominciare da capo: riprendilo da ${name} (tieni quello che i reparti prima hanno già fatto), rifai da lì in poi e fai partire il render.` : "Produci il video di questo turno."}`;
     ok = fired(env.ROUTINE_PRODUCE_TOKEN ? await fireRoutine(env, "PRODUCE", text) : await fireRoutine(env, "REDO", `idea: ${text}\nrequest: restart-${now.slice(0, 16)}`));
@@ -397,6 +393,24 @@ async function restart(env, state, kind, target, now) {
   }
   if (ok) state.departments[target] = { ...(state.departments[target] || {}), status: "working", task: "Ripartito dall'ufficio", updated_at: now };
   return { ok, how };
+}
+
+// the calendar has one row per video (two a day): a video that moves on (made, published) leaves its old row, on any day
+function calendarPut(state, day) {
+  state.calendar = state.calendar.filter((c) => c.title !== day.title).concat(day);
+  state.calendar.sort((a, b) => a.date.localeCompare(b.date));
+}
+
+// GitHub's 15-minute timer is often an hour late: with GH_DISPATCH_TOKEN (a fine-grained token that can only start
+// workflows in this repository) a command from the phone wakes the watchman at once
+const REPO = "pietrosaviotti012-jpg/lanternfox-studio";
+async function wakeWatchman(env) {
+  if (!env.GH_DISPATCH_TOKEN) return 0;
+  const r = await fetch(`https://api.github.com/repos/${REPO}/actions/workflows/office.yml/dispatches`, {
+    method: "POST", body: JSON.stringify({ ref: "main" }),
+    headers: { Authorization: `Bearer ${env.GH_DISPATCH_TOKEN}`, Accept: "application/vnd.github+json", "User-Agent": "lanternfox-office" },
+  });
+  return r.status;
 }
 
 async function fireRoutine(env, which, text) {
@@ -607,8 +621,7 @@ export default {
       if (done) {
         item.status = "published";
         const date = now.slice(0, 10);
-        state.calendar = state.calendar.filter((c) => c.date !== date).concat({ date, title: item.title, status: "published" });
-        state.calendar.sort((a, b) => a.date.localeCompare(b.date));
+        calendarPut(state, { date, title: item.title, status: "published" });
       }
       state.departments.pubblicazione = { status: error ? "error" : done ? "done" : "working", task: error ? `${name}: ${clip(error, 200)}` : done ? `Pubblicato: ${item.title}` : draft ? `${name}: nelle bozze` : `Pubblicato su ${name}`, output: "", updated_at: now };
       await saveState(env, state);
@@ -742,6 +755,7 @@ export default {
       state.publish_at_utc = String(env.PUBLISH_AT_UTC || "22").split(",").map(Number);   // the publishing slots (UTC hours)
       state.youtube = JSON.parse((await env.DATA.get("yt_channel")) || "null");
       state.schedule = SCHEDULE; state.can_produce = Boolean(env.ROUTINE_PRODUCE_TOKEN); state.can_restart = canRestart(env);
+      state.links = { repo: REPO, routines: Object.fromEntries(["PRODUCE", "PUBLISH", "RESEARCH", "COMMUNITY"].map((w) => [w, env[`ROUTINE_${w}_ID`] || null])) };
       return json(state);
     }
     // "Collega YouTube": Google's consent page, then back here with a code that becomes the refresh token
@@ -805,6 +819,7 @@ export default {
       if (r.error) return json({ error: r.error }, 400);
       state.log.push({ at: now, dept: "revisione", status: r.ok ? "working" : "error", text: `Hai fatto ripartire: ${r.how}` });
       await saveState(env, state);
+      if (state.ops.some((o) => o.status === "waiting")) ctx.waitUntil(wakeWatchman(env));
       return json({ ok: r.ok, how: r.how }, r.ok ? 200 : 502);
     }
     // an example to study (Idea tab): a link (Instagram, TikTok, YouTube) or an mp4 straight from the phone (up to 24 MB)
@@ -825,6 +840,7 @@ export default {
       state.examples.push({ ...item, at: now, status: "waiting" });
       state.log.push({ at: now, dept: "ricerca", status: "working", text: "Nuovo esempio da studiare per la Ricerca" });
       await saveState(env, state);
+      ctx.waitUntil(wakeWatchman(env));
       return json({ ok: true, id });
     }
     if (url.pathname === "/community/decide" && request.method === "POST") {

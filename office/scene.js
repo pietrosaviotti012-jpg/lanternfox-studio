@@ -840,17 +840,34 @@ function publishedBlock(q) {
 
 function renderDays() {
   const today = new Date().toISOString().slice(0, 10);
-  const map = Object.fromEntries((state.calendar || []).map((c) => [c.date, c]));
+  const label = { planned: "In programma", made: "Fatto", published: "Pubblicato", skipped: "Nessun video" };
   const out = [];
   for (let i = -3; i < 11; i++) {
     const date = new Date(Date.now() + i * 864e5).toISOString().slice(0, 10);
-    const c = map[date];
-    const st = c ? c.status : (i < 0 ? "skipped" : "planned");
-    const label = { planned: "In programma", made: "Fatto", published: "Pubblicato", skipped: "Nessun video" }[st] || st;
+    const vids = (state.calendar || []).filter((c) => c.date === date);   // both videos of the day, each with how it went
+    const st = i < 0 ? "skipped" : "planned";
     out.push(`<li class="${date === today ? "today" : ""}"><span class="d">${fmtDay(date)}<small>${date === today ? "oggi" : ""}</small></span>
-      <span>${c ? esc(c.title) : `<span class="note">${i < 0 ? "—" : "Il Soggetto lo sceglie la mattina stessa"}</span>`}</span><span class="pill ${st}">${label}</span></li>`);
+      ${vids.length ? `<span class="vids">${vids.map((c) => `<span class="vid"><span>${esc(c.title)}</span><span class="pill ${c.status}">${label[c.status] || c.status}</span></span>`).join("")}</span>`
+        : `<span><span class="note">${i < 0 ? "—" : "Il Soggetto li sceglie la mattina stessa"}</span></span><span class="pill ${st}">${label[st]}</span>`}</li>`);
   }
   $("days").innerHTML = out.join("");
+}
+
+// where each house's work can be seen in detail: the render's jobs and logs on GitHub, or the Claude routine's runs
+const WORKS = { ricerca: "RESEARCH", soggetto: "PRODUCE", copione: "PRODUCE", regia: "PRODUCE", voce: "RENDER", animazione: "RENDER",
+  musica: "RENDER", montaggio: "RENDER", qualita: "RENDER", pubblicazione: "PUBLISH", community: "COMMUNITY", statistiche: "COMMUNITY" };
+function workLinks(id) {
+  const L = state?.links, w = WORKS[id];
+  if (!L || !w) return "";
+  const gh = `https://github.com/${L.repo}`, a = (href, text) => `<a class="btn" href="${esc(href)}" target="_blank" rel="noopener" style="text-decoration:none">${text}</a>`;
+  if (w === "RENDER") {
+    const f = state.chain?.failed;
+    return a(f?.url && f.id === (state.video?.id || f.id) ? f.url : `${gh}/actions/workflows/render.yml`, "Il render su GitHub")
+      + a(`${gh}/actions/workflows/office.yml`, "Il guardiano");
+  }
+  const r = L.routines?.[w];
+  return (r ? a(`https://claude.ai/code/routines/${r}`, "Il lavoro di Claude") : "")
+    + a(`${gh}/commits/main`, "Cosa ha salvato su GitHub");
 }
 
 // "Fai ripartire" for one house that stopped: only that house (and what comes after it) runs again
@@ -970,6 +987,7 @@ function fillSheet(id) {
       ${(() => { const p = progress(id, info); return p ? `<div class="meter"><i style="width:${Math.round(p.k * 100)}%"></i></div><p class="note" style="margin-top:6px">Di solito ci mette ${TYPICAL[id]} min: ${etaText(p)}.</p>` : ""; })()}
       ${info.output ? `<p class="out">${esc(info.output)}</p>` : ""}${info.updated_at ? `<p class="note" style="margin-top:6px">Aggiornato alle ${fmtTime(info.updated_at)}</p>` : ""}</div>
     ${info.status === "error" && id !== "revisione" ? `<div class="row" style="margin-top:14px">${restartBtn(id, true)}</div>` : ""}
+    ${workLinks(id) ? `<div class="row" style="margin-top:14px">${workLinks(id)}</div>` : ""}
     ${id === "ricerca" ? `<div class="row" style="margin-top:14px"><button class="btn" data-goto="idea">${state?.research ? `Cosa ha studiato oggi (${state.research.studied.length} video)` : "Dagli un video da studiare"}</button></div>` : ""}
     ${isDesk ? `<div class="row" style="margin-top:14px"><button class="btn primary" data-goto="approva">${pending ? `Guarda ${pending === 1 ? "il video" : `i ${pending} video`} da approvare` : "Apri la coda di approvazione"}</button></div>` : ""}
     ${d.skills.length ? `<h3>Con quali strumenti lavora</h3><ul class="chips">${d.skills.map((s) => `<li>${esc(s)}</li>`).join("")}</ul>` : ""}`;

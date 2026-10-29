@@ -25,7 +25,8 @@ createServer((req, res) => {
     // as on the Worker today: Ricerca and Community have no restart key yet
     const can_restart = Object.fromEntries(["ricerca", "soggetto", "copione", "regia", "voce", "animazione", "musica", "montaggio", "qualita", "pubblicazione", "community", "statistiche"]
       .map((d) => [d, !["ricerca", "community", "statistiche"].includes(d)]));
-    return res.end(JSON.stringify({ ...sample, publish_at_utc: [16, 22], schedule: SCHEDULE, can_restart }));
+    return res.end(JSON.stringify({ ...sample, publish_at_utc: [16, 22], schedule: SCHEDULE, can_restart,
+      links: { repo: "pietrosaviotti012-jpg/lanternfox-studio", routines: { PRODUCE: "trig_01BjJQVd4USismSyDNg6QzjF", PUBLISH: "trig_0189NypF3VnHYLoPwvSyA3NX", RESEARCH: "trig_01CYHvbjAagyYwNktktKbJgV", COMMUNITY: "trig_01N2hEZUpEKAbPLJNZse79AM" } } }));
   }
   if (url.pathname === "/idea") {   // the idea goes in the list, as if the Regia had started
     let body = "";

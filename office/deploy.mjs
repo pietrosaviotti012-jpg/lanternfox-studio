@@ -58,6 +58,7 @@ if (withSecrets) {
   bindings.push({ type: "secret_text", name: "STUDIO_SECRET", text: env.STUDIO_SECRET });
   if (env.PUBLISH_KEY) bindings.push({ type: "secret_text", name: "PUBLISH_KEY", text: env.PUBLISH_KEY });
   for (const w of ["PUBLISH", "REDO", "PRODUCE", "RESEARCH", "COMMUNITY"]) if (env[`ROUTINE_${w}_TOKEN`]) bindings.push({ type: "secret_text", name: `ROUTINE_${w}_TOKEN`, text: env[`ROUTINE_${w}_TOKEN`] });
+  if (env.GH_DISPATCH_TOKEN) bindings.push({ type: "secret_text", name: "GH_DISPATCH_TOKEN", text: env.GH_DISPATCH_TOKEN });   // wakes the watchman
   if (env.YT_CLIENT_SECRET) bindings.push({ type: "secret_text", name: "YT_CLIENT_SECRET", text: env.YT_CLIENT_SECRET });   // the user's Google project (YouTube)
 }
 const metadata = { main_module: "worker.js", compatibility_date: "2025-06-01", bindings,

@@ -199,6 +199,9 @@
   .days li { display: grid; grid-template-columns: 64px 1fr auto; gap: 12px; align-items: center; padding: 12px 14px; border-radius: 14px; background: #101b40; }
   .days .d { font: 600 1rem var(--serif); line-height: 1.1; }
   .days .d small { display: block; font: 400 .78rem var(--sans); color: var(--muted); }
+  /* a day with its videos: each title with its own state, one under the other */
+  .days .vids { grid-column: 2 / 4; display: grid; gap: 8px; }
+  .days .vid { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center; }
   .pill { font-size: .78rem; padding: 3px 10px; border-radius: 999px; background: #1a2756; color: var(--muted); }
   .pill.published { background: rgba(159,217,168,.15); color: var(--ok); }
   .pill.made { background: var(--lamp-soft); color: var(--lamp); }
@@ -331,7 +334,7 @@
 
   <section role="tabpanel" id="p-calendario" aria-labelledby="t-calendario" hidden>
     <h2>Calendario</h2>
-    <p class="lead">Una storia al giorno: quelle in programma, quelle fatte e quelle già uscite.</p>
+    <p class="lead">Due storie al giorno: quelle in programma, quelle fatte e quelle già uscite.</p>
     <ul class="days" id="days"></ul>
   </section>
 

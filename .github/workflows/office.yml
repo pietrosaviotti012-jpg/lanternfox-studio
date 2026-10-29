@@ -57,13 +57,11 @@ jobs:
             [ -z "$line" ] && continue
             ID=$(echo "$line" | node -e "let d='';process.stdin.on('data',c=>d+=c).on('end',()=>console.log(JSON.parse(d).id))")
             T=$(echo "$line" | node -e "let d='';process.stdin.on('data',c=>d+=c).on('end',()=>console.log(JSON.parse(d).target||''))")
-            RUN=$(echo "$line" | node -e "let d='';process.stdin.on('data',c=>d+=c).on('end',()=>console.log(JSON.parse(d).run||''))")
-            # a render that stopped: only its failed jobs run again (the voice and the frames already made are kept)
-            if [ -n "$RUN" ] && gh run rerun "$RUN" --failed; then R=done; W="rifatti solo i pezzi fermi"
-            elif [ -f "productions/$T/script.json" ] || git ls-tree -d HEAD "productions/$T" >/dev/null 2>&1; then
-              gh workflow run render.yml -f production="productions/$T" && R=done || R=failed; W=ripartito
+            # always from the latest code: the voice lines already recorded come back from the cache
+            if [ -f "productions/$T/script.json" ] || git ls-tree -d HEAD "productions/$T" >/dev/null 2>&1; then
+              gh workflow run render.yml -f production="productions/$T" && R=done || R=failed
             else R=failed; fi
-            node tools/office.mjs "{\"op\":{\"id\":\"$ID\",\"status\":\"$R\",\"result\":\"render di $T: ${R/done/$W}\"}}"
+            node tools/office.mjs "{\"op\":{\"id\":\"$ID\",\"status\":\"$R\",\"result\":\"render di $T: ${R/done/ripartito}\"}}"
           done < ops.jsonl
       - name: Health
         run: |
