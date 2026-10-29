@@ -104,9 +104,10 @@ jobs:
           while IFS=$'\t' read -r ID URL FILE; do
             SRC="$URL"
             if [ -n "$FILE" ]; then curl -sf -H "Authorization: Bearer $STUDIO_SECRET" "$FILE" -o "/tmp/$ID.mp4" && SRC="/tmp/$ID.mp4"; fi
-            if OUT=$(python tools/analyze.py "$SRC" 2>/tmp/err.txt | tail -1); then
-              REL=${OUT#"$PWD/"}; R="studiato: https://github.com/${{ github.repository }}/blob/main/$REL/analysis.md"; S=studied
-            else R="non riuscito: $(tail -c 200 /tmp/err.txt | tr '\n"' '  ')"; S=failed; fi
+            if python tools/analyze.py "$SRC" > /tmp/out.txt 2>/tmp/err.txt; then
+              OUT=$(tail -1 /tmp/out.txt); REL=$(realpath --relative-to="$PWD" "$OUT")
+              R="studiato: https://github.com/${{ github.repository }}/blob/main/$REL/analysis.md"; S=studied
+            else tail -20 /tmp/err.txt; R="non riuscito: $(grep -i 'error' /tmp/err.txt | tail -1 | cut -c1-200 | tr '\"\\' '  ')"; S=failed; fi
             echo "$ID $S $R"
             [ "$ID" != inbox ] && node tools/office.mjs "{\"op\":{\"kind\":\"example\",\"id\":\"$ID\",\"status\":\"$S\",\"result\":\"$R\"}}"
           done < todo.tsv
