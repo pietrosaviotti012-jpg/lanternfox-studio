@@ -28,6 +28,13 @@ createServer((req, res) => {
     return res.end(JSON.stringify({ ...sample, publish_at_utc: [16, 22], schedule: SCHEDULE, can_restart,
       links: { repo: "pietrosaviotti012-jpg/lanternfox-studio", routines: { PRODUCE: "trig_01BjJQVd4USismSyDNg6QzjF", PUBLISH: "trig_0189NypF3VnHYLoPwvSyA3NX", RESEARCH: "trig_01CYHvbjAagyYwNktktKbJgV", COMMUNITY: "trig_01N2hEZUpEKAbPLJNZse79AM" } } }));
   }
+  if (url.pathname === "/guard") {   // the general's round, as the Worker would report it with the sample's broken houses
+    const broken = Object.entries(sample.departments || {}).filter(([, d]) => d.status === "error").map(([id]) => id);
+    sample.guard = { at: new Date().toISOString(), seen: broken, done: broken,
+      text: broken.length ? `Ho trovato: ${broken.join(", ")} fermi. Ho fatto ripartire: ${broken.join(", ")}.` : "Ho controllato tutte le casette: la catena è in ordine." };
+    res.writeHead(200, { "Content-Type": "application/json" });
+    return res.end(JSON.stringify({ ok: true, guard: sample.guard }));
+  }
   if (url.pathname === "/idea") {   // the idea goes in the list, as if the Regia had started
     let body = "";
     req.on("data", (c) => (body += c));

@@ -91,6 +91,18 @@ function drawFigure(g, kind, fur) {
 }
 
 const FIGURES = {
+  // il Generale: la volpe con il bicorno, la giubba rossa, le spalline d'oro e i bottoni
+  general: (p) => {
+    const { g, shape, ell, tri } = p, gold = "#f2c14e";
+    shape("#9c2a22", () => { g.moveTo(80, 236); g.bezierCurveTo(78, 170, 96, 150, 128, 148); g.bezierCurveTo(160, 150, 178, 170, 176, 236); g.closePath(); });
+    FIGURES.fox({ ...p, shape: (fill, draw) => fill === p.fur || fill === p.cream || fill === "#a8461f" || fill === "#0e1532" ? shape(fill, draw) : null });
+    shape("#9c2a22", () => { g.moveTo(84, 236); g.bezierCurveTo(84, 196, 100, 178, 128, 176); g.bezierCurveTo(156, 178, 172, 196, 172, 236); g.closePath(); });
+    shape(gold, () => { ell(88, 184, 20, 9, -.35); ell(168, 184, 20, 9, .35); });
+    shape(gold, () => { for (const y of [196, 212, 228]) ell(128, y, 4.5, 4.5); });
+    shape("#1c1410", () => { g.moveTo(62, 84); g.quadraticCurveTo(128, 18, 194, 84); g.quadraticCurveTo(128, 66, 62, 84); });
+    shape(gold, () => { g.moveTo(62, 84); g.quadraticCurveTo(128, 66, 194, 84); g.quadraticCurveTo(128, 72, 62, 84); });
+    shape("#e8473b", () => ell(128, 50, 9, 9));
+  },
   fox: ({ g, fur, cream, shape, ell, tri, eye }) => {
     shape(fur, () => { g.moveTo(70, 236); g.bezierCurveTo(10, 220, 20, 150, 60, 150); g.bezierCurveTo(70, 190, 100, 210, 130, 212); g.closePath(); });
     shape(cream, () => { g.moveTo(40, 160); g.bezierCurveTo(20, 175, 18, 200, 30, 214); g.bezierCurveTo(30, 190, 40, 172, 55, 162); g.closePath(); });
@@ -189,3 +201,4 @@ const FIGURES = {
 };
 
 const ICONS = Object.fromEntries(DEPTS.map((d) => [d.id, paperCut(d.animal, d.fur, 128).toDataURL()]));
+ICONS.general = paperCut("general", "#e8743b", 160).toDataURL();

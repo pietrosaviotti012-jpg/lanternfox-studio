@@ -24,7 +24,7 @@
 <style>
   :root {
     --night: #0a1330; --deep: #121d45; --hill: #3f5a92; --mist: #6a86c2; --ink: #0e1532;
-    --lamp: #ffb862; --lamp-soft: rgba(255, 184, 98, .16); --fox: #e8743b; --paper: #f3e6cf; --muted: #9fb0d6;
+    --lamp: #ffb862; --lamp-soft: rgba(255, 184, 98, .16); --fox: #e8743b; --paper: #f3e6cf; --muted: #d2c3a6;
     --alarm: #ff8f73; --ok: #9fd9a8;
     --serif: "Fraunces", Georgia, serif; --sans: "Atkinson Hyperlegible", system-ui, sans-serif;
     --gutter: 16px; --panel: 420px;
@@ -144,6 +144,16 @@
 
   /* the chain stopped: what, where, and the button to start it again */
   .alert { margin: 0 0 16px; padding: 14px 16px; border-radius: 14px; background: rgba(255,143,115,.12); border: 1px solid var(--alarm); }
+  /* il Generale: la volpe che controlla e fa ripartire la catena */
+  .general { display: grid; grid-template-columns: 72px 1fr; gap: 14px; align-items: start; padding: 14px; margin: 0 0 16px;
+    border-radius: 16px; background: linear-gradient(135deg, rgba(156,42,34,.28), rgba(242,193,78,.08)); box-shadow: inset 0 0 0 1px rgba(242,193,78,.45); }
+  .general img { width: 72px; height: 72px; }
+  .general b { display: block; font: 600 1.1rem var(--serif); color: #f2c14e; }
+  .general .note { display: block; margin-top: 2px; color: var(--paper); }
+  .general .row { margin-top: 10px; }
+  .general.patrol img { animation: salute .5s ease-in-out infinite alternate; }
+  @keyframes salute { to { transform: translateY(-5px) rotate(-4deg); } }
+  @media (prefers-reduced-motion: reduce) { .general.patrol img { animation: none; } }
   .alert b { display: block; color: var(--alarm); font: 600 1.05rem var(--serif); margin-bottom: 4px; }
   .alert .row { margin-top: 10px; }
   .alert.ok { background: rgba(159,217,168,.08); border-color: rgba(159,217,168,.4); }
@@ -269,7 +279,7 @@
 
 <main class="panel">
   <div class="tabs" role="tablist" aria-label="Sezioni">
-    <button role="tab" id="t-oggi" aria-controls="p-oggi" aria-selected="true">Oggi</button>
+    <button role="tab" id="t-oggi" aria-controls="p-oggi" aria-selected="true">Home</button>
     <button role="tab" id="t-idea" aria-controls="p-idea" aria-selected="false">Idea</button>
     <button role="tab" id="t-approva" aria-controls="p-approva" aria-selected="false">Approva<span class="count" id="queueCount" hidden></span></button>
     <button role="tab" id="t-calendario" aria-controls="p-calendario" aria-selected="false">Calendario</button>
@@ -278,6 +288,11 @@
 
   <section role="tabpanel" id="p-oggi" aria-labelledby="t-oggi">
     <p class="demo-flag">Questa è una prova: si muove solo sul tuo schermo, nessun video viene creato o pubblicato.</p>
+    <div class="general" id="general">
+      <img alt="" id="generalImg" width="72" height="72">
+      <div><b>Il Generale</b><span class="note" id="generalText">La volpe che fa la guardia alla catena: chiamala e controlla ogni casetta, poi fa ripartire quello che si è fermato.</span>
+        <div class="row"><button class="btn primary" id="callGeneral">Chiama il Generale</button></div></div>
+    </div>
     <div id="alert"></div>
     <span class="vno" id="videoNo" hidden></span>
     <h2 id="videoTitle">Nessuna storia oggi, per ora</h2>

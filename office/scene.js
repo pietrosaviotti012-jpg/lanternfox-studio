@@ -157,7 +157,7 @@ function board(text, w = 2, h = 0.62) {
   const g = c.getContext("2d");
   g.fillStyle = "#f3e6cf"; g.beginPath(); g.roundRect(6, 6, c.width - 12, c.height - 12, 22); g.fill();
   g.strokeStyle = "#8a6a4a"; g.lineWidth = 8; g.stroke();
-  g.fillStyle = "#1a2550"; g.font = `600 ${Math.round(c.height * 0.5)}px Fraunces, Georgia, serif`;
+  g.fillStyle = "#3a2618"; g.font = `600 ${Math.round(c.height * 0.5)}px Fraunces, Georgia, serif`;
   g.textAlign = "center"; g.textBaseline = "middle"; g.fillText(text, c.width / 2, c.height / 2 + 4);
   const tex = new THREE.CanvasTexture(c); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 4;
   const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: tex, side: THREE.DoubleSide }));
@@ -375,6 +375,27 @@ const smoke = DEPTS.map((d, i) => Array.from({ length: 4 }, (_, k) => {
 }));
 const chimneyTop = (id) => { const c = houses[id].chimney; return c.getWorldPosition(new THREE.Vector3()).add(new THREE.Vector3(0, 0.45, 0)); };
 
+// il Generale: sta di guardia nella piazzetta della fine, davanti a tutti; quando lo chiami risale il marciapiede a controllare
+const general = (() => {
+  const tex = new THREE.CanvasTexture(paperCut("general", "#e8743b", 256)); tex.colorSpace = THREE.SRGBColorSpace;
+  const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true }));
+  s.scale.set(2.2, 2.2, 1);
+  const b = walkPath.getPointAt(1), db = walkPath.getTangentAt(1);
+  const home = new THREE.Vector3(b.x - 0.9, 1.2, b.z + 0.9);   // a sinistra dell'orso, sullo schermo (il cartello è a destra)
+  s.position.copy(home); scene.add(s);
+  return { s, home, patrol: 0 };
+})();
+function generalTick(dt) {
+  const g = general;
+  if (g.patrol > 0 && !reduceMotion) {
+    g.patrol = Math.max(0, g.patrol - dt);
+    const u = 1 - Math.abs(1 - 2 * ((8 - g.patrol) / 8));   // there and back along the sidewalk in 8 s
+    const p = walkPath.getPointAt(1 - Math.min(1, Math.max(0, u)));
+    g.s.position.set(p.x, 1.12 + Math.abs(Math.sin(g.patrol * 9)) * 0.18, p.z);
+    if (g.patrol === 0) g.s.position.copy(g.home);
+  }
+}
+
 // il postino: una volpina con la lanterna che porta la storia lungo il marciapiede
 // e si ferma davanti alla casetta che ci sta lavorando
 const courier = (() => {
@@ -562,6 +583,7 @@ function loop() {
     if (k === 1) flight = null;
   }
   controls.update();
+  generalTick(1 / 60);
   // riflettore: quando una casetta è aperta, il resto del villaggio si abbassa
   const focus = Math.max(...DEPTS.map((d) => houses[d.id].open));
   hemi.intensity = 1.15 - 0.7 * focus; moonLight.intensity = 0.9 - 0.6 * focus;
@@ -880,6 +902,7 @@ const restartBtn = (id, primary) => id === "revisione" ? "" : state?.can_restart
 const utcToday = (hhmm) => { const [h, m] = hhmm.split(":").map(Number); const d = new Date(); d.setUTCHours(h, m, 0, 0); return d; };
 const inMin = (d) => { const m = Math.round((d - Date.now()) / 60000); return m < 60 ? `tra ${m} min` : `tra ${Math.floor(m / 60)} h ${String(m % 60).padStart(2, "0")}`; };
 function renderControl() {
+  renderGeneral();
   const deps = state.departments || {}, now = Date.now();
   // 1. a stopped chain, in red, with the button that starts it again
   const fail = state.chain?.failed;
@@ -1070,6 +1093,31 @@ $("comments").addEventListener("click", async (e) => {
   b.disabled = false;
   toast(!r.ok ? "Non sono riuscito a salvare: riprova" : ok ? "Risposta approvata: parte al prossimo giro dei commenti" : "Lasciato senza risposta");
   load();
+});
+
+// il Generale in Home: cosa ha visto e fatto all'ultimo giro; il tasto lo manda a controllare tutta la catena
+$("generalImg").src = ICONS.general;
+function renderGeneral() {
+  const g = state?.guard;
+  if (g) $("generalText").textContent = `Ultimo giro alle ${fmtTime(g.at)}. ${g.text}`;
+}
+$("callGeneral").addEventListener("click", async () => {
+  const card = $("general"), b = $("callGeneral");
+  card.classList.add("patrol"); general.patrol = 8; b.disabled = true;
+  $("generalText").textContent = "Il Generale passa casetta per casetta e controlla la catena…";
+  let guard;
+  if (demo) {
+    await new Promise((r) => setTimeout(r, 1500));
+    guard = { at: new Date().toISOString(), text: "Nella prova non riparte niente: qui avrei controllato ogni casetta e fatto ripartire quelle ferme." };
+  } else {
+    const r = await fetch("/guard", { method: "POST" }).catch(() => null);
+    guard = (await r?.json().catch(() => null))?.guard;
+  }
+  card.classList.remove("patrol"); b.disabled = false;
+  if (!guard) { $("generalText").textContent = "Non sono riuscito a chiamare il Generale: riprova."; return; }
+  state.guard = guard; renderGeneral();
+  toast(guard.done?.length ? `Il Generale ha fatto ripartire ${guard.done.length === 1 ? "un reparto" : `${guard.done.length} reparti`}` : "Il Generale: tutto in ordine");
+  if (!demo) load();
 });
 
 // fai ripartire: i tasti nel riquadro rosso e nella giornata

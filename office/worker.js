@@ -401,6 +401,40 @@ function calendarPut(state, day) {
   state.calendar.sort((a, b) => a.date.localeCompare(b.date));
 }
 
+// Il Generale, the fox who guards the chain: when the user calls him he walks the whole village and restarts what is broken.
+//   - a house that stopped (error), or one "at work" with no news for over two hours (stuck): restarted, the render only once;
+//   - a production slot of today that did not start 40 minutes after its time: a new video;
+//   - commands still waiting for GitHub: he wakes the watchman.
+// What he saw and did stays in state.guard for the Home card.
+const RENDER_DEPTS = ["voce", "animazione", "musica", "montaggio", "qualita"];
+async function guardRound(env, state, now) {
+  const seen = [], done = [], deps = state.departments, t = Date.parse(now);
+  const label = (id) => id[0].toUpperCase() + id.slice(1);
+  const broken = Object.keys(RESTART).filter((id) => deps[id]?.status === "error");
+  const stuck = Object.keys(RESTART).filter((id) => deps[id]?.status === "working" && deps[id].updated_at && t - Date.parse(deps[id].updated_at) > 2 * 3600e3);
+  let renderDone = false;
+  for (const id of [...broken, ...stuck]) {
+    seen.push(`${label(id)} ${broken.includes(id) ? "fermo" : "bloccato da oltre due ore"}`);
+    if (RENDER_DEPTS.includes(id)) { if (renderDone) continue; renderDone = true; }
+    const r = await restart(env, state, "dept", id, now);
+    done.push(r.how);
+  }
+  const day = new Date(t + 3600e3).toISOString().slice(0, 10), started = state.today?.day === day ? state.today.ids.length : 0;
+  const missed = SCHEDULE.filter((s) => s.slot && started < s.slot && t > Date.parse(`${now.slice(0, 10)}T${s.utc}:00Z`) + 40 * 60000);
+  if (missed.length && !broken.length && !stuck.length) {
+    seen.push(`il video ${missed[0].slot} di oggi non è partito`);
+    done.push((await restart(env, state, "produce", "", now)).how);
+  }
+  const waiting = state.ops.filter((o) => o.status === "waiting").length;
+  if (waiting) seen.push(`${waiting} ${waiting === 1 ? "comando aspetta" : "comandi aspettano"} GitHub`);
+  const woke = await wakeWatchman(env);
+  state.guard = { at: now, seen, done, watchman: woke === 204,
+    text: seen.length ? `Ho trovato: ${seen.join("; ")}. ${done.length ? "Ho fatto ripartire: " + done.join("; ") + "." : ""}`
+      : "Ho controllato tutte le casette: nessuno è fermo, la catena è in ordine." };
+  state.log.push({ at: now, dept: "regia", status: seen.length ? "working" : "done", text: `Il Generale ha fatto il giro: ${state.guard.text}` });
+  return state.guard;
+}
+
 // GitHub's 15-minute timer is often an hour late: with GH_DISPATCH_TOKEN (a fine-grained token that can only start
 // workflows in this repository) a command from the phone wakes the watchman at once
 const REPO = "pietrosaviotti012-jpg/lanternfox-studio";
@@ -812,6 +846,12 @@ export default {
     // rerender: the watchman starts the render again within ~15 minutes; produce: a new video now (the Production routine,
     // or the Regia one when the Production token is not there); publish: the publishing routine now;
     // dept: only the house that stopped (see RESTART)
+    if (url.pathname === "/guard" && request.method === "POST") {   // "Chiama il Generale" in Home
+      const state = await loadState(env), now = new Date().toISOString();
+      const guard = await guardRound(env, state, now);
+      await saveState(env, state);
+      return json({ ok: true, guard });
+    }
     if (url.pathname === "/ops/command" && request.method === "POST") {
       const { kind, target } = await request.json().catch(() => ({}));
       const state = await loadState(env), now = new Date().toISOString();
