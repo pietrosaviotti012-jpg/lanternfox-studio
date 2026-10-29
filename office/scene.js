@@ -675,8 +675,9 @@ function render() {
     const pw = ph.depts.map((id) => progress(id, deps[id])).find(Boolean);
     const pill = { working: `<span class="pill made">In corso${pw ? `: ${etaText(pw)}` : ""}</span>`, waiting: `<span class="pill made">Tocca a te</span>`,
       done: `<span class="pill published">Fatto</span>`, error: `<span class="pill">Si è fermato</span>` }[st] || "";
+    const btns = st === "error" ? ph.depts.filter((id) => (deps[id] || {}).status === "error").map((id) => restartBtn(id, true)).join("") : "";
     return `<li data-st="${st}"><div><b>${esc(ph.title)}</b><span class="who">${esc(ph.depts.map((id) => BY_ID[id].name).join(" · "))}</span>
-      <p>${esc(ph.text)}</p>${pill}</div></li>`;
+      <p>${esc(ph.text)}</p>${pill}${btns ? `<div class="row" style="margin-top:8px">${btns}</div>` : ""}</div></li>`;
   }).join("");
 
   const ideas = [...(state.ideas || [])].reverse();
@@ -852,6 +853,12 @@ function renderDays() {
   $("days").innerHTML = out.join("");
 }
 
+// "Fai ripartire" for one house that stopped: only that house (and what comes after it) runs again
+// (Ricerca and Community without their key: they start again by themselves at their next round)
+const restartBtn = (id, primary) => id === "revisione" ? "" : state?.can_restart?.[id] === false
+  ? `<span class="note">${esc(BY_ID[id].name)} riparte da sola al prossimo giro</span>`
+  : `<button class="btn${primary ? " primary" : ""}" data-op="dept" data-target="${id}">Fai ripartire ${esc(BY_ID[id].name)}</button>`;
+
 // —— control of the chain: what stopped, the day's shifts, the next video out, the Research's day, GitHub ——
 const utcToday = (hhmm) => { const [h, m] = hhmm.split(":").map(Number); const d = new Date(); d.setUTCHours(h, m, 0, 0); return d; };
 const inMin = (d) => { const m = Math.round((d - Date.now()) / 60000); return m < 60 ? `tra ${m} min` : `tra ${Math.floor(m / 60)} h ${String(m % 60).padStart(2, "0")}`; };
@@ -860,16 +867,16 @@ function renderControl() {
   // 1. a stopped chain, in red, with the button that starts it again
   const fail = state.chain?.failed;
   const broken = DEPTS.filter((d) => (deps[d.id] || {}).status === "error");
-  const front = ["ricerca", "soggetto", "copione", "regia"], pub = ["pubblicazione"];
   let alert = "";
   if (fail) alert += `<div class="alert"><b>⚠ Il render di "${esc(fail.id)}" si è fermato (${esc(fail.step)})</b>
     <span class="note">Alle ${fmtTime(fail.at)}. <a href="${esc(fail.url)}" target="_blank" rel="noopener" style="color:var(--lamp)">Vedi su GitHub</a></span>
-    <div class="row"><button class="btn primary" data-op="rerender" data-target="${esc(fail.id)}">Fai ripartire il render</button></div></div>`;
+    <div class="row">${["voce", "animazione", "musica", "montaggio", "qualita"].map((id) => (deps[id] || {}).status === "error" ? restartBtn(id, true) : "").join("")
+      || `<button class="btn primary" data-op="rerender" data-target="${esc(fail.id)}">Fai ripartire il render</button>`}</div></div>`;
   for (const d of broken) {
     if (fail && ["voce", "animazione", "musica", "montaggio"].includes(d.id)) continue;
-    const kind = front.includes(d.id) ? "produce" : pub.includes(d.id) ? "publish" : null;
+    const btn = restartBtn(d.id, true);
     alert += `<div class="alert"><b>⚠ ${esc(d.name)} si è fermato</b><span class="note">${esc(deps[d.id].task || "")}</span>
-      ${kind ? `<div class="row"><button class="btn primary" data-op="${kind}">${kind === "produce" ? "Fai ripartire la produzione" : "Riprova la pubblicazione"}</button></div>` : ""}</div>`;
+      ${btn ? `<div class="row">${btn}</div>` : ""}</div>`;
   }
   const opsRunning = (state.ops || []).filter((o) => o.status === "waiting" || o.status === "running");
   if (opsRunning.length) alert += `<div class="alert ok"><b>Ripartenza in corso</b><span class="note">${opsRunning.map((o) => `render di ${esc(o.target)}`).join(", ")}: il guardiano di GitHub passa ogni 15 minuti.</span></div>`;
@@ -962,6 +969,7 @@ function fillSheet(id) {
     <div class="now"><b>${info.status === "idle" ? "Ultimo lavoro" : "Adesso"}</b>${info.task ? esc(info.task) : `<span class="note">Niente da fare, per ora.</span>`}
       ${(() => { const p = progress(id, info); return p ? `<div class="meter"><i style="width:${Math.round(p.k * 100)}%"></i></div><p class="note" style="margin-top:6px">Di solito ci mette ${TYPICAL[id]} min: ${etaText(p)}.</p>` : ""; })()}
       ${info.output ? `<p class="out">${esc(info.output)}</p>` : ""}${info.updated_at ? `<p class="note" style="margin-top:6px">Aggiornato alle ${fmtTime(info.updated_at)}</p>` : ""}</div>
+    ${info.status === "error" && id !== "revisione" ? `<div class="row" style="margin-top:14px">${restartBtn(id, true)}</div>` : ""}
     ${id === "ricerca" ? `<div class="row" style="margin-top:14px"><button class="btn" data-goto="idea">${state?.research ? `Cosa ha studiato oggi (${state.research.studied.length} video)` : "Dagli un video da studiare"}</button></div>` : ""}
     ${isDesk ? `<div class="row" style="margin-top:14px"><button class="btn primary" data-goto="approva">${pending ? `Guarda ${pending === 1 ? "il video" : `i ${pending} video`} da approvare` : "Apri la coda di approvazione"}</button></div>` : ""}
     ${d.skills.length ? `<h3>Con quali strumenti lavora</h3><ul class="chips">${d.skills.map((s) => `<li>${esc(s)}</li>`).join("")}</ul>` : ""}`;
@@ -1052,7 +1060,7 @@ document.addEventListener("click", async (e) => {
   if (!b) return;
   if (demo) { toast("Nella prova non riparte niente"); return; }
   const kind = b.dataset.op, target = b.dataset.target || "";
-  const what = { rerender: `il render di "${target}"`, produce: "la produzione di un video nuovo", publish: "la pubblicazione" }[kind];
+  const what = { rerender: `il render di "${target}"`, produce: "la produzione di un video nuovo", publish: "la pubblicazione", dept: `solo ${BY_ID[target]?.name || target}` }[kind];
   if (!confirm(`Faccio ripartire ${what}?`)) return;
   b.disabled = true;
   const r = await fetch("/ops/command", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ kind, target }) });

@@ -22,7 +22,10 @@ createServer((req, res) => {
     res.writeHead(200, { "Content-Type": "application/json" });
     // working houses started a few minutes ago, so the progress bars and the "verso le…" show something real
     for (const d of Object.values(sample.departments || {})) if (d.status === "working") d.updated_at = new Date(Date.now() - 4 * 60000).toISOString();
-    return res.end(JSON.stringify({ ...sample, publish_at_utc: [16, 22], schedule: SCHEDULE }));
+    // as on the Worker today: Ricerca and Community have no restart key yet
+    const can_restart = Object.fromEntries(["ricerca", "soggetto", "copione", "regia", "voce", "animazione", "musica", "montaggio", "qualita", "pubblicazione", "community", "statistiche"]
+      .map((d) => [d, !["ricerca", "community", "statistiche"].includes(d)]));
+    return res.end(JSON.stringify({ ...sample, publish_at_utc: [16, 22], schedule: SCHEDULE, can_restart }));
   }
   if (url.pathname === "/idea") {   // the idea goes in the list, as if the Regia had started
     let body = "";

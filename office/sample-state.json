@@ -33,8 +33,8 @@
       "updated_at": "2026-10-27T07:05:00Z"
     },
     "animazione": {
-      "status": "working",
-      "task": "Animo la scena 4 di 6: la volpe sale la scala del faro",
+      "status": "error",
+      "task": "Il render si è fermato: una macchina dei fotogrammi non ha finito",
       "output": "",
       "updated_at": "2026-10-27T09:38:00Z"
     },

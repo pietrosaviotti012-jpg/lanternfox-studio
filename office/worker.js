@@ -354,6 +354,51 @@ async function youtubeUpload(env, item) {
   return `https://youtube.com/shorts/${done.id}`;
 }
 
+// "Fai ripartire" on a house: each house goes back to whoever does its work, and only that part is done again.
+//   ricerca, community/statistiche: their routine; soggetto, copione, regia: the Production routine, told to pick up the
+//   video it was making from that house; voce, animazione, musica, montaggio, qualita: the render, and when it stopped on
+//   GitHub only its failed jobs run again (the voice and the frames already made are kept); pubblicazione: the publishing routine.
+const RESTART = { ricerca: "RESEARCH", soggetto: "PRODUCE", copione: "PRODUCE", regia: "PRODUCE", voce: "RENDER", animazione: "RENDER",
+  musica: "RENDER", montaggio: "RENDER", qualita: "RENDER", pubblicazione: "PUBLISH", community: "COMMUNITY", statistiche: "COMMUNITY" };
+const canRestart = (env) => Object.fromEntries(Object.entries(RESTART).map(([d, w]) =>
+  [d, w === "RENDER" || Boolean(env[`ROUTINE_${w}_TOKEN`]) || (w === "PRODUCE" && Boolean(env.ROUTINE_REDO_TOKEN))]));
+async function restart(env, state, kind, target, now) {
+  const fired = (s) => s >= 200 && s < 300;
+  const op = (o) => state.ops.push({ id: "op-" + now.replace(/\D/g, "").slice(0, 14), at: now, status: "waiting", ...o });
+  if (kind === "rerender") {
+    if (!/^[\w-]+$/.test(target || "")) return { error: "video non valido" };
+    op({ kind, target }); return { ok: true, how: "Il guardiano di GitHub lo fa ripartire entro un quarto d'ora" };
+  }
+  if (kind === "produce") {
+    const ok = fired(env.ROUTINE_PRODUCE_TOKEN ? await fireRoutine(env, "PRODUCE", "Ripartenza dall'ufficio: produci il video di questo turno.")
+      : await fireRoutine(env, "REDO", "idea: un video nuovo del turno di oggi: scegli tu formato e storia da stories/BANCA.md, come farebbe la Produzione.\nrequest: restart-" + now.slice(0, 16)));
+    return { ok, how: ok ? "La Produzione è ripartita: un video nuovo arriva in circa 40 minuti" : "Non riesco ad avviare la Produzione" };
+  }
+  if (kind === "publish") {
+    const ok = fired(await fireRoutine(env, "PUBLISH", "Ripartenza dall'ufficio"));
+    return { ok, how: ok ? "La Pubblicazione è ripartita" : "Non riesco ad avviare la Pubblicazione" };
+  }
+  if (kind !== "dept" || !RESTART[target]) return { error: "comando sconosciuto" };
+  const which = RESTART[target], name = target[0].toUpperCase() + target.slice(1), video = state.video?.id || state.chain?.failed?.id;
+  let ok, how;
+  if (which === "RENDER") {
+    if (!video) return { ok: false, how: `${name}: non so quale video rifare` };
+    const failed = state.chain?.failed, run = failed?.id === video && (/actions\/runs\/(\d+)/.exec(failed.url || "") || [])[1];
+    op({ kind: "rerender", target: video, ...(run ? { run } : {}), dept: target }); ok = true;
+    how = run ? `${name}: il guardiano rifà solo i pezzi fermi del render di "${video}" entro un quarto d'ora`
+      : `${name}: il guardiano rifà il render di "${video}" entro un quarto d'ora (la voce già registrata resta)`;
+  } else if (which === "PRODUCE") {
+    const text = `Ripartenza dall'ufficio dal reparto ${name}. ${video ? `Se productions/ contiene già il video "${video}", non ricominciare da capo: riprendilo da ${name} (tieni quello che i reparti prima hanno già fatto), rifai da lì in poi e fai partire il render.` : "Produci il video di questo turno."}`;
+    ok = fired(env.ROUTINE_PRODUCE_TOKEN ? await fireRoutine(env, "PRODUCE", text) : await fireRoutine(env, "REDO", `idea: ${text}\nrequest: restart-${now.slice(0, 16)}`));
+    how = ok ? `${name} è ripartito: la Produzione riprende ${video ? `"${video}" da lì` : "il video del turno"}` : `Non riesco a far ripartire ${name}`;
+  } else {
+    ok = fired(await fireRoutine(env, which, `Ripartenza dall'ufficio: il reparto ${name} si era fermato, rifai il giro di adesso.`));
+    how = ok ? `${name} è ripartito` : env[`ROUTINE_${which}_TOKEN`] ? `Non riesco a far ripartire ${name}` : `${name} riparte da solo al prossimo giro: manca la sua chiave`;
+  }
+  if (ok) state.departments[target] = { ...(state.departments[target] || {}), status: "working", task: "Ripartito dall'ufficio", updated_at: now };
+  return { ok, how };
+}
+
 async function fireRoutine(env, which, text) {
   const id = env[`ROUTINE_${which}_ID`], token = env[`ROUTINE_${which}_TOKEN`];
   if (!id || !token) return 0;
@@ -696,7 +741,7 @@ export default {
       state.devices = (await subscriptions(env)).length;
       state.publish_at_utc = String(env.PUBLISH_AT_UTC || "22").split(",").map(Number);   // the publishing slots (UTC hours)
       state.youtube = JSON.parse((await env.DATA.get("yt_channel")) || "null");
-      state.schedule = SCHEDULE; state.can_produce = Boolean(env.ROUTINE_PRODUCE_TOKEN);
+      state.schedule = SCHEDULE; state.can_produce = Boolean(env.ROUTINE_PRODUCE_TOKEN); state.can_restart = canRestart(env);
       return json(state);
     }
     // "Collega YouTube": Google's consent page, then back here with a code that becomes the refresh token
@@ -751,26 +796,16 @@ export default {
     // the user's decision on a flagged comment: the proposed (or edited) reply goes out at the next round, or nothing
     // —— control of the chain from the phone ——
     // rerender: the watchman starts the render again within ~15 minutes; produce: a new video now (the Production routine,
-    // or the Regia one when the Production token is not there); publish: the publishing routine now
+    // or the Regia one when the Production token is not there); publish: the publishing routine now;
+    // dept: only the house that stopped (see RESTART)
     if (url.pathname === "/ops/command" && request.method === "POST") {
       const { kind, target } = await request.json().catch(() => ({}));
       const state = await loadState(env), now = new Date().toISOString();
-      let how = "", ok = true;
-      if (kind === "rerender") {
-        if (!/^[\w-]+$/.test(target || "")) return json({ error: "video non valido" }, 400);
-        state.ops.push({ id: "op-" + now.replace(/\D/g, "").slice(0, 14), kind, target, at: now, status: "waiting" });
-        how = "Il guardiano di GitHub lo fa ripartire entro un quarto d'ora";
-      } else if (kind === "produce") {
-        const s = env.ROUTINE_PRODUCE_TOKEN ? await fireRoutine(env, "PRODUCE", "Ripartenza dall'ufficio: produci il video di questo turno.")
-          : await fireRoutine(env, "REDO", "idea: un video nuovo del turno di oggi: scegli tu formato e storia da stories/BANCA.md, come farebbe la Produzione.\nrequest: restart-" + now.slice(0, 16));
-        ok = s >= 200 && s < 300; how = ok ? "La Produzione è ripartita: un video nuovo arriva in circa 40 minuti" : "Non riesco ad avviare la Produzione";
-      } else if (kind === "publish") {
-        const s = await fireRoutine(env, "PUBLISH", "Ripartenza dall'ufficio"); ok = s >= 200 && s < 300;
-        how = ok ? "La Pubblicazione è ripartita" : "Non riesco ad avviare la Pubblicazione";
-      } else return json({ error: "comando sconosciuto" }, 400);
-      state.log.push({ at: now, dept: "revisione", status: ok ? "working" : "error", text: `Hai fatto ripartire: ${how}` });
+      const r = await restart(env, state, kind, target, now);
+      if (r.error) return json({ error: r.error }, 400);
+      state.log.push({ at: now, dept: "revisione", status: r.ok ? "working" : "error", text: `Hai fatto ripartire: ${r.how}` });
       await saveState(env, state);
-      return json({ ok, how }, ok ? 200 : 502);
+      return json({ ok: r.ok, how: r.how }, r.ok ? 200 : 502);
     }
     // an example to study (Idea tab): a link (Instagram, TikTok, YouTube) or an mp4 straight from the phone (up to 24 MB)
     if (url.pathname === "/examples" && request.method === "POST") {
