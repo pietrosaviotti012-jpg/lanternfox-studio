@@ -38,6 +38,8 @@ La Ricerca aggiunge ogni giorno 3-5 voci nuove (dalle mode del momento, da Reddi
 - What if the internet went quiet for one day? (Niente mappe, niente pagamenti, il primo vicino che bussa alla porta.) (dal 2026-10-29)
 - What if the sun didn't rise tomorrow? (Alle 6:40 il cielo resta nero. Le piante, il freddo, le stelle di giorno: cosa succede ora per ora, con i fatti veri.) (dal 2026-10-29, dal "the sun should be up" di *Eyes Down*)
 
+- What if sound stopped for one minute? ("You don't hear the crash. You see it." Chiusa: "Would you notice first, or would your dog?") (dal 2026-10-29, sera)
+
 ## Your Call (seconda persona, scelta finale)
 - ⭐ **Lantern Night** (serie): la parte 2 segue GO o STAY. → `productions/2026-10-28-lantern-night-1`
 - ⭐ **The Last Train**: "It's 11:58 pm. The last train arrives. It's completely empty, except for one seat with your name on it." TAKE IT or WAIT.
@@ -48,6 +50,10 @@ La Ricerca aggiunge ogni giorno 3-5 voci nuove (dalle mode del momento, da Reddi
 - **The Map**: trovi in soffitta una mappa della tua città con una casa in più. Stasera c'è una luce accesa. GO or BURN THE MAP.
 - ⭐ **Two Alerts** (dal 2026-10-29): alle 2:40 il telefono riceve l'allerta ufficiale "Stay indoors". Un minuto dopo arriva un secondo messaggio, dallo stesso numero: "Ignore the last alert. Leave now." STAY or LEAVE.
 - **Not Delivered** (dal 2026-10-29): durante il blackout scrivi a tua sorella "are you ok?". Il messaggio resta "not delivered" per ore, poi lei risponde da dietro la tua porta: "open, it's me". OPEN or TEXT HER AGAIN.
+
+- ⭐ **On My Way** (dal 2026-10-29, sera): tua madre scrive "on my way, 10 min". Ma è già seduta sul tuo divano. TRUST THE TEXT or THE COUCH. (Il dilemma "quale delle due è vera" è il più commentato della settimana.)
+- ⭐ **The Last Lighthouse** (dal 2026-10-29, sera, formato conto alla rovescia): "The storm will last nine days. You have lamp oil for six." Barra: DAY 1/9 · OIL 6 · FOOD · WATER. Qualcosa sbatte alla porta della cisterna. LIGHT IT or SAVE IT.
+- **Rule 3** (dal 2026-10-29, sera, formato regole): la sirena del paese suona due volte l'anno. Stanotte ha suonato tre volte. La regola 3 dice cosa fare, ma nessuno la ricorda.
 
 ## Gialli e storie con colpo di scena
 - ⭐ **The Tell-Tale Heart** (Poe, pubblico dominio), raccontato da noi in 45 secondi, con la lanterna come filo.
