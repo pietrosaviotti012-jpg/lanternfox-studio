@@ -94,7 +94,7 @@ jobs:
           curl -sL https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-linux64-gpl.tar.xz | tar -xJ -C /tmp
           echo /tmp/ffmpeg-master-latest-linux64-gpl/bin >> "$GITHUB_PATH"
       - name: Tools
-        run: pip install yt-dlp faster-whisper numpy soundfile
+        run: pip install yt-dlp faster-whisper "av<19" numpy soundfile   # av 19 breaks faster-whisper
       - name: Study the videos
         env:
           EXAMPLES: ${{ needs.watch.outputs.examples }}
