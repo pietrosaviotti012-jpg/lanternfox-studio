@@ -838,18 +838,37 @@ function reviewCard(q) {
     <p class="cap">${esc(q.caption || "")}</p>${actions}</div></article>`;
 }
 
+// —— publishing times: the slots (UTC hours), the Italian day, and when each approved video goes out ——
+const romeDay = (t) => new Date(t).toLocaleDateString("sv-SE", { timeZone: "Europe/Rome" });
+function nextSlot(from) {   // the first publishing slot at or after "from" (ms)
+  const hours = [].concat(state?.publish_at_utc ?? [22]).map(Number).sort((a, b) => a - b);
+  for (let d = 0; d < 9; d++) for (const h of hours) {
+    const at = new Date(from); at.setUTCDate(at.getUTCDate() + d); at.setUTCHours(h, 0, 0, 0);
+    if (at.getTime() >= from - 5 * 60e3) return at;
+  }
+  return new Date(from);
+}
+const outAt = (q) => nextSlot(Math.max(Date.now(), Date.parse(q.publish_after || 0) || 0));
+const whenText = (at) => `${romeDay(at) === romeDay(Date.now()) ? "oggi" : romeDay(at) === romeDay(Date.now() + 864e5) ? "domani" : fmtDay(romeDay(at))} alle ${fmtTime(at.toISOString())}`;
+// how many videos go out today: already out (first platform) plus the approved ones waiting for a slot today
+function todayCount(exceptId) {
+  const today = romeDay(Date.now());
+  const out = (state.queue || []).filter((q) => Object.values(q.published || {}).some((p) => p?.url && romeDay(Date.parse(p.at)) === today)).length;
+  const waiting = (state.queue || []).filter((q) => q.status === "approved" && q.id !== exceptId && romeDay(outAt(q)) === today).length;
+  return out + waiting;
+}
+
 // After "Pubblica": when it goes out and where it already is; TikTok arrives in the drafts and the user taps Publish
 function publishedBlock(q) {
   const pub = q.published || {};
-  // the next publishing slot (one story per slot)
-  const slots = [].concat(state?.publish_at_utc ?? [22]);
-  const hour = slots.find((h) => h > new Date().getUTCHours()) ?? slots[0];
-  const outAt = new Date(); outAt.setUTCHours(hour, 0, 0, 0);
-  const local = outAt.toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" });
+  // the slot it waits for (one story per slot), or the time the user chose
+  const at = outAt(q), local = whenText(at), later = Date.parse(q.publish_after || 0) > Date.now();
   const row = (key, name) => pub[key]?.url ? `<li><a href="${esc(pub[key].url)}" target="_blank" rel="noopener">${name}: uscito ↗</a></li>`
     : pub[key]?.draft ? `<li>${name}: nelle bozze</li>`
-    : pub[key]?.error ? `<li>${name}: non riuscito, riprovo al prossimo giro</li>` : `<li>${name}: esce alle ${local}</li>`;
-  const now = `<div class="row">${q.status === "approved" ? `<button class="btn primary" data-now="${esc(q.id)}">Pubblica adesso</button>` : ""}${dlButton(q)}</div>`;
+    : pub[key]?.error ? `<li>${name}: non riuscito, riprovo al prossimo giro</li>` : `<li>${name}: esce ${local}</li>`;
+  const now = `<div class="row">${q.status === "approved" ? `<button class="btn primary" data-now="${esc(q.id)}">Pubblica adesso</button>
+    ${later ? `<button class="btn" data-when="${esc(q.id)}" data-after="">Al prossimo orario</button>`
+      : `<button class="btn" data-when="${esc(q.id)}" data-after="${nextSlot(at.getTime() + 60e3).toISOString()}">Sposta al giro dopo</button>`}` : ""}${dlButton(q)}</div>`;
   return `<p class="decided">${q.status === "published" ? "Pubblicato" : "Approvato"} alle ${fmtTime(q.decided_at)}</p>
     <ul class="chips">${row("instagram", "Instagram")}${row("youtube", "YouTube")}${pub.tiktok ? row("tiktok", "TikTok") : ""}</ul>${now}
     ${pub.tiktok?.url ? "" : pub.tiktok?.draft ? `<p class="note" style="margin:0 0 8px">Su TikTok il video è nelle bozze: apri l'app, tocca la notifica, incolla la didascalia e premi Pubblica.</p>
@@ -860,8 +879,9 @@ function publishedBlock(q) {
 }
 
 function renderDays() {
+  if ($("days").querySelector(".noteform")) return;   // a note being written: the 6-second refresh waits
   const today = new Date().toISOString().slice(0, 10);
-  const label = { planned: "In programma", made: "Fatto", published: "Pubblicato", skipped: "Nessun video" };
+  const label = { planned: "In programma", made: "Fatto", approved: "Approvato", published: "Pubblicato", skipped: "Nessun video" };
   const out = [];
   for (let i = -3; i < 11; i++) {
     const date = new Date(Date.now() + i * 864e5).toISOString().slice(0, 10);
@@ -869,7 +889,10 @@ function renderDays() {
     const st = i < 0 ? "skipped" : "planned";
     out.push(`<li class="${date === today ? "today" : ""}"><span class="d">${fmtDay(date)}<small>${date === today ? "oggi" : ""}</small></span>
       ${vids.length ? `<span class="vids">${vids.map((c) => `<span class="vid"><span>${esc(c.title)}</span><span class="pill ${c.status}">${label[c.status] || c.status}</span></span>`).join("")}</span>`
-        : `<span><span class="note">${i < 0 ? "—" : "Il Soggetto li sceglie la mattina stessa"}</span></span><span class="pill ${st}">${label[st]}</span>`}</li>`);
+        : `<span><span class="note">${i < 0 ? "—" : "Il Soggetto li sceglie la mattina stessa"}</span></span><span class="pill ${st}">${label[st]}</span>`}
+      <span class="mine">${(state.notes || []).filter((n) => n.date === date).map((n) => `<span class="mynote">✎ ${esc(n.text)}
+        <button class="x" data-unnote="${esc(n.id)}" aria-label="Togli la nota">×</button></span>`).join("")}
+        <button class="addnote" data-note="${date}">+ Aggiungi una nota</button></span></li>`);
   }
   $("days").innerHTML = out.join("");
 }
@@ -921,11 +944,10 @@ function renderControl() {
   if (opsRunning.length) alert += `<div class="alert ok"><b>Ripartenza in corso</b><span class="note">${opsRunning.map((o) => `render di ${esc(o.target)}`).join(", ")}: il guardiano di GitHub passa ogni 15 minuti.</span></div>`;
   $("alert").innerHTML = alert;
   // 2. the next video out
-  const slots = [].concat(state.publish_at_utc ?? [16, 22]);
-  const ready = (state.queue || []).filter((q) => q.status === "approved");
-  const nextSlot = slots.map((h) => { const d = new Date(); d.setUTCHours(h, 0, 0, 0); if (d < now) d.setUTCDate(d.getUTCDate() + 1); return d; }).sort((a, b) => a - b)[0];
+  const ready = (state.queue || []).filter((q) => q.status === "approved").sort((a, b) => outAt(a) - outAt(b));
   $("nextOut").hidden = !ready.length;
-  if (ready.length) $("nextOut").textContent = `Prossima uscita: "${ready[0].title}" alle ${fmtTime(nextSlot.toISOString())} (${inMin(nextSlot)})` + (ready.length > 1 ? `, poi altri ${ready.length - 1}` : "");
+  if (ready.length) { const at = outAt(ready[0]);
+    $("nextOut").textContent = `Prossima uscita: "${ready[0].title}" ${whenText(at)} (${inMin(at)})` + (ready.length > 1 ? `, poi altri ${ready.length - 1}` : ""); }
   // 3. the day's shifts, in Italian time, with how each one went
   const today = (state.today?.day === new Date(now + 3600e3).toISOString().slice(0, 10)) ? state.today.ids.length : 0;
   const sched = state.schedule || [];
@@ -1062,22 +1084,62 @@ $("queue").addEventListener("click", async (e) => {
     load();
     return;
   }
+  const w = e.target.closest("[data-when]");   // "Sposta al giro dopo" / "Al prossimo orario"
+  if (w) {
+    if (demo) { toast("Nella prova non si sposta niente"); return; }
+    w.disabled = true;
+    const r = await fetch("/approve/when", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: w.dataset.when, after: w.dataset.after || null }) });
+    toast(r.ok ? `Esce ${whenText(outAt({ publish_after: w.dataset.after }))}` : "Non sono riuscito a spostarlo: riprova");
+    render.queueSig = null; load();
+    return;
+  }
   const b = e.target.closest("[data-approve],[data-redo]");
   if (!b) return;
   const id = b.dataset.approve || b.dataset.redo;
   const decision = b.dataset.approve ? "approved" : "redo";
   const note = document.getElementById("note-" + id)?.value || "";
+  const after = b.dataset.after ?? null;
+  if (decision === "approved" && after === null && todayCount(id) >= 2) {
+    const today = nextSlot(Date.now()), tomorrow = nextSlot(Date.parse(romeDay(Date.now() + 864e5) + "T00:00:00+01:00"));
+    if (romeDay(today) === romeDay(Date.now())) {   // there is still a slot today: the user chooses
+      b.closest(".row").outerHTML = `<div class="ask"><p>Oggi escono già ${todayCount(id)} video. Quando pubblico questo?</p><div class="row">
+        <button class="btn primary" data-approve="${esc(id)}" data-after="${tomorrow.toISOString()}">${esc(whenText(tomorrow).replace(/^./, (c) => c.toUpperCase()))}</button>
+        <button class="btn" data-approve="${esc(id)}" data-after="">${esc(whenText(today).replace(/^./, (c) => c.toUpperCase()))}</button></div></div>`;
+      return;
+    }
+  }
   if (decision === "redo" && !note.trim()) { toast("Scrivi cosa cambiare, così il Copione sa da dove ripartire"); document.getElementById("note-" + id)?.focus(); return; }
   if (demo) { const q = state.queue.find((x) => x.id === id); Object.assign(q, { status: decision, note, decided_at: new Date().toISOString() }); render(); toast(decision === "approved" ? "Approvato (per finta: è una prova)" : "Mandato alla Regia (per finta)"); return; }
   b.disabled = true;
-  const r = await fetch("/approve", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, decision, note }) });
+  const r = await fetch("/approve", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, decision, note, after: after || null }) });
   b.disabled = false;
   if (!r.ok) { toast("Non sono riuscito a salvare la scelta: riprova"); return; }
   const res = await r.json().catch(() => ({}));
-  toast(decision === "approved" ? "Approvato: esce all'orario, oppure premi Pubblica adesso"
+  toast(decision === "approved" ? `Approvato: esce ${whenText(outAt({ publish_after: after }))}, oppure premi Pubblica adesso`
     : res.started ? "La Regia sta rifacendo il video con la tua nota" : "Nota salvata, ma la Regia non è partita: controlla la routine");
   load();
 });
+
+// le tue note nel calendario: un campo che si apre sotto il giorno, e la × per toglierle
+$("days").addEventListener("click", async (e) => {
+  const add = e.target.closest("[data-note]"), del = e.target.closest("[data-unnote]"), save = e.target.closest("[data-savenote]");
+  if (add) {
+    add.outerHTML = `<span class="noteform"><input type="text" maxlength="300" placeholder="Es. domani video su Halloween" aria-label="La tua nota">
+      <button class="btn primary" data-savenote="${add.dataset.note}">Salva</button></span>`;
+    $("days").querySelector(".noteform input").focus();
+    return;
+  }
+  if (!del && !save) return;
+  const body = del ? { id: del.dataset.unnote, remove: true } : { date: save.dataset.savenote, text: save.previousElementSibling.value };
+  if (save && !body.text.trim()) return;
+  if (demo) { toast("Nella prova le note non si salvano"); return; }
+  const r = await fetch("/calendar/note", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) { toast("Non sono riuscito a salvare la nota: riprova"); return; }
+  state.notes = j.notes; $("days").querySelector(".noteform")?.remove(); renderDays();
+  toast(del ? "Nota tolta" : "Nota salvata nel calendario");
+});
+$("days").addEventListener("keydown", (e) => { if (e.key === "Enter" && e.target.matches(".noteform input")) e.target.nextElementSibling.click(); });
 
 // commenti da guardare: la decisione va all'ufficio, la risposta parte al prossimo giro di Ada
 $("comments").addEventListener("click", async (e) => {
@@ -1173,12 +1235,17 @@ function toast(text) {
 
 
 // ---------------------------------------------------------------- dati veri: lettura periodica
+const PAGE_VERSION = "__BUILD__";   // filled in by build.mjs: the version of this page
 async function load() {
   if (demo) return;
   try {
     const r = await fetch("/state.json", { cache: "no-store" });
     if (r.status === 401) { location.reload(); return; }
     state = await r.json();
+    // the Office was updated while the app stayed open (an iPhone keeps it in memory for days): load the new page once
+    if (state.build && state.build !== PAGE_VERSION && !sessionStorage.getItem("reloaded-" + state.build)) {
+      sessionStorage.setItem("reloaded-" + state.build, "1"); location.reload(); return;
+    }
     render();
   } catch { /* rete assente: riprova al prossimo giro */ }
 }

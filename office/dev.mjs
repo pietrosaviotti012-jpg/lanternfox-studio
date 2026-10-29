@@ -26,7 +26,7 @@ createServer((req, res) => {
     const can_restart = Object.fromEntries(["ricerca", "soggetto", "copione", "regia", "voce", "animazione", "musica", "montaggio", "qualita", "pubblicazione", "community", "statistiche"]
       .map((d) => [d, !["ricerca", "community", "statistiche"].includes(d)]));
     return res.end(JSON.stringify({ ...sample, publish_at_utc: [16, 22], schedule: SCHEDULE, can_restart,
-      links: { repo: "pietrosaviotti012-jpg/lanternfox-studio", routines: { PRODUCE: "trig_01BjJQVd4USismSyDNg6QzjF", PUBLISH: "trig_0189NypF3VnHYLoPwvSyA3NX", RESEARCH: "trig_01CYHvbjAagyYwNktktKbJgV", COMMUNITY: "trig_01N2hEZUpEKAbPLJNZse79AM" } } }));
+      links: { repo: "pietrosaviotti012-jpg/lanternfox-studio", routines: { PRODUCE: "trig_01BjJQVd4USismSyDNg6QzjF", PUBLISH: "trig_0189NypF3VnHYLoPwvSyA3NX", RESEARCH: "trig_01CYHvbjAagyYwNktktKbJgV", COMMUNITY: "trig_01N2hEZUpEKAbPLJNZse79AM" } } }).split('"__TODAY__"').join(JSON.stringify(new Date(Date.now() - 3600e3).toISOString())));
   }
   if (url.pathname === "/guard") {   // the general's round, as the Worker would report it with the sample's broken houses
     const broken = Object.entries(sample.departments || {}).filter(([, d]) => d.status === "error").map(([id]) => id);
@@ -34,6 +34,23 @@ createServer((req, res) => {
       text: broken.length ? `Ho trovato: ${broken.join(", ")} fermi. Ho fatto ripartire: ${broken.join(", ")}.` : "Ho controllato tutte le casette: la catena è in ordine." };
     res.writeHead(200, { "Content-Type": "application/json" });
     return res.end(JSON.stringify({ ok: true, guard: sample.guard }));
+  }
+  if (url.pathname === "/calendar/note" || url.pathname === "/approve" || url.pathname === "/approve/when") {   // as the Worker, in memory
+    let body = "";
+    req.on("data", (c) => (body += c));
+    req.on("end", () => {
+      const b = JSON.parse(body || "{}");
+      if (url.pathname === "/calendar/note") {
+        sample.notes ||= [];
+        if (b.remove) sample.notes = sample.notes.filter((n) => n.id !== b.id);
+        else sample.notes.push({ id: "note-" + Date.now().toString(36), date: b.date, text: b.text, at: new Date().toISOString() });
+      } else {
+        const q = (sample.queue || []).find((x) => x.id === b.id);
+        if (q) { if (b.decision) Object.assign(q, { status: b.decision, decided_at: new Date().toISOString() }); if (b.after) q.publish_after = b.after; else delete q.publish_after; }
+      }
+      res.writeHead(200, { "Content-Type": "application/json" }); res.end(JSON.stringify({ ok: true, notes: sample.notes }));
+    });
+    return;
   }
   if (url.pathname === "/idea") {   // the idea goes in the list, as if the Regia had started
     let body = "";

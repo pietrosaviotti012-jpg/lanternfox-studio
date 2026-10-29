@@ -407,6 +407,23 @@ async function restart(env, state, kind, target, now) {
   return { ok, how };
 }
 
+// a chosen publishing time: an ISO date within the next 8 days, or nothing (= the next slot); false when it is not valid
+function validAfter(after) {
+  if (after == null || after === "") return null;
+  const t = Date.parse(after);
+  return Number.isFinite(t) && t > Date.now() - 3600e3 && t < Date.now() + 8 * 864e5 ? new Date(t).toISOString() : false;
+}
+// the day an approved video goes out: the first publishing slot at or after now (or its chosen time)
+function outDate(env, item) {
+  const from = Math.max(Date.now(), Date.parse(item.publish_after || 0) || 0);
+  const hours = String(env.PUBLISH_AT_UTC || "22").split(",").map(Number).sort((a, b) => a - b);
+  for (let d = 0; d < 9; d++) for (const h of hours) {
+    const at = new Date(from); at.setUTCDate(at.getUTCDate() + d); at.setUTCHours(h, 0, 0, 0);
+    if (at.getTime() >= from - 5 * 60e3) return new Date(at.getTime() + 3600e3).toISOString().slice(0, 10);
+  }
+  return new Date(from).toISOString().slice(0, 10);
+}
+
 // the calendar has one row per video (two a day): a video that moves on (made, published) leaves its old row, on any day
 function calendarPut(state, day) {
   state.calendar = state.calendar.filter((c) => c.title !== day.title).concat(day);
@@ -659,7 +676,7 @@ export default {
         // ?for=<id>: the "Pubblica adesso" run, which sees only its video; otherwise the scheduled run, which skips reserved ones
         const only = url.searchParams.get("for"), t = Date.now();
         const items = state.queue.filter((q) => q.status === "approved" && PLATFORMS.some((p) => !sent(q.published?.[p]))
-          && (only ? q.id === only : !(q.now_at && t - Date.parse(q.now_at) < RESERVE_MS)));
+          && (only ? q.id === only : !(q.now_at && t - Date.parse(q.now_at) < RESERVE_MS) && !(q.publish_after && Date.parse(q.publish_after) > t + 5 * 60e3)));
         return json({ platforms: PLATFORMS, items: items.map(({ id, title, caption, preview_url, cover_url, published }) => ({ id, title, caption, preview_url, cover_url, published: published || {} })) });
       }
       if (request.method !== "POST") return json({ error: "metodo non valido" }, 405);
@@ -815,7 +832,7 @@ export default {
       state.devices = (await subscriptions(env)).length;
       state.publish_at_utc = String(env.PUBLISH_AT_UTC || "22").split(",").map(Number);   // the publishing slots (UTC hours)
       state.youtube = JSON.parse((await env.DATA.get("yt_channel")) || "null");
-      state.schedule = SCHEDULE; state.can_produce = Boolean(env.ROUTINE_PRODUCE_TOKEN); state.can_restart = canRestart(env);
+      state.schedule = SCHEDULE; state.can_produce = Boolean(env.ROUTINE_PRODUCE_TOKEN); state.can_restart = canRestart(env); state.build = "__BUILD__";
       state.links = { repo: REPO, routines: Object.fromEntries(["PRODUCE", "PUBLISH", "RESEARCH", "COMMUNITY"].map((w) => [w, env[`ROUTINE_${w}_ID`] || null])) };
       return json(state);
     }
@@ -847,14 +864,18 @@ export default {
     }
 
     if (url.pathname === "/approve" && request.method === "POST") {
-      const { id, decision, note } = await request.json();
+      const { id, decision, note, after } = await request.json();
       if (!["approved", "redo"].includes(decision)) return json({ error: "decisione non valida" }, 400);
+      const when = validAfter(after);
+      if (when === false) return json({ error: "orario non valido" }, 400);
       const state = await loadState(env);
       const item = state.queue.find((q) => q.id === id);
       if (!item) return json({ error: "video non trovato" }, 404);
       item.status = decision;
       item.note = clip(note, 1000);
       item.decided_at = new Date().toISOString();
+      if (decision === "approved") { if (when) item.publish_after = when; else delete item.publish_after; }
+      if (decision === "approved") calendarPut(state, { date: outDate(env, item), title: item.title, status: "approved" });
       // approved videos wait for the publishing routine's slot (PUBLISH_AT_UTC); "redo" starts the Regia routine with the note
       const started = decision === "redo" ? await fireRoutine(env, "REDO", `id: ${id}\nnote: ${item.note}`) : 0;
       const redoOk = started >= 200 && started < 300;
@@ -866,6 +887,33 @@ export default {
         text: decision === "approved" ? `Hai approvato "${item.title}": esce all'orario di pubblicazione` : `Hai chiesto di rifare "${item.title}"` });
       await saveState(env, state);
       return json({ ok: true, started: decision === "redo" ? redoOk : undefined });
+    }
+    // move an approved video to another slot ("Sposta a domani" / "Riporta a oggi" in Approva); after: null = the next slot
+    if (url.pathname === "/approve/when" && request.method === "POST") {
+      const { id, after } = await request.json().catch(() => ({}));
+      const when = validAfter(after);
+      if (when === false) return json({ error: "orario non valido" }, 400);
+      const state = await loadState(env), item = state.queue.find((q) => q.id === id && q.status === "approved");
+      if (!item) return json({ error: "video non approvato o non trovato" }, 404);
+      if (when) item.publish_after = when; else delete item.publish_after;
+      calendarPut(state, { date: outDate(env, item), title: item.title, status: "approved" });
+      state.log.push({ at: new Date().toISOString(), dept: "pubblicazione", status: "done", text: `"${item.title}" esce ${when ? "dal " + when.slice(0, 10) : "al prossimo orario"}` });
+      await saveState(env, state);
+      return json({ ok: true });
+    }
+    // your own notes in the calendar: { date, text } adds one, { id, remove: true } takes it away
+    if (url.pathname === "/calendar/note" && request.method === "POST") {
+      const { date, text, id, remove } = await request.json().catch(() => ({}));
+      const state = await loadState(env);
+      state.notes ||= [];
+      if (remove) state.notes = state.notes.filter((n) => n.id !== id);
+      else {
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(date || "") || !String(text || "").trim()) return json({ error: "data o testo mancanti" }, 400);
+        state.notes.push({ id: "note-" + Date.now().toString(36), date, text: clip(String(text).trim(), 300), at: new Date().toISOString() });
+        state.notes = state.notes.slice(-150);
+      }
+      await saveState(env, state);
+      return json({ ok: true, notes: state.notes });
     }
     // "Chiedi un video": an idea of the user's goes to the Regia routine, which writes the story, draws it and starts the render
     // the user's decision on a flagged comment: the proposed (or edited) reply goes out at the next round, or nothing

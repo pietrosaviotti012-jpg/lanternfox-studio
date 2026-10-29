@@ -89,6 +89,60 @@
   },
   "queue": [
     {
+      "id": "2026-10-29-sample-1",
+      "title": "Lantern Night, part 1",
+      "status": "published",
+      "created_at": "2026-10-26T18:00:00Z",
+      "caption": "The moon tried counting sheep. The sheep were asleep first. 🌙🦊\n\n#bedtimestory #papercut #animatedstory",
+      "platforms": [
+        "Instagram",
+        "YouTube",
+        "TikTok"
+      ],
+      "preview_url": "https://github.com/pietrosaviotti012-jpg/lanternfox-studio/releases/download/film-2026-10-28-lighthouse-fox/film.mp4",
+      "cover_url": "https://github.com/pietrosaviotti012-jpg/lanternfox-studio/releases/download/film-2026-10-28-lighthouse-fox/poster.jpg",
+      "n": 1,
+      "day": "2026-10-28",
+      "decided_at": "__TODAY__",
+      "published": {
+        "instagram": {
+          "url": "https://www.instagram.com/",
+          "at": "__TODAY__"
+        },
+        "youtube": {
+          "url": "https://youtube.com/",
+          "at": "__TODAY__"
+        }
+      }
+    },
+    {
+      "id": "2026-10-29-sample-0",
+      "title": "The Flannan Isles Keepers",
+      "status": "published",
+      "created_at": "2026-10-26T18:00:00Z",
+      "caption": "The moon tried counting sheep. The sheep were asleep first. 🌙🦊\n\n#bedtimestory #papercut #animatedstory",
+      "platforms": [
+        "Instagram",
+        "YouTube",
+        "TikTok"
+      ],
+      "preview_url": "https://github.com/pietrosaviotti012-jpg/lanternfox-studio/releases/download/film-2026-10-28-lighthouse-fox/film.mp4",
+      "cover_url": "https://github.com/pietrosaviotti012-jpg/lanternfox-studio/releases/download/film-2026-10-28-lighthouse-fox/poster.jpg",
+      "n": 1,
+      "day": "2026-10-28",
+      "decided_at": "__TODAY__",
+      "published": {
+        "instagram": {
+          "url": "https://www.instagram.com/",
+          "at": "__TODAY__"
+        },
+        "youtube": {
+          "url": "https://youtube.com/",
+          "at": "__TODAY__"
+        }
+      }
+    },
+    {
       "id": "2026-10-28-lighthouse-fox",
       "title": "The Lighthouse Fox",
       "status": "pending",

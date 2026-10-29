@@ -3,7 +3,18 @@
 // node office/deploy.mjs --secrets  ricarica anche PASSWORD e STUDIO_SECRET dal file .env
 import { readFileSync, writeFileSync } from "fs";
 import { join } from "path";
-import { buildWorker, HERE } from "./build.mjs";
+import { buildWorker, page, HERE } from "./build.mjs";
+import { execFileSync } from "child_process";
+import { tmpdir } from "os";
+
+// before publishing: the page's whole script (app.js + interiors.js + scene.js together) must parse,
+// so a name declared in two files can never take the live office down
+{
+  const tmp = join(tmpdir(), "lanternfox-page-check.mjs");
+  writeFileSync(tmp, page().split('<script type="module">')[1].split("</script>")[0]);
+  try { execFileSync(process.execPath, ["--check", tmp], { stdio: "pipe" }); }
+  catch (e) { console.error("La pagina ha un errore, non pubblico: " + String(e.stderr).slice(0, 600)); process.exit(1); }
+}
 
 const API = "https://api.cloudflare.com/client/v4";
 const NAME = "lanternfox-office";

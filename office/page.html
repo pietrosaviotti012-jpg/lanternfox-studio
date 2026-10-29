@@ -23,7 +23,7 @@
 </script>
 <style>
   :root {
-    --night: #0a1330; --deep: #121d45; --hill: #3f5a92; --mist: #6a86c2; --ink: #0e1532;
+    --night: #0a1330; --deep: #121d45; --hill: #3f5a92; --mist: #6a86c2; --ink: #24160c;
     --lamp: #ffb862; --lamp-soft: rgba(255, 184, 98, .16); --fox: #e8743b; --paper: #f3e6cf; --muted: #d2c3a6;
     --alarm: #ff8f73; --ok: #9fd9a8;
     --serif: "Fraunces", Georgia, serif; --sans: "Atkinson Hyperlegible", system-ui, sans-serif;
@@ -39,6 +39,9 @@
   @media (max-width: 979px) { :root { --safe-top: calc(env(safe-area-inset-top, 0px) + 22px); } }
   .topband { position: fixed; inset: 0 0 auto 0; height: var(--safe-top); background: var(--night); z-index: 30; pointer-events: none; }
   button, input, textarea { font: inherit; color: inherit; }
+  /* links never in the browser's blue or purple */
+  a, a:visited { color: var(--lamp); }
+  ::placeholder { color: var(--muted); opacity: .8; }
   :focus-visible { outline: 3px solid var(--lamp); outline-offset: 2px; border-radius: 8px; }
 
   /* ---------------------------------------------------------------- il villaggio */
@@ -165,7 +168,7 @@
   .dayplan time { font: 600 1rem var(--serif); font-variant-numeric: tabular-nums; }
   .dayplan .who { display: block; font-weight: 700; }
   .dayplan .what { font-size: .85rem; color: var(--muted); }
-  .dayplan li.past { opacity: .6; }
+  .dayplan li.past .who, .dayplan li.past time { color: var(--muted); }   /* faded by colour, not by transparency: no lilac on the night blue */
   .dayplan li.next { box-shadow: inset 0 0 0 1px var(--lamp); }
   .dayplan li.miss { box-shadow: inset 0 0 0 1px var(--alarm); opacity: 1; }
   .dayplan .btn { padding: 7px 10px; font-size: .82rem; }
@@ -209,6 +212,15 @@
   .days li { display: grid; grid-template-columns: 64px 1fr auto; gap: 12px; align-items: center; padding: 12px 14px; border-radius: 14px; background: #101b40; }
   .days .d { font: 600 1rem var(--serif); line-height: 1.1; }
   .days .d small { display: block; font: 400 .78rem var(--sans); color: var(--muted); }
+  /* your notes under each day, and the field to add one */
+  .days .mine { grid-column: 1 / 4; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .days .mynote { display: inline-flex; align-items: center; gap: 6px; padding: 4px 6px 4px 10px; border-radius: 10px; background: rgba(255,184,98,.12); color: var(--paper); font-size: .88rem; }
+  .days .mynote .x { border: 0; background: none; color: var(--lamp); font-size: 1.1rem; line-height: 1; cursor: pointer; padding: 0 4px; }
+  .days .addnote { border: 0; background: none; color: var(--lamp); font-size: .85rem; cursor: pointer; padding: 2px 0; }
+  .days .noteform { display: flex; gap: 8px; width: 100%; }
+  .days .noteform input { flex: 1; min-width: 0; padding: 8px 10px; border-radius: 10px; border: 1px solid rgba(255,184,98,.4); background: #0d1636; color: var(--paper); }
+  .pill.approved { background: rgba(255,184,98,.16); color: var(--lamp); }
+  .ask p { margin: 0 0 8px; color: var(--paper); font-weight: 700; }
   /* a day with its videos: each title with its own state, one under the other */
   .days .vids { grid-column: 2 / 4; display: grid; gap: 8px; }
   .days .vid { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center; }

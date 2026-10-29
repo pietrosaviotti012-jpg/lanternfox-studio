@@ -31,6 +31,10 @@ export function buildWorker() {
     login = put(login, `"${name}"`, `"${name}?v=${version}"`);
     worker = put(worker, `"${name}"`, `"${name}?v=${version}"`);
   }
+  // the page's own version: an app left open notices a newer one in state.json and reloads
+  const build = createHash("sha256").update(html).digest("hex").slice(0, 10);
+  html = put(html, "__BUILD__", build);
+  worker = put(worker, "__BUILD__", build);
   worker = put(worker, "__PAGE__", JSON.stringify(html));
   worker = put(worker, "__LOGIN__", JSON.stringify(login));
   return put(worker, "__ASSETS__", JSON.stringify(files));
