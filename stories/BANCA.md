@@ -36,6 +36,7 @@ La Ricerca aggiunge ogni giorno 3-5 voci nuove (dalle mode del momento, da Reddi
 - ⭐ What if every clock in the world stopped at the same second? (Il primo a cadere è il GPS: si lega all'orologio fermo delle Flannan.) (dal 2026-10-29) → `productions/2026-10-29-clocks-stop`
 - What if the Sun went out for eight minutes? (Nessuno se ne accorge per 8 minuti e 20 secondi: la luce è in viaggio. Poi il freddo, piano.) (dal 2026-10-29)
 - What if the internet went quiet for one day? (Niente mappe, niente pagamenti, il primo vicino che bussa alla porta.) (dal 2026-10-29)
+- What if the sun didn't rise tomorrow? (Alle 6:40 il cielo resta nero. Le piante, il freddo, le stelle di giorno: cosa succede ora per ora, con i fatti veri.) (dal 2026-10-29, dal "the sun should be up" di *Eyes Down*)
 
 ## Your Call (seconda persona, scelta finale)
 - ⭐ **Lantern Night** (serie): la parte 2 segue GO o STAY. → `productions/2026-10-28-lantern-night-1`
@@ -45,6 +46,8 @@ La Ricerca aggiunge ogni giorno 3-5 voci nuove (dalle mode del momento, da Reddi
 - **The Keeper's Shift** (dal 2026-10-29): sei il guardiano di ricambio, sbarchi su un'isola col faro spento e trovi una sola cerata appesa. ENTER or SIGNAL THE SHIP.
 - **The Stopped Clock** (dal 2026-10-29): alle 3:00 tutti gli orologi di casa si fermano, ma il tuo telefono continua a contare, all'indietro. Si lega al What if degli orologi. RESET or WAIT.
 - **The Map**: trovi in soffitta una mappa della tua città con una casa in più. Stasera c'è una luce accesa. GO or BURN THE MAP.
+- ⭐ **Two Alerts** (dal 2026-10-29): alle 2:40 il telefono riceve l'allerta ufficiale "Stay indoors". Un minuto dopo arriva un secondo messaggio, dallo stesso numero: "Ignore the last alert. Leave now." STAY or LEAVE.
+- **Not Delivered** (dal 2026-10-29): durante il blackout scrivi a tua sorella "are you ok?". Il messaggio resta "not delivered" per ore, poi lei risponde da dietro la tua porta: "open, it's me". OPEN or TEXT HER AGAIN.
 
 ## Gialli e storie con colpo di scena
 - ⭐ **The Tell-Tale Heart** (Poe, pubblico dominio), raccontato da noi in 45 secondi, con la lanterna come filo.
