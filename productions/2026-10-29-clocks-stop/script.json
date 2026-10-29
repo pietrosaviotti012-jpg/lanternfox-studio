@@ -22,121 +22,46 @@
     "stopped"
    ],
    "clock": "03:00:00 · TONIGHT",
-   "gap": 0.3,
+   "gap": 0.35,
    "act": {
-    "intensity": 0.55,
+    "intensity": 0.5,
     "pace": 0.32,
-    "speed": 0.97
+    "speed": 0.96
    }
   },
   {
    "id": "L02",
-   "text": "Your phone. Your oven. The atomic clocks in space.",
+   "text": "Your phone. Your oven.",
    "em": [
-    "atomic"
+    "oven"
    ],
    "gap": 0.3,
    "act": {
-    "intensity": 0.45,
+    "intensity": 0.5,
     "pace": 0.32,
-    "speed": 0.96,
-    "gain_db": -0.5
+    "speed": 0.96
    }
   },
   {
    "id": "L03",
+   "text": "Even the atomic clocks in space.",
+   "em": [
+    "atomic"
+   ],
+   "gap": 0.4,
+   "act": {
+    "intensity": 0.5,
+    "pace": 0.32,
+    "speed": 0.96
+   }
+  },
+  {
+   "id": "L04",
    "text": "And the first thing to break isn't time. It's your map.",
    "em": [
     "map"
    ],
    "hit": true,
-   "gap": 0.8,
-   "act": {
-    "intensity": 0.62,
-    "pace": 0.32,
-    "speed": 0.95,
-    "gain_db": 0.5
-   }
-  },
-  {
-   "id": "L04",
-   "text": "GPS isn't really a map. It's a ring of clocks in the sky.",
-   "em": [
-    "clocks"
-   ],
-   "gap": 0.4,
-   "act": {
-    "intensity": 0.45,
-    "pace": 0.32,
-    "speed": 0.97
-   },
-   "say": "Gee-Pee-Ess isn't really a map. It's a ring of clocks in the sky."
-  },
-  {
-   "id": "L05",
-   "text": "Your phone finds you by timing their signals.",
-   "em": [
-    "timing"
-   ],
-   "gap": 0.3,
-   "act": {
-    "intensity": 0.4,
-    "pace": 0.32,
-    "speed": 0.97,
-    "gain_db": -0.5
-   }
-  },
-  {
-   "id": "L06",
-   "text": "One millionth of a second off, and you're three hundred meters away.",
-   "em": [
-    "millionth",
-    "hundred"
-   ],
-   "gap": 0.7,
-   "act": {
-    "intensity": 0.5,
-    "pace": 0.32,
-    "speed": 0.96,
-    "gain_db": 0.5
-   }
-  },
-  {
-   "id": "L07",
-   "text": "At one second past three, every blue dot freezes.",
-   "em": [
-    "freezes"
-   ],
-   "clock": "03:00:01",
-   "gap": 0.3,
-   "act": {
-    "intensity": 0.55,
-    "pace": 0.32,
-    "speed": 0.96,
-    "gain_db": 0.5
-   }
-  },
-  {
-   "id": "L08",
-   "text": "Ships. Planes. Delivery trucks. All lost at once.",
-   "em": [
-    "lost"
-   ],
-   "gap": 0.5,
-   "act": {
-    "intensity": 0.55,
-    "pace": 0.32,
-    "speed": 0.95,
-    "gain_db": 0.5
-   }
-  },
-  {
-   "id": "L09",
-   "text": "Then the phone towers start dropping calls.",
-   "em": [
-    "dropping"
-   ],
-   "clock": "03:04",
    "gap": 0.6,
    "act": {
     "intensity": 0.5,
@@ -145,36 +70,116 @@
    }
   },
   {
-   "id": "L10",
-   "text": "But here's the strange part.",
+   "id": "L05",
+   "text": "GPS isn't really a map. It's a ring of clocks in the sky.",
    "em": [
-    "strange"
+    "clocks"
    ],
-   "gap": 0.7,
+   "gap": 0.35,
    "act": {
-    "intensity": 0.4,
+    "intensity": 0.5,
     "pace": 0.32,
-    "speed": 0.95,
-    "gain_db": -1
+    "speed": 0.96
+   },
+   "say": "Gee-Pee-Ess isn't really a map. It's a ring of clocks in the sky."
+  },
+  {
+   "id": "L06",
+   "text": "Your phone finds you by timing their signals.",
+   "em": [
+    "timing"
+   ],
+   "gap": 0.3,
+   "act": {
+    "intensity": 0.5,
+    "pace": 0.32,
+    "speed": 0.96
+   }
+  },
+  {
+   "id": "L07",
+   "text": "One millionth of a second off, and you're three hundred meters away.",
+   "em": [
+    "millionth",
+    "hundred"
+   ],
+   "gap": 0.55,
+   "act": {
+    "intensity": 0.5,
+    "pace": 0.32,
+    "speed": 0.96
+   }
+  },
+  {
+   "id": "L08",
+   "text": "At one second past three, every blue dot freezes.",
+   "em": [
+    "freezes"
+   ],
+   "clock": "03:00:01",
+   "gap": 0.35,
+   "act": {
+    "intensity": 0.5,
+    "pace": 0.32,
+    "speed": 0.96
+   }
+  },
+  {
+   "id": "L09",
+   "text": "Ships. Planes. Delivery trucks. All lost at once.",
+   "em": [
+    "lost"
+   ],
+   "gap": 0.4,
+   "act": {
+    "intensity": 0.5,
+    "pace": 0.32,
+    "speed": 0.96
+   }
+  },
+  {
+   "id": "L10",
+   "text": "Then the phone towers start dropping calls.",
+   "em": [
+    "dropping"
+   ],
+   "clock": "03:04",
+   "gap": 0.45,
+   "act": {
+    "intensity": 0.5,
+    "pace": 0.32,
+    "speed": 0.96
    }
   },
   {
    "id": "L11",
+   "text": "But here's the strange part.",
+   "em": [
+    "strange"
+   ],
+   "gap": 0.55,
+   "act": {
+    "intensity": 0.5,
+    "pace": 0.32,
+    "speed": 0.96
+   }
+  },
+  {
+   "id": "L12",
    "text": "Time didn't stop at all. Only our way of counting it did.",
    "em": [
     "counting"
    ],
    "hit": true,
-   "gap": 0.7,
+   "gap": 0.55,
    "act": {
-    "intensity": 0.55,
+    "intensity": 0.5,
     "pace": 0.32,
-    "speed": 0.95,
-    "gain_db": 1
+    "speed": 0.96
    }
   },
   {
-   "id": "L12",
+   "id": "L13",
    "text": "The Sun still rises. The stars still turn.",
    "em": [
     "sun",
@@ -183,24 +188,22 @@
    "clock": "06:58 · SUNRISE",
    "gap": 0.4,
    "act": {
-    "intensity": 0.4,
+    "intensity": 0.5,
     "pace": 0.32,
-    "speed": 0.96,
-    "gain_db": -1
+    "speed": 0.96
    }
   },
   {
-   "id": "L13",
+   "id": "L14",
    "text": "And a fox with a lantern still finds its way home by them.",
    "em": [
     "home"
    ],
    "gap": 0.4,
    "act": {
-    "intensity": 0.4,
+    "intensity": 0.5,
     "pace": 0.32,
-    "speed": 0.95,
-    "gain_db": -1
+    "speed": 0.96
    }
   }
  ],
@@ -259,5 +262,6 @@
    "at": "S13",
    "mood": "warm"
   }
- ]
+ ],
+ "motion": false
 }

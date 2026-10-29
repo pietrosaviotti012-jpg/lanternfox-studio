@@ -599,14 +599,26 @@ export function plane(x, o, g) {
 
 // A kitchen oven: body, door with a window, knobs, a clock display (dark glass on x; burns in g)
 export function oven(x, o, g) {
-  const { cx, by, w, h, col = '#141a33', glass = '#2c2a44' } = o, dy = by + h * .86, dw = w * .34, dh = h * .09;
+  // o.disp: display width as a share of w (default .34); o.handle: the door bar; o.hob: a stovetop with a pot on top,
+  // so it reads as a kitchen oven at a glance; o.lit: the door window glows warm (oven light on) in g
+  const { cx, by, w, h, col = '#141a33', glass = '#2c2a44', disp = .34, handle = false, hob = false, lit = false } = o;
+  const dy = by + h * .86, dw = w * disp, dh = h * (disp > .34 ? .11 : .09);
   if (x) {
     x.fillStyle = col; x.fillRect(cx - w / 2, by, w, h);
     x.fillStyle = glass; x.fillRect(cx - w * .36, by + h * .16, w * .72, h * .42); x.fillRect(cx - dw / 2, dy - dh / 2, dw, dh);
     x.fillStyle = col; x.fillRect(cx - w * .38, by + h * .64, w * .76, h * .03);
     x.fillStyle = '#2a3156'; for (const k of [-.38, -.26, .26, .38]) { x.beginPath(); x.arc(cx + w * k, dy, h * .03, 0, TAU); x.fill(); }
+    if (handle) { x.fillStyle = '#3a4270'; x.fillRect(cx - w * .3, by + h * .62, w * .6, h * .025); }
+    if (hob) {
+      x.fillStyle = col; x.fillRect(cx - w * .52, by + h, w * 1.04, h * .03);
+      x.fillStyle = '#1f2547';   // a pot with two handles on the left burner
+      x.fillRect(cx - w * .32, by + h * 1.03, w * .26, h * .16); x.fillRect(cx - w * .36, by + h * 1.15, w * .34, h * .025);
+      x.fillRect(cx - w * .38, by + h * 1.11, w * .05, h * .02); x.fillRect(cx - w * .01, by + h * 1.11, w * .05, h * .02);
+      x.fillRect(cx + w * .1, by + h * 1.03, w * .22, h * .012);   // the empty right burner
+    }
   }
-  if (g) { g.fillStyle = '#fff'; g.fillRect(cx - dw / 2, dy - dh / 2, dw, dh); }
+  if (g) { g.fillStyle = '#fff'; g.fillRect(cx - dw / 2, dy - dh / 2, dw, dh);
+    if (lit) { g.globalAlpha = .45; g.fillRect(cx - w * .36, by + h * .16, w * .72, h * .42); g.globalAlpha = 1; } }
   return [cx, dy];
 }
 

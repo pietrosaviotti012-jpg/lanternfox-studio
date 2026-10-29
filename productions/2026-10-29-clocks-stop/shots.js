@@ -86,28 +86,32 @@ export function SHOTS(C, DUR) {
         });
       } },
 
-    // 2 · Your phone, your oven: a dark kitchen; the phone on the table reads 3:00, the camera whips right to the oven clock
-    { id: 'S2', start: at('L02') - .2, sfx: [{ t: .15, type: 'click' }, { t: C.L02.dur * .3, type: 'paper', v: .4 }],
+    // 2 · Your phone, your oven: a dark kitchen floor. The phone stands on a little table and reads 3:00; one slow, steady pan
+    //     (no whip) comes to rest on the oven: door window, handle, knobs, a pot on the hob, and big glowing green 3:00 digits
+    { id: 'S2', start: at('L02') - .2, in: { type: 'dissolve', dur: .35 }, sfx: [{ t: .15, type: 'click' }, { t: C.L02.dur * .5, type: 'paper', v: .35 }],
       build: E => {
-        const ov = E.word('L02', 2);
-        const digits = (name, cx, cy, size, col) => ({ name, z: -.088, ...NOGLOW, w: .09, h: .04, x: cx, y: cy, draw: x => text(x, '3:00', 0, 0, size, '"Anton"', { fill: col }) });
+        const ov = E.word('L02', 3);
+        const PH = { cx: -.08, cy: .1, w: .056, h: .1 }, OV = { cx: .09, by: -.002, w: .11, h: .12, col: '#2a3358', glass: '#121730', disp: .56, handle: true, hob: true };
+        const table = x => { x.fillStyle = '#1a2142'; x.fillRect(-.135, .045, .11, .007); x.fillRect(-.125, -.002, .005, .048); x.fillRect(-.045, -.002, .005, .048); };
         return layered(E, {
-          light: [0, .05, -.13], lightR: .2, sky: { stops: ROOM }, on: false,
+          light: [0, .05, -.13], lightR: .22, sky: { stops: ROOM }, on: false,
           layers: [
-            { name: 'phone', z: -.09, trans: .1, glow: 2.6, glowCol: '#bcd6ff', draw: x => phone(x, { cx: -.07, cy: .07, w: .075, h: .14 }), glowDraw: g => phone(null, { cx: -.07, cy: .07, w: .075, h: .14 }, g) },
-            digits('pdig', -.07, .09, .024, '#1b2140'),
-            { name: 'oven', z: -.09, trans: .1, glow: 2.8, glowCol: '#7dffb0', draw: x => oven(x, { cx: .1, by: -.02, w: .12, h: .16 }), glowDraw: g => oven(null, { cx: .1, by: -.02, w: .12, h: .16 }, g) },
-            digits('odig', .1, .1176, .016, '#0f2a1c'),
-            { name: 'table', z: -.07, trans: .05, draw: x => { x.fillStyle = '#0b0f1e'; x.fillRect(-.25, -.3, .5, .3); x.fillRect(-.25, -.005, .5, .006); } },
+            { name: 'phone', z: -.09, trans: .1, glow: 2.6, glowCol: '#bcd6ff', draw: x => phone(x, PH), glowDraw: g => phone(null, PH, g) },
+            { name: 'pdig', z: -.088, ...NOGLOW, w: .06, h: .03, x: PH.cx, y: PH.cy + .012, draw: x => text(x, '3:00', 0, 0, .019, '"Anton"', { fill: '#1b2140' }) },
+            { name: 'table', z: -.087, trans: .05, draw: table },
+            { name: 'oven', z: -.09, trans: .12, draw: x => oven(x, OV) },
+            { name: 'odig', z: -.088, ...NOGLOW, glow: 4, glowCol: '#7dffb0', w: .08, h: .03, x: OV.cx, y: OV.by + OV.h * .86,
+              draw: x => text(x, '3:00', 0, 0, .021, '"Anton"', { fill: '#1d4a32' }), glowDraw: g => text(g, '3:00', 0, 0, .021, '"Anton"', { fill: '#fff' }) },
+            { name: 'floor', z: -.07, trans: .05, draw: x => { x.fillStyle = '#0b0f1e'; x.fillRect(-.25, -.3, .5, .3); } },
           ],
-          glows: { phone: [[0, 1]], oven: [[0, 0], [ov - .1, 0], [ov + .1, 1]] },
-          cam: [[0, [-.06, .07, .5, -.06, .075, -.07]], [Math.max(.2, ov - .45), [-.04, .07, .5, -.04, .077, -.07]], [ov + .55, [.08, .072, .47, .09, .08, -.07]], [E.dur, [.1, .075, .44, .1, .085, -.07]]],
+          glows: { phone: [[0, 1]], odig: [[0, 1]] },
+          cam: [[0, [-.08, .05, .45, -.08, .05, -.07]], [ov + .2, [.07, .02, .53, .07, .015, -.07]], [E.dur, [.09, .012, .55, .09, .008, -.07]]],
           focus: -.09, aper: 14,
         });
       } },
 
     // 3 · …the atomic clocks in space: a satellite over the curve of the Earth, its clock light burning, drifting through the frame
-    { id: 'S3', start: mid('L02', .5), sfx: [{ t: 0, type: 'shimmer', v: .7 }],
+    { id: 'S3', start: at('L03') - .2, in: { type: 'dissolve', dur: .4 }, sfx: [{ t: 0, type: 'shimmer', v: .7 }],
       build: E => layered(E, {
         light: [0, .05, -.13], lightR: .3, sky: { stops: SPACE }, on: false,
         layers: [
@@ -125,7 +129,7 @@ export function SHOTS(C, DUR) {
       }) },
 
     // 4 · "The first thing to break isn't time": the frozen clock face, very close, the red hand trembling
-    { id: 'S4', start: at('L03') - .3, sfx: [{ t: .3, type: 'click' }],
+    { id: 'S4', start: at('L04') - .3, in: { type: 'dissolve', dur: .4 }, sfx: [{ t: .3, type: 'click' }],
       build: E => layered(E, {
         light: [0, .1, -.13], lightR: .2, sky: { stops: NIGHT, stars: 80 }, on: false,
         layers: [...towerLayers()],
@@ -135,7 +139,7 @@ export function SHOTS(C, DUR) {
       }) },
 
     // 5 · "It's your map": a paper street map lit from behind, the blue dot pulsing on it; the camera drops onto the dot
-    { id: 'S5', start: mid('L03', .78), sfx: [{ t: 0, type: 'paper', v: .8 }],
+    { id: 'S5', start: mid('L04', .78), in: { type: 'dissolve', dur: .35 }, sfx: [{ t: 0, type: 'paper', v: .8 }],
       build: E => layered(E, {
         light: [0, .08, -.13], lightR: .3, sky: { stops: ROOM }, on: false,
         layers: [
@@ -148,9 +152,9 @@ export function SHOTS(C, DUR) {
       }) },
 
     // 6 · A ring of clocks in the sky: satellites circling the Earth on a dotted orbit; on "timing" their signals run down to one dot
-    { id: 'S6', start: mid('L04', .5), in: { type: 'dissolve', dur: .5 }, sfx: [{ t: .2, type: 'shimmer', v: .6 }],
+    { id: 'S6', start: mid('L05', .5), in: { type: 'dissolve', dur: .5 }, sfx: [{ t: .2, type: 'shimmer', v: .6 }],
       build: E => {
-        const t0 = E.word('L05', 5), t1 = E.cueEnd('L05') + .3;
+        const t0 = E.word('L06', 5), t1 = E.cueEnd('L06') + .3;
         const ORB = (a) => [Math.cos(a) * .135, .03 + Math.sin(a) * .05];   // the orbit, seen at a slant
         const N = 6, home = [0, .005];
         const sats = Array.from({ length: N }, (_, i) => ({ name: 's' + i, z: -.08, trans: .1, glow: 4, glowCol: '#ffe2a8', w: .06, h: .05, x: 0, y: 0,
@@ -188,9 +192,9 @@ export function SHOTS(C, DUR) {
       } },
 
     // 7 · A millionth of a second: the map close; "0.000001 s" appears, then the dot slides 300 m across the river to the wrong street
-    { id: 'S7', start: at('L06') - .3, in: { type: 'dissolve', dur: .4 }, sfx: [{ t: .3 + C.L06.dur * .55, type: 'whoosh', v: .5 }],
+    { id: 'S7', start: at('L07') - .3, in: { type: 'dissolve', dur: .4 }, sfx: [{ t: .3 + C.L07.dur * .55, type: 'whoosh', v: .5 }],
       build: E => {
-        const off = E.word('L06', 5), away = E.word('L06', 11) + .2, mil = E.word('L06', 1);
+        const off = E.word('L07', 5), away = E.word('L07', 11) + .2, mil = E.word('L07', 1);
         const A = [-.035, .1], B = [.045, .015];
         return layered(E, {
           light: [0, .07, -.13], lightR: .3, sky: { stops: ROOM }, on: false,
@@ -208,15 +212,15 @@ export function SHOTS(C, DUR) {
             const u = ss(seg(t, off, away)); L.dot.position.x = lerp(A[0], B[0], u); L.dot.position.y = lerp(A[1], B[1], u);
             reveal(L, 'micro', t, mil - .1, .3); reveal(L, 'path', t, off, .3); reveal(L, 'meters', t, away - .3, .4);
           },
-          cam: [[0, [-.03, .1, .4, -.03, .105, -.07]], [off, [-.02, .09, .42, -.02, .095, -.07]], [away, [.01, .07, .5, .01, .075, -.07]], [E.dur, [.01, .07, .52, .01, .075, -.07]]],
+          cam: [[0, [-.025, .095, .42, -.025, .1, -.07]], [E.dur, [.01, .07, .52, .01, .075, -.07]]],
           focus: -.1, aper: 16,
         });
       } },
 
     // 8 · Every blue dot freezes: the phone in a hand-held close-up, the map on its screen; the dot stops pulsing and goes grey
-    { id: 'S8', start: at('L07') - .3, sfx: [{ t: .3 + C.L07.dur * .92, type: 'click' }],
+    { id: 'S8', start: at('L08') - .3, in: { type: 'dissolve', dur: .35 }, sfx: [{ t: .3 + C.L08.dur * .92, type: 'click' }],
       build: E => {
-        const frz = E.word('L07', 8), lost = E.word('L07', 3);
+        const frz = E.word('L08', 8), lost = E.word('L08', 3);
         const P = { cx: 0, cy: .075, w: .1, h: .19 };
         return layered(E, {
           light: [0, .06, -.13], lightR: .2, sky: { stops: ROOM }, on: false,
@@ -237,9 +241,9 @@ export function SHOTS(C, DUR) {
 
     // 9 · Ships, planes, trucks: a night coast seen in one slow pull-back; the boat rides in the water, the truck drives on the
     //     shore road, the plane blinks overhead; on "lost" all three start to wander
-    { id: 'S9', start: at('L08') - .25, sfx: [{ t: 0, type: 'waves', d: 4, v: .5 }, { t: C.L08.dur * .6, type: 'whoosh', v: .3 }],
+    { id: 'S9', start: at('L09') - .25, in: { type: 'dissolve', dur: .4 }, sfx: [{ t: 0, type: 'waves', d: 4, v: .5 }, { t: C.L09.dur * .6, type: 'whoosh', v: .3 }],
       build: E => {
-        const lost = E.word('L08', 5);
+        const lost = E.word('L09', 5);
         const truck = (c, g) => { if (c) { c.fillStyle = '#0e1532'; c.fillRect(-.03, -.006, .055, .03); c.fillRect(.025, -.006, .022, .022);
             c.beginPath(); for (const wx of [-.018, .012, .036]) { c.moveTo(wx + .006, -.006); c.arc(wx, -.006, .006, 0, TAU); } c.fill();
             c.fillStyle = '#2c2a44'; c.fillRect(.043, .002, .006, .006); }
@@ -270,9 +274,9 @@ export function SHOTS(C, DUR) {
 
     // 10 · The phone masts: three masts on the hills over a town, red beacons blinking; on "dropping" they go out one by one,
     //      and the town's windows (its screens) go dark with them
-    { id: 'S10', start: at('L09') - .3, in: { type: 'dissolve', dur: .4 }, sfx: [{ t: 0, type: 'wind', d: 5, v: .35 }, { t: .3 + C.L09.dur * .85, type: 'click' }],
+    { id: 'S10', start: at('L10') - .3, in: { type: 'dissolve', dur: .4 }, sfx: [{ t: 0, type: 'wind', d: 5, v: .35 }, { t: .3 + C.L10.dur * .85, type: 'click' }],
       build: E => {
-        const drop = E.word('L09', 5);
+        const drop = E.word('L10', 5);
         const MASTS = [{ name: 'm0', cx: -.06, by: .0, h: .15, z: -.1 }, { name: 'm1', cx: .04, by: .02, h: .12, z: -.11 }, { name: 'm2', cx: .1, by: .015, h: .09, z: -.115 }];
         return layered(E, {
           light: [0, .1, -.13], lightR: .28, sky: { stops: NIGHT, stars: 120 }, on: false,
@@ -286,16 +290,16 @@ export function SHOTS(C, DUR) {
           glows: { town: [[0, 1], [drop + .5, 1], [drop + 1.6, .25]], nosvc: [[0, 0], [drop, 0], [drop + .3, 1]] },
           update: (t, L) => { MASTS.forEach((m, i) => { const blink = (t * .9 + i * .33) % 1 < .45 ? 1 : .15, out = t > drop + i * .35 ? 0 : 1;
             L[m.name].material.userData.u.uGlowLit.value = blink * out; }); reveal(L, 'nosvc', t, drop, .3); },
-          cam: [[0, [0, -.02, .62, 0, .04, -.07]], [drop, [0, .0, .56, 0, .06, -.07]], [E.dur, [0, .02, .62, 0, .055, -.07]]],
+          cam: [[0, [0, .0, .58, 0, .05, -.07]], [E.dur, [0, .015, .63, 0, .055, -.07]]],
           focus: -.1, aper: 12,
         });
       } },
 
     // 11 · The strange part: the frozen clock tower again, the town dark. On "at all" the moon starts to cross the sky behind
     //      it: time is still moving, only the clock is not
-    { id: 'S11', start: at('L10') - .4, in: { type: 'dissolve', dur: .8 }, sfx: [{ t: at('L11') - at('L10') + .4 + C.L11.dur * .3, type: 'shimmer', v: .8 }],
+    { id: 'S11', start: at('L11') - .4, in: { type: 'dissolve', dur: .8 }, sfx: [{ t: at('L12') - at('L11') + .4 + C.L12.dur * .3, type: 'shimmer', v: .8 }],
       build: E => {
-        const go = E.word('L11', 4);
+        const go = E.word('L12', 4);
         return layered(E, {
           light: [0, .1, -.13], lightR: .22, sky: { stops: NIGHT, stars: 160 }, on: false,
           layers: [
@@ -315,9 +319,9 @@ export function SHOTS(C, DUR) {
       } },
 
     // 12 · The Sun still rises, the stars still turn: dawn over the hills; the star field turns and fades as the sun comes up on "rises"
-    { id: 'S12', start: at('L12') - .4, in: { type: 'dissolve', dur: .8 }, sfx: [{ t: .4 + C.L12.dur * .4, type: 'chime' }],
+    { id: 'S12', start: at('L13') - .4, in: { type: 'dissolve', dur: .8 }, sfx: [{ t: .4 + C.L13.dur * .4, type: 'chime' }],
       build: E => {
-        const rise = E.word('L12', 3), turn = E.word('L12', 7);
+        const rise = E.word('L13', 3), turn = E.word('L13', 7);
         return layered(E, {
           light: [0, -.02, -.13], lightR: .3, lightCol: '#ffd29a', sky: { stops: DAWN }, on: false,
           layers: [
@@ -339,9 +343,9 @@ export function SHOTS(C, DUR) {
 
     // 13 · The fox walks home by them: twilight path over the hill, the fox with its lantern crossing toward a cottage; on "home"
     //      the cottage window warms up
-    { id: 'S13', start: at('L13') - .4, in: { type: 'dissolve', dur: .7 }, sfx: [{ t: .4, type: 'steps', n: 8, every: .45 }],
+    { id: 'S13', start: at('L14') - .4, in: { type: 'dissolve', dur: .7 }, sfx: [{ t: .4, type: 'steps', n: 8, every: .45 }],
       build: E => {
-        const hm = E.word('L13', 10);
+        const hm = E.word('L14', 10);
         return layered(E, {
           light: [.05, .05, -.13], lightR: .26, sky: { stops: DAWN.map(([u, c], i) => [u, i < 2 ? c : '#5a5878']), stars: 140 }, on: false,
           layers: [
