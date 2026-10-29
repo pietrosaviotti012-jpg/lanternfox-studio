@@ -105,7 +105,7 @@ jobs:
             SRC="$URL"
             if [ -n "$FILE" ]; then curl -sf -H "Authorization: Bearer $STUDIO_SECRET" "$FILE" -o "/tmp/$ID.mp4" && SRC="/tmp/$ID.mp4"; fi
             if python tools/analyze.py "$SRC" > /tmp/out.txt 2>/tmp/err.txt; then
-              OUT=$(tail -1 /tmp/out.txt); REL=$(realpath --relative-to="$PWD" "$OUT")
+              OUT=$(tr '\r' '\n' < /tmp/out.txt | grep research/analisi | tail -1); REL=$(realpath -m --relative-to="$PWD" "$OUT")
               R="studiato: https://github.com/${{ github.repository }}/blob/main/$REL/analysis.md"; S=studied
             else tail -20 /tmp/err.txt; R="non riuscito: $(grep -i 'error' /tmp/err.txt | tail -1 | cut -c1-200 | tr '\"\\' '  ')"; S=failed; fi
             echo "$ID $S $R"

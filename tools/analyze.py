@@ -40,7 +40,7 @@ if os.path.exists(src):
         run("ffmpeg", "-v", "error", "-y", "-i", src, "-c", "copy", video)
 else:
     from yt_dlp import YoutubeDL
-    with YoutubeDL({"outtmpl": video, "format": "mp4/best", "quiet": True, "no_warnings": True, "overwrites": True}) as y:
+    with YoutubeDL({"outtmpl": video, "format": "mp4/best", "quiet": True, "no_warnings": True, "noprogress": True, "overwrites": True}) as y:
         d = y.extract_info(src, download=True)
     for k in ("uploader", "channel", "title", "description", "duration", "view_count", "like_count", "comment_count", "upload_date", "webpage_url"):
         if d.get(k) is not None:
