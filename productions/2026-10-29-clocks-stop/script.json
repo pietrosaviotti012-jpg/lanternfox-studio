@@ -1,0 +1,294 @@
+{
+ "title": "What If Every Clock Stopped at the Same Second?",
+ "series": "What If…",
+ "format": "what-if",
+ "voice": {
+  "engine": "chatterbox",
+  "preset": "professore"
+ },
+ "captions": "pop",
+ "hud": {
+  "tag": "WHAT IF…"
+ },
+ "fx": "dust",
+ "lead": 0.4,
+ "tail": 3.4,
+ "lines": [
+  {
+   "id": "L01",
+   "text": "What if every clock in the world stopped at the same second?",
+   "em": [
+    "clock",
+    "stopped"
+   ],
+   "clock": "03:00:00 · TONIGHT",
+   "gap": 0.3,
+   "act": {
+    "intensity": 0.55,
+    "pace": 0.32,
+    "speed": 0.97
+   }
+  },
+  {
+   "id": "L02",
+   "text": "Your phone. Your oven. The atomic clocks in space.",
+   "em": [
+    "atomic"
+   ],
+   "gap": 0.3,
+   "act": {
+    "intensity": 0.45,
+    "pace": 0.32,
+    "speed": 0.96,
+    "gain_db": -0.5
+   }
+  },
+  {
+   "id": "L03",
+   "text": "And the first thing to break isn't time. It's your map.",
+   "em": [
+    "map"
+   ],
+   "hit": true,
+   "gap": 0.8,
+   "act": {
+    "intensity": 0.62,
+    "pace": 0.32,
+    "speed": 0.95,
+    "gain_db": 1
+   }
+  },
+  {
+   "id": "L04",
+   "text": "GPS isn't really a map. It's a ring of clocks in the sky.",
+   "em": [
+    "clocks"
+   ],
+   "gap": 0.4,
+   "act": {
+    "intensity": 0.45,
+    "pace": 0.32,
+    "speed": 0.97
+   }
+  },
+  {
+   "id": "L05",
+   "text": "Your phone finds you by timing their signals.",
+   "em": [
+    "timing"
+   ],
+   "gap": 0.3,
+   "act": {
+    "intensity": 0.4,
+    "pace": 0.32,
+    "speed": 0.97,
+    "gain_db": -0.5
+   }
+  },
+  {
+   "id": "L06",
+   "text": "One millionth of a second off, and you're three hundred meters away.",
+   "em": [
+    "millionth",
+    "hundred"
+   ],
+   "gap": 0.7,
+   "act": {
+    "intensity": 0.5,
+    "pace": 0.32,
+    "speed": 0.96,
+    "gain_db": 0.5
+   }
+  },
+  {
+   "id": "L07",
+   "text": "At one second past three, every blue dot freezes.",
+   "em": [
+    "freezes"
+   ],
+   "clock": "03:00:01",
+   "gap": 0.3,
+   "act": {
+    "intensity": 0.55,
+    "pace": 0.32,
+    "speed": 0.96,
+    "gain_db": 0.5
+   },
+   "card": {
+    "app": "Maps",
+    "kind": "info",
+    "title": "Searching for GPS…",
+    "body": "Your location is unavailable.",
+    "hold": 3.0
+   }
+  },
+  {
+   "id": "L08",
+   "text": "Ships. Planes. Delivery trucks. All lost at once.",
+   "em": [
+    "lost"
+   ],
+   "gap": 0.5,
+   "act": {
+    "intensity": 0.55,
+    "pace": 0.32,
+    "speed": 0.95,
+    "gain_db": 0.5
+   }
+  },
+  {
+   "id": "L09",
+   "text": "Then the phone towers start dropping calls.",
+   "em": [
+    "dropping"
+   ],
+   "clock": "03:04",
+   "gap": 0.6,
+   "act": {
+    "intensity": 0.5,
+    "pace": 0.32,
+    "speed": 0.96
+   },
+   "card": {
+    "app": "Carrier",
+    "kind": "info",
+    "title": "No service",
+    "body": "Network time unavailable.",
+    "hold": 2.6
+   }
+  },
+  {
+   "id": "L10",
+   "text": "But here's the strange part.",
+   "em": [
+    "strange"
+   ],
+   "gap": 0.7,
+   "act": {
+    "intensity": 0.35,
+    "pace": 0.32,
+    "speed": 0.94,
+    "gain_db": -3
+   }
+  },
+  {
+   "id": "L11",
+   "text": "Time didn't stop at all. Only our way of counting it did.",
+   "em": [
+    "counting"
+   ],
+   "hit": true,
+   "gap": 0.7,
+   "act": {
+    "intensity": 0.6,
+    "pace": 0.32,
+    "speed": 0.95,
+    "gain_db": 1.5
+   }
+  },
+  {
+   "id": "L12",
+   "text": "The Sun still rises. The stars still turn.",
+   "em": [
+    "sun",
+    "stars"
+   ],
+   "clock": "06:58 · SUNRISE",
+   "gap": 0.4,
+   "act": {
+    "intensity": 0.4,
+    "pace": 0.32,
+    "speed": 0.96,
+    "gain_db": -1
+   }
+  },
+  {
+   "id": "L13",
+   "text": "And a fox with a lantern still finds its way home by them.",
+   "em": [
+    "home"
+   ],
+   "gap": 0.7,
+   "act": {
+    "intensity": 0.4,
+    "pace": 0.32,
+    "speed": 0.95,
+    "gain_db": -1
+   }
+  },
+  {
+   "id": "L14",
+   "text": "How long until you'd notice? Comment MINUTE or HOUR.",
+   "em": [
+    "minute",
+    "hour"
+   ],
+   "gap": 0.3,
+   "act": {
+    "intensity": 0.5,
+    "pace": 0.32,
+    "speed": 0.97
+   }
+  }
+ ],
+ "bpm": 64,
+ "seed": 31,
+ "music": [
+  {
+   "at": "S1",
+   "mood": "rise"
+  },
+  {
+   "at": "S2",
+   "mood": "hush"
+  },
+  {
+   "at": "S3",
+   "mood": "rise"
+  },
+  {
+   "at": "S4",
+   "mood": "calm"
+  },
+  {
+   "at": "S5",
+   "mood": "calm"
+  },
+  {
+   "at": "S6",
+   "mood": "rise"
+  },
+  {
+   "at": "S7",
+   "mood": "storm"
+  },
+  {
+   "at": "S8",
+   "mood": "storm"
+  },
+  {
+   "at": "S9",
+   "mood": "storm"
+  },
+  {
+   "at": "S10",
+   "mood": "hush"
+  },
+  {
+   "at": "S11",
+   "mood": "rise"
+  },
+  {
+   "at": "S12",
+   "mood": "warm"
+  },
+  {
+   "at": "S13",
+   "mood": "warm"
+  },
+  {
+   "at": "S14",
+   "mood": "end"
+  }
+ ]
+}

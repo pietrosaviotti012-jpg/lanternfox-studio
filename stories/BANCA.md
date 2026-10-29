@@ -22,6 +22,7 @@ La Ricerca aggiunge ogni giorno 3-5 voci nuove (dalle mode del momento, da Reddi
 - **Gef, la mangusta parlante (anni '30)**: una famiglia dell'Isola di Man giura che una mangusta parla con loro.
 - **L'interferenza di Max Headroom (1987)**: qualcuno buca il segnale tv di Chicago, e non è mai stato trovato.
 - **Le luci di Marfa (Texas, dal 1880 circa)**: luci che fluttuano sul deserto; dire che la spiegazione più probabile sono i fari delle auto. (dal 2026-10-29)
+- **L'isola Hy-Brasil (leggenda)**: un'isola rotonda segnata sulle carte nautiche per secoli a ovest dell'Irlanda, visibile un giorno ogni sette anni. Dire che è leggenda e che sparì dalle carte nell'Ottocento. (dal 2026-10-29)
 - **La nave Octavius (leggenda, 1775)**: una baleniera trovata alla deriva con l'equipaggio congelato e il diario di bordo fermo a 13 anni prima. Raccontarla come leggenda: le fonti sono tarde. (dal 2026-10-29)
 
 ## What if
@@ -29,11 +30,12 @@ La Ricerca aggiunge ogni giorno 3-5 voci nuove (dalle mode del momento, da Reddi
 - ⭐ What if the Moon disappeared for one night? (Le maree, gli animali, il buio.)
 - ⭐ What if you could hear every thought in a room for one minute?
 - What if the Earth stopped spinning for one second?
-- What if every clock in the world stopped at the same time?
 - What if you woke up and everyone had forgotten you?
 - What if the ocean drained overnight?
 - What if animals could talk, for one day only?
-- ⭐ What if every clock in the world stopped at the same second? (Il primo a cadere è il GPS: si lega all'orologio fermo delle Flannan.) (dal 2026-10-29)
+- ⭐ What if every clock in the world stopped at the same second? (Il primo a cadere è il GPS: si lega all'orologio fermo delle Flannan.) (dal 2026-10-29) → `productions/2026-10-29-clocks-stop`
+- What if the Sun went out for eight minutes? (Nessuno se ne accorge per 8 minuti e 20 secondi: la luce è in viaggio. Poi il freddo, piano.) (dal 2026-10-29)
+- What if the internet went quiet for one day? (Niente mappe, niente pagamenti, il primo vicino che bussa alla porta.) (dal 2026-10-29)
 
 ## Your Call (seconda persona, scelta finale)
 - ⭐ **Lantern Night** (serie): la parte 2 segue GO o STAY. → `productions/2026-10-28-lantern-night-1`
@@ -41,6 +43,7 @@ La Ricerca aggiunge ogni giorno 3-5 voci nuove (dalle mode del momento, da Reddi
 - ⭐ **Room 0**: in hotel, il tuo ascensore ha un pulsante in più, "0". PRESS or LEAVE.
 - **The Snow Rule**: nel tuo paese, durante la neve, nessuno apre la porta. Stanotte qualcuno bussa con la voce di tua madre. OPEN or STAY.
 - **The Keeper's Shift** (dal 2026-10-29): sei il guardiano di ricambio, sbarchi su un'isola col faro spento e trovi una sola cerata appesa. ENTER or SIGNAL THE SHIP.
+- **The Stopped Clock** (dal 2026-10-29): alle 3:00 tutti gli orologi di casa si fermano, ma il tuo telefono continua a contare, all'indietro. Si lega al What if degli orologi. RESET or WAIT.
 - **The Map**: trovi in soffitta una mappa della tua città con una casa in più. Stasera c'è una luce accesa. GO or BURN THE MAP.
 
 ## Gialli e storie con colpo di scena

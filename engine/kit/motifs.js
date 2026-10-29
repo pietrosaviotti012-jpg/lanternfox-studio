@@ -424,7 +424,7 @@ export function doorFrame(x, o) {
 
 // A round wall clock: case, face (cream paper), hour marks, two hands at h:m. The face can glow in g (moonlight on it).
 export function wallClock(x, o, g) {
-  const { cx, cy, r, h = 3, m = 0, col = '#1a1410', face = '#e9d6ae', ink = '#2a2020' } = o;
+  const { cx, cy, r, h = 3, m = 0, col = '#1a1410', face = '#e9d6ae', ink = '#2a2020', hands = true } = o;   // hands: false → draw them as clockHand sheets
   if (x) {
     x.fillStyle = col; x.beginPath(); x.arc(cx, cy, r * 1.14, 0, TAU); x.fill();
     x.fillRect(cx - r * .08, cy + r * 1.1, r * .16, r * .25);                                   // hook
@@ -433,8 +433,8 @@ export function wallClock(x, o, g) {
     for (let i = 0; i < 12; i++) { const a = i * TAU / 12, l = i % 3 ? r * .08 : r * .16, w = i % 3 ? r * .03 : r * .055;
       x.save(); x.translate(cx + Math.sin(a) * r * .84, cy + Math.cos(a) * r * .84); x.rotate(-a); x.fillRect(-w / 2, -l / 2, w, l); x.restore(); }
     const hand = (a, l, w) => { x.save(); x.translate(cx, cy); x.rotate(-a); x.beginPath(); x.moveTo(-w / 2, -l * .15); x.lineTo(-w * .3, l); x.lineTo(w * .3, l); x.lineTo(w / 2, -l * .15); x.closePath(); x.fill(); x.restore(); };
-    hand((h % 12 + m / 60) * TAU / 12, r * .5, r * .075); hand(m * TAU / 60, r * .78, r * .05);
-    x.beginPath(); x.arc(cx, cy, r * .06, 0, TAU); x.fill();
+    if (hands) { hand((h % 12 + m / 60) * TAU / 12, r * .5, r * .075); hand(m * TAU / 60, r * .78, r * .05);
+      x.beginPath(); x.arc(cx, cy, r * .06, 0, TAU); x.fill(); }
   }
   if (g) { g.fillStyle = 'rgba(255,255,255,.5)'; g.beginPath(); g.arc(cx, cy, r, 0, TAU); g.fill(); }
 }
@@ -491,4 +491,121 @@ export function lensLamp(x, o, g) {
     if (g) { g.fillStyle = i === 3 ? '#fff' : 'rgba(255,255,255,.7)'; g.fillRect(cx - w / 2, y + s * .008, w, hh); }
   }
   if (x) { x.fillStyle = col; x.beginPath(); x.moveTo(cx - s * .16, top + rings * s * .085); x.quadraticCurveTo(cx, top + rings * s * .085 + s * .12, cx + s * .16, top + rings * s * .085); x.closePath(); x.fill(); }
+}
+
+// —— Added for "What If Every Clock Stopped at the Same Second?": clock hands as their own sheets, a clock tower, a satellite,
+// a phone mast, a paper street map with the blue dot, a plane, a kitchen oven with its clock ——
+
+// One clock hand on its own small sheet, pivot at the sheet centre (0, 0), pointing up (12 o'clock) at rotation 0.
+// Turn it clockwise with sheet.rotation.z = −angle. l = length, w = width at the pivot, tail = the short end behind the pivot.
+export function clockHand(x, o) {
+  const { l, w, tail = .18, col = '#1a1410', hub = true } = o;
+  x.fillStyle = col; x.beginPath(); x.moveTo(-w / 2, -l * tail); x.lineTo(-w * .22, l); x.lineTo(w * .22, l); x.lineTo(w / 2, -l * tail); x.closePath(); x.fill();
+  if (hub) { x.beginPath(); x.arc(0, 0, w * .75, 0, TAU); x.fill(); }
+}
+
+// A town clock tower: shaft, belfry ledge, clock face near the top (cream paper that burns in g), pointed roof with a finial.
+// cx, by = bottom centre; w, h = shaft size. Draw the hands with clockHand sheets at the returned face { cx, cy, r }.
+export function clockTower(x, o, g) {
+  const { cx, by, w, h, col = '#0e1532', face = '#e9d6ae', ink = '#2a2020', windows = true } = o, r = w * .36, fy = by + h - w * .52;
+  if (x) {
+    x.fillStyle = col; x.fillRect(cx - w / 2, by, w, h);
+    x.fillRect(cx - w * .62, by + h - w * .05, w * 1.24, w * .07); x.fillRect(cx - w * .58, by + h * .55, w * 1.16, w * .05);
+    x.beginPath(); x.moveTo(cx - w * .6, by + h + w * .02); x.lineTo(cx, by + h + w * 1.3); x.lineTo(cx + w * .6, by + h + w * .02); x.closePath(); x.fill();
+    x.fillRect(cx - w * .015, by + h + w * 1.25, w * .03, w * .22);
+    if (windows) { x.fillStyle = '#2c2a44'; for (const k of [.18, .34]) x.fillRect(cx - w * .08, by + h * k, w * .16, h * .09); }
+    wallClock(x, { cx, cy: fy, r, col, face, ink, hands: false });
+  }
+  if (g) { g.fillStyle = '#fff'; g.beginPath(); g.arc(cx, fy, r, 0, TAU); g.fill();
+    if (windows) for (const k of [.18, .34]) g.fillRect(cx - w * .08, by + h * k, w * .16, h * .09); }
+  return { cx, cy: fy, r };
+}
+
+// A satellite: a gold box body, two solar wings with cell lines, a dish; a small light (its atomic clock) burns in g
+export function satellite(x, o, g) {
+  const { cx, cy, s, col = '#1a1410', body = '#b68a3e', wing = '#2b3a6a', rot = 0 } = o;
+  const P = c => { c.save(); c.translate(cx, cy); c.rotate(rot); };
+  if (x) {
+    P(x);
+    x.fillStyle = col; x.fillRect(-s * .9, -s * .012, s * 1.8, s * .024);                               // the boom
+    for (const d of [-1, 1]) { x.fillStyle = wing; x.fillRect(d > 0 ? s * .28 : -s * .88, -s * .17, s * .6, s * .34);
+      x.fillStyle = col; for (let i = 1; i < 4; i++) x.fillRect((d > 0 ? s * .28 : -s * .88) + i * s * .15 - s * .006, -s * .17, s * .012, s * .34);
+      x.fillRect(d > 0 ? s * .28 : -s * .88, -s * .006, s * .6, s * .012); }
+    x.fillStyle = body; x.fillRect(-s * .2, -s * .22, s * .4, s * .44);
+    x.fillStyle = col; x.fillRect(-s * .2, -s * .02, s * .4, s * .04);
+    x.beginPath(); x.moveTo(-s * .12, s * .22); x.quadraticCurveTo(0, s * .42, s * .12, s * .22); x.closePath(); x.fill();   // the dish
+    x.fillRect(-s * .01, s * .22, s * .02, s * .1);
+    x.fillStyle = '#3a3040'; x.beginPath(); x.arc(0, -s * .11, s * .055, 0, TAU); x.fill();
+    x.restore();
+  }
+  if (g) { P(g); g.fillStyle = '#fff'; g.beginPath(); g.arc(0, -s * .11, s * .055, 0, TAU); g.fill(); g.restore(); }
+}
+
+// A phone mast: a tapering lattice tower with cross braces, three antenna panels at the top; its red beacon burns in g
+export function cellTower(x, o, g) {
+  const { cx, by, h, col = '#0e1532' } = o, w0 = h * .16, w1 = h * .04, top = by + h;
+  const at = u => [lerp(w0, w1, u) / 2, by + h * u];
+  if (x) {
+    x.strokeStyle = col; x.fillStyle = col; x.lineCap = 'round'; x.lineWidth = h * .014;
+    x.beginPath(); x.moveTo(cx - w0 / 2, by); x.lineTo(cx - w1 / 2, top); x.moveTo(cx + w0 / 2, by); x.lineTo(cx + w1 / 2, top); x.stroke();
+    x.lineWidth = h * .006; x.beginPath();
+    for (let i = 0; i < 7; i++) { const [a, ya] = at(i / 7), [b, yb] = at((i + 1) / 7); x.moveTo(cx - a, ya); x.lineTo(cx + b, yb); x.moveTo(cx + a, ya); x.lineTo(cx - b, yb); x.moveTo(cx - b, yb); x.lineTo(cx + b, yb); }
+    x.stroke();
+    for (const d of [-1, 0, 1]) x.fillRect(cx + d * h * .045 - h * .012, top - h * .12, h * .024, h * .1);
+    x.fillRect(cx - h * .07, top - h * .025, h * .14, h * .012);
+    x.fillRect(cx - h * .004, top, h * .008, h * .06);
+    x.fillStyle = '#4a1c1c'; x.beginPath(); x.arc(cx, top + h * .065, h * .012, 0, TAU); x.fill();
+  }
+  if (g) { g.fillStyle = '#fff'; g.beginPath(); g.arc(cx, top + h * .065, h * .012, 0, TAU); g.fill(); }
+  return [cx, top + h * .065];
+}
+
+// A paper street map on a w × h sheet: blocks, streets, a river, a park (seeded). Ink lines on cream paper.
+export function streetMap(x, o) {
+  const { w, h, seed = 3, paper = '#d8c398', ink = '#8a6e45', water = '#7f97b8', park = '#9fae7c', bg = true } = o, R = mulberry(seed);
+  if (bg) { x.fillStyle = paper; x.fillRect(-w / 2, -h / 2, w, h); }
+  x.fillStyle = water; x.beginPath(); x.moveTo(-w / 2, -h * .08);
+  for (let i = 0; i <= 12; i++) x.lineTo(-w / 2 + w * i / 12, -h * .08 + Math.sin(i * .9 + seed) * h * .04);
+  for (let i = 12; i >= 0; i--) x.lineTo(-w / 2 + w * i / 12, -h * .14 + Math.sin(i * .9 + seed) * h * .04);
+  x.closePath(); x.fill();
+  x.fillStyle = park; x.fillRect(w * .12, h * .18, w * .2, h * .12);
+  x.strokeStyle = ink; x.lineCap = 'round';
+  for (let i = 0; i < 9; i++) { x.lineWidth = (i % 3 ? .0011 : .0022) * w / .3; const px = -w / 2 + w * (i + .5 + (R() - .5) * .3) / 9;
+    x.beginPath(); x.moveTo(px, -h / 2); x.lineTo(px + (R() - .5) * w * .06, h / 2); x.stroke(); }
+  for (let i = 0; i < 13; i++) { x.lineWidth = (i % 4 ? .0011 : .0022) * w / .3; const py = -h / 2 + h * (i + .5 + (R() - .5) * .3) / 13;
+    x.beginPath(); x.moveTo(-w / 2, py); x.lineTo(w / 2, py + (R() - .5) * h * .04); x.stroke(); }
+}
+
+// The blue dot of a map app: a ring and a core (dark paper on x, white on g; give the sheet a blue glowCol)
+export function mapDot(x, o, g) {
+  const { cx = 0, cy = 0, r, col = '#1d3a6a', ring = true } = o;
+  const shape = (c, fill) => { c.fillStyle = fill; c.beginPath(); c.arc(cx, cy, r, 0, TAU); c.fill();
+    if (ring) { c.globalAlpha = .35; c.beginPath(); c.arc(cx, cy, r * 2.2, 0, TAU); c.fill(); c.globalAlpha = 1; } };
+  if (x) shape(x, col);
+  if (g) shape(g, '#fff');
+}
+
+// A small plane seen from the side, flying right; its wing-tip light burns in g
+export function plane(x, o, g) {
+  const { cx, cy, s, col = '#0e1532' } = o;
+  if (x) {
+    x.fillStyle = col; x.beginPath(); x.moveTo(cx - s * .5, cy + s * .02); x.quadraticCurveTo(cx - s * .1, cy + s * .07, cx + s * .42, cy + s * .03);
+    x.quadraticCurveTo(cx + s * .52, cy, cx + s * .42, cy - s * .03); x.lineTo(cx - s * .46, cy - s * .03); x.closePath(); x.fill();
+    x.beginPath(); x.moveTo(cx - s * .38, cy + s * .02); x.lineTo(cx - s * .48, cy + s * .2); x.lineTo(cx - s * .4, cy + s * .2); x.lineTo(cx - s * .26, cy + s * .03); x.closePath(); x.fill();
+    x.beginPath(); x.moveTo(cx - s * .02, cy); x.lineTo(cx - s * .2, cy - s * .2); x.lineTo(cx - s * .12, cy - s * .2); x.lineTo(cx + s * .12, cy); x.closePath(); x.fill();
+  }
+  if (g) { g.fillStyle = '#fff'; g.beginPath(); g.arc(cx - s * .18, cy - s * .19, s * .025, 0, TAU); g.fill(); }
+}
+
+// A kitchen oven: body, door with a window, knobs, a clock display (dark glass on x; burns in g)
+export function oven(x, o, g) {
+  const { cx, by, w, h, col = '#141a33', glass = '#2c2a44' } = o, dy = by + h * .86, dw = w * .34, dh = h * .09;
+  if (x) {
+    x.fillStyle = col; x.fillRect(cx - w / 2, by, w, h);
+    x.fillStyle = glass; x.fillRect(cx - w * .36, by + h * .16, w * .72, h * .42); x.fillRect(cx - dw / 2, dy - dh / 2, dw, dh);
+    x.fillStyle = col; x.fillRect(cx - w * .38, by + h * .64, w * .76, h * .03);
+    x.fillStyle = '#2a3156'; for (const k of [-.38, -.26, .26, .38]) { x.beginPath(); x.arc(cx + w * k, dy, h * .03, 0, TAU); x.fill(); }
+  }
+  if (g) { g.fillStyle = '#fff'; g.fillRect(cx - dw / 2, dy - dh / 2, dw, dh); }
+  return [cx, dy];
 }
