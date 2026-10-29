@@ -661,6 +661,18 @@ export default {
     }
 
     // —— YouTube: the routine asks, the Office uploads with the user's own Google project and returns the link ——
+    // the routines read the user's calendar notes (from yesterday to two weeks ahead); ?dept=<house> marks them as read by it
+    if (url.pathname === "/notes" && request.method === "GET") {
+      if (!(await publishOk(request, env))) return json({ error: "non autorizzato" }, 401);
+      const state = await loadState(env), from = new Date(Date.now() - 864e5).toISOString().slice(0, 10);
+      const to = new Date(Date.now() + 14 * 864e5).toISOString().slice(0, 10), dept = url.searchParams.get("dept");
+      const notes = (state.notes || []).filter((n) => n.date >= from && n.date <= to);
+      if (dept && DEPTS.includes(dept) && notes.some((n) => !(n.read_by || []).includes(dept))) {
+        for (const n of notes) n.read_by = [...new Set([...(n.read_by || []), dept])];
+        await saveState(env, state);
+      }
+      return json({ today: new Date(Date.now() + 3600e3).toISOString().slice(0, 10), notes: notes.map(({ date, text, at }) => ({ date, text, at })) });
+    }
     if (url.pathname === "/publish/youtube" && request.method === "POST") {
       if (!(await publishOk(request, env))) return json({ error: "non autorizzato" }, 401);
       const { id } = await request.json().catch(() => ({}));
@@ -906,18 +918,6 @@ export default {
       state.log.push({ at: new Date().toISOString(), dept: "pubblicazione", status: "done", text: `"${item.title}" esce ${when ? "dal " + when.slice(0, 10) : "al prossimo orario"}` });
       await saveState(env, state);
       return json({ ok: true });
-    }
-    // the routines read the user's calendar notes (from yesterday to two weeks ahead); ?dept=<house> marks them as read by it
-    if (url.pathname === "/notes" && request.method === "GET") {
-      if (!(await publishOk(request, env))) return json({ error: "non autorizzato" }, 401);
-      const state = await loadState(env), from = new Date(Date.now() - 864e5).toISOString().slice(0, 10);
-      const to = new Date(Date.now() + 14 * 864e5).toISOString().slice(0, 10), dept = url.searchParams.get("dept");
-      const notes = (state.notes || []).filter((n) => n.date >= from && n.date <= to);
-      if (dept && DEPTS.includes(dept) && notes.some((n) => !(n.read_by || []).includes(dept))) {
-        for (const n of notes) n.read_by = [...new Set([...(n.read_by || []), dept])];
-        await saveState(env, state);
-      }
-      return json({ today: new Date(Date.now() + 3600e3).toISOString().slice(0, 10), notes: notes.map(({ date, text, at }) => ({ date, text, at })) });
     }
     // your own notes in the calendar: { date, text } adds one, { id, remove: true } takes it away
     if (url.pathname === "/calendar/note" && request.method === "POST") {
