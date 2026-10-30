@@ -5,6 +5,8 @@
 // turns from regole/notte to regole/allarme (eyes in every window, three knocks, the tall shadow at the peephole, the monster's line).
 // The end holds your dark house, the shadow at the door, the neighbors in the street and the fox's lantern under ANSWER or SILENT.
 // Subjects sit between 15 % and 52 % of the frame height (the series tag and clock above, the pop captions below).
+// Scene checks (pipeline/VISIVO.md): the rules card is flat, still and inside the margins (captions off on its lines);
+// the night and alarm scenes use a lifted sky and lighter sheets so houses and people read; your face carries its own light.
 // Starts are anchored to narration lines (C), effects to the line timings (E.cue / E.cueEnd / E.word).
 import { layered } from './engine/kit/shot.js';
 import { houses, house, neighbor, phone, person, tvSet, couch, foreground, lurkers, tallShadow, foxCameo, doorFrame } from './engine/kit/motifs.js';
@@ -16,6 +18,20 @@ const T = theme('regole', 'notte'), A = theme('regole', 'allarme');
 const CREAM = '#efe8d8', INK = '#14110d';
 const YOU = { coat: '#4f9a72', hat: false, pants: '#1d2a26' };   // you: a green puffer, the one colour of the video
 const ROOM = [[0, '#020403'], [1, '#07100c']];
+// lifted night and alarm palettes: a bright horizon behind the roofs, dark sheets that still read against it
+const NSKY = [[0, '#05100a'], [.25, '#123323'], [.45, '#2f6e50'], [.6, '#4c9a74'], [1, '#5aa882']];
+const ASKY = [[0, '#120404'], [.25, '#3a0b0b'], [.45, '#7a1a14'], [.6, '#a8301f'], [1, '#c04a2a']];
+const N = { far: '#1f4a38', mid: '#163a2b', near: '#0e2219', glass: '#081610' };
+const R = { far: '#3a0a08', mid: '#5a140e', ground: '#7a1a14', near: '#240705', glass: '#200605', lit: '#c43a28' };
+const TAU = Math.PI * 2;
+// the face's own light: the head glows softly, eyes and mouth stay dark (same geometry as person())
+const faceGlow = (g, { cx, by, s, face }) => {
+  const hr = s * .16, hy = by + s * .78, ex = hr * .36, ey = hy + hr * .05, big = face === 'scared' || face === 'surprised';
+  g.fillStyle = '#fff'; g.beginPath(); g.arc(cx, hy, hr, 0, TAU); g.fill();
+  g.fillStyle = '#000'; for (const d of [-1, 1]) { g.beginPath(); g.arc(cx + d * ex, ey, hr * (big ? .09 : .11), 0, TAU); g.fill(); }
+  g.fillRect(cx - hr * .28, hy - hr * .52, hr * .56, hr * .2);
+};
+const FACE = { glow: .6, glowCol: '#f6e8d6' };
 
 const fill = col => x => { x.fillStyle = col; x.fillRect(-.25, -.45, .5, .9); };
 // a wall with a window cut in it (the sky panel shows through the hole)
@@ -28,25 +44,28 @@ const wall = (col, win) => x => {
 const ground = (col, base, seed) => x => { x.fillStyle = col; foreground(x, { base, seed, reedsAt: [-.2, .18], reedsN: 10, stones: 3, amp: .003 }); };
 // you, holding the phone up to your face; the screen glows green on its own sheet
 const youLayers = (face, z = -.07, by = -.02, s = .16) => [
-  { name: 'you', z, trans: .02, draw: x => person(x, { ...YOU, cx: 0, by, s, face }) },
+  { name: 'you', z, trans: .02, ...FACE, draw: x => person(x, { ...YOU, cx: 0, by, s, face }), glowDraw: g => faceGlow(g, { cx: 0, by, s, face }) },
   { name: 'ph', z: z + .006, trans: .05, glow: 1.6, glowCol: T.glow, w: .05, h: .07, x: s * .19, y: by + s * .5,
     draw: x => phone(x, { cx: 0, cy: 0, w: s * .14, h: s * .25, screen: '#13261c' }), glowDraw: g => phone(null, { cx: 0, cy: 0, w: s * .14, h: s * .25 }, g) },
 ];
-// the rules sheet: cream paper, black type, rule three torn across; the piece with rule four is its own sheet (it sags)
+// the rules card: cream paper, black type, rule three torn across; a flat card well inside the frame (x ±0.05, y 0.057-0.138,
+// 15-52 % of the height under CARD_CAM). The piece with rule four is its own sheet; in S7 it sits a little lower, still.
 const RULES = ['1. STAY INSIDE UNTIL 6:00 AM.', '2. KEEP EVERY LIGHT OFF.', '3. IF SOMEONE KNOCKS THREE TIMES,'];
-const tear = (x, y, seed = 3) => { x.beginPath(); x.moveTo(-.25, y); for (let i = 0; i <= 40; i++) x.lineTo(-.25 + i * .0125, y + ((i * 7919 + seed * 31) % 9 - 4) * .0011); };
-const sheetTop = x => {
-  x.fillStyle = CREAM; x.beginPath(); x.moveTo(-.25, .3); x.lineTo(.25, .3); tearPath(x); x.closePath(); x.fill();
-  text(x, 'THE FOUR RULES', -.075, .105, .011, '"Anton"', { fill: T.tag, align: 'left' });
-  x.fillStyle = INK; x.fillRect(-.075, .094, .15, .0012);
-  RULES.forEach((r, i) => text(x, r, -.075, .077 - i * .02, .0072, '"Anton"', { fill: INK, align: 'left' }));
+const CX0 = -.05, CX1 = .05, CTOP = .138, CBOT = .057, TL = -.042;
+const jag = (x, y, seed, back) => { for (let i = 0; i <= 20; i++) { const j = back ? 20 - i : i; x.lineTo(CX0 + j * .005, y + ((j * 7919 + seed * 31) % 9 - 4) * .0006); } };
+const sheetTop = (red = false) => x => {
+  x.fillStyle = CREAM; x.beginPath(); x.moveTo(CX0, CTOP); x.lineTo(CX1, CTOP); jag(x, .0815, 3, true); x.closePath(); x.fill();
+  text(x, 'THE FOUR RULES', TL, .129, .008, '"Anton"', { fill: T.tag, align: 'left' });
+  x.fillStyle = INK; x.fillRect(TL, .1225, .084, .0009);
+  RULES.forEach((r, i) => text(x, r, TL, .1115 - i * .011, .0055, '"Anton"', { fill: red && i === 2 ? T.tag : INK, align: 'left' }));
 };
-function tearPath(x) { x.lineTo(.25, .028); for (let i = 40; i >= 0; i--) x.lineTo(-.25 + i * .0125, .028 + ((i * 7919 + 93) % 9 - 4) * .0011); }
 const sheetLow = x => {
-  x.fillStyle = CREAM; tear(x, .018); x.lineTo(.25, -.3); x.lineTo(-.25, -.3); x.closePath(); x.fill();
-  text(x, '4. NEVER ANSWER IN YOUR', -.075, .002, .0072, '"Anton"', { fill: INK, align: 'left' });
-  text(x, 'OWN VOICE.', -.075, -.012, .0072, '"Anton"', { fill: T.tag, align: 'left' });
+  x.fillStyle = CREAM; x.beginPath(); x.moveTo(CX0, .076); jag(x, .076, 5); x.lineTo(CX1, CBOT); x.lineTo(CX0, CBOT); x.closePath(); x.fill();
+  text(x, '4. NEVER ANSWER IN YOUR', TL, .070, .0055, '"Anton"', { fill: INK, align: 'left' });
+  text(x, 'OWN VOICE.', TL, .0625, .0055, '"Anton"', { fill: T.tag, align: 'left' });
 };
+// one fixed, square-on camera for the card (no move, no tilt): the frame is ±0.067 wide and 0.24 tall at the card
+const CARD_CAM = [[0, [0, .058, .3, 0, .058, -.09]]];
 // a facade across the road: a wall of six windows (two rows), dark glass; returns the window centres
 const WINS = [[-.05, .06], [0, .06], [.05, .06], [-.05, .11], [0, .11], [.05, .11]];
 const facade = (col, glass) => x => {
@@ -144,30 +163,28 @@ export function SHOTS(C, DUR) {
         });
       } },
 
-    // 6 · Rule four: the rules sheet in cream, black type, "OWN VOICE" in red; a slow tilt down the list
+    // 6 · Rule four: the rules card in cream, black type, "OWN VOICE" in red; flat and still, inside the margins
     { id: 'S6', start: at('L06') - .3, in: { type: 'dissolve', dur: .4 }, sfx: [{ t: .1, type: 'paper', v: .8 }],
       build: E => layered(E, {
         light: [0, .08, -.13], lightR: .2, lightCol: '#fff4e0', key: .9, amb: .7, ambCol: '#d8d0c0', sky: { stops: [[0, '#1a1712'], [1, '#2a251c']] }, on: false,
         layers: [
-          { name: 'top', z: -.09, trans: .25, draw: sheetTop },
+          { name: 'top', z: -.09, trans: .25, draw: sheetTop() },
           { name: 'low', z: -.089, trans: .25, draw: sheetLow },
         ],
-        cam: [[0, [0, .065, .38, 0, .065, -.09]], [E.dur, [0, .045, .36, 0, .045, -.09]]],
+        cam: CARD_CAM,
         focus: -.09, aper: 30, grade: { sat: .9 },
       }) },
 
-    // 7 · Rule three just stops: close on the torn line; on "knocks" the lower piece drops away a little more
+    // 7 · Rule three just stops: the same card, same framing; rule three now in red and the torn piece fallen a little lower
     { id: 'S7', start: at('L07') - .2, sfx: [{ t: .2 + C.L07.dur * 6 / 9, type: 'paper', v: 1 }],
       build: E => {
-        const k = E.word('L07', 6);
         return layered(E, {
           light: [0, .05, -.13], lightR: .2, lightCol: '#fff4e0', key: .9, amb: .6, ambCol: '#d8d0c0', sky: { stops: [[0, '#050403'], [1, '#0d0b08']] }, on: false,
           layers: [
-            { name: 'top', z: -.09, trans: .25, draw: sheetTop },
-            { name: 'low', z: -.089, trans: .25, draw: sheetLow },
+            { name: 'top', z: -.09, trans: .25, draw: sheetTop(true) },
+            { name: 'low', z: -.089, y: -.004, trans: .25, draw: sheetLow },
           ],
-          move: { low: [[0, [0, -.002, 0]], [k, [0, -.002, 0]], [k + .25, [.002, -.012, -.04]], [E.dur, [.002, -.014, -.045]]] },
-          cam: [[0, [.03, .03, .26, .03, .03, -.09]], [E.dur, [.035, .03, .22, .035, .028, -.09]]],
+          cam: CARD_CAM,
           focus: -.09, aper: 30,
         });
       } },
@@ -175,27 +192,28 @@ export function SHOTS(C, DUR) {
     // 8 · The whisper: you in the dark room, scared, the phone lighting you from below (the unknown-number chat is the overlay)
     { id: 'S8', start: at('L08') - .2, sfx: [{ t: .1, type: 'chime', v: .45 }],
       build: E => layered(E, {
-        light: [.03, .07, -.05], lightR: .07, lightCol: T.glow, key: .7, amb: .3, sky: { stops: ROOM }, on: false,
+        light: [.03, .07, -.05], lightR: .07, lightCol: T.glow, key: .8, amb: .45, sky: { stops: ROOM }, on: false,
         layers: [
-          { name: 'wall', z: -.12, trans: .05, draw: fill('#06100b') },
+          { name: 'wall', z: -.12, trans: .05, draw: fill('#10261c') },
           ...youLayers('scared'),
         ],
         glows: { ph: [[0, .5], [.2, 1]] }, flicker: ['ph'],
         cam: [[0, [-.02, .08, .34, 0, .085, -.07]], [E.dur, [.01, .09, .3, 0, .09, -.07]]],
-        focus: -.07, aper: 22, grade: { sat: .8 },
+        focus: -.07, aper: 22, grade: { sat: .85, expo: 1.2 },
       }) },
 
     // 9 · You look outside: through your window the whole city is dark, not one lamp
     { id: 'S9', start: at('L09') - .3, in: { type: 'dissolve', dur: .5 }, sfx: [{ t: 0, type: 'wind', d: end('L09') - at('L09') + 1, v: .4 }],
       build: E => layered(E, {
-        light: [0, .1, -.13], lightR: .12, lightCol: T.light, key: .35, amb: .2, sky: { stops: T.sky, stars: 160 }, on: false,
+        light: [0, .1, -.13], lightR: .14, lightCol: T.light, key: .7, amb: .5, ambCol: '#7aa894', sky: { stops: NSKY, stars: 160 }, on: false,
+        moon: { x: .045, y: .175, r: .016, gain: 1.6 },
         layers: [
-          { name: 'city', z: -.12, trans: .3, draw: x => { x.fillStyle = T.far; x.fillRect(-.25, -.45, .5, .52); houses(x, { x0: -.24, x1: .24, by: .07, h: .05, seed: 21, col: T.far, glass: '#0b1712', lit: false }); } },
-          { name: 'road', z: -.1, trans: .1, draw: x => { x.fillStyle = T.mid; x.fillRect(-.25, -.45, .5, .5); houses(x, { x0: -.24, x1: .24, by: .03, h: .045, seed: 4, col: T.mid, glass: '#08120d', lit: false }); } },
-          { name: 'wall', z: -.065, trans: .04, draw: wall(T.near, [-.09, .02, .18, .18]) },
+          { name: 'city', z: -.12, trans: .3, draw: x => { x.fillStyle = N.far; x.fillRect(-.25, -.45, .5, .52); houses(x, { x0: -.24, x1: .24, by: .07, h: .05, seed: 21, col: N.far, glass: N.glass, lit: false }); } },
+          { name: 'road', z: -.1, trans: .1, draw: x => { x.fillStyle = N.mid; x.fillRect(-.25, -.45, .5, .5); houses(x, { x0: -.24, x1: .24, by: .03, h: .045, seed: 4, col: N.mid, glass: N.glass, lit: false }); } },
+          { name: 'wall', z: -.065, trans: .04, draw: wall(N.near, [-.09, .02, .18, .18]) },
         ],
         cam: [[0, [-.02, .1, .44, 0, .1, -.1]], [E.dur, [.02, .105, .36, .01, .105, -.1]]],
-        focus: [[0, -.065], [E.dur * .4, -.11]], aper: 16,
+        focus: [[0, -.065], [E.dur * .4, -.11]], aper: 16, grade: { expo: 1.25, vig: .3 },
       }) },
 
     // 10 · Except one tiny light: on the roof across the road, in the top corner, the fox sits with her lantern lit
@@ -203,28 +221,28 @@ export function SHOTS(C, DUR) {
       build: E => {
         const lit = E.word('L10', 3);
         return layered(E, {
-          light: [.05, .14, -.12], lightR: .1, lightCol: '#ffc878', key: .4, amb: .2, sky: { stops: T.sky, stars: 140 }, on: false,
+          light: [.05, .14, -.12], lightR: .12, lightCol: '#ffc878', key: .65, amb: .45, ambCol: '#7aa894', sky: { stops: NSKY, stars: 140 }, on: false,
           layers: [
-            { name: 'roofs', z: -.11, trans: .2, draw: x => { x.fillStyle = T.mid; x.fillRect(-.25, -.45, .5, .5); house(x, { cx: .03, by: .05, w: .14, h: .05, roof: .05, cols: 3, rows: 1, col: T.mid, glass: '#08120d', lit: false, door: false }); } },
+            { name: 'roofs', z: -.11, trans: .2, draw: x => { x.fillStyle = N.far; x.fillRect(-.25, -.45, .5, .5); house(x, { cx: .03, by: .05, w: .14, h: .05, roof: .05, cols: 3, rows: 1, col: N.far, glass: N.glass, lit: false, door: false }); } },
             foxAt(.068, .099, .045, -.105),
-            { name: 'fg', z: -.06, trans: .02, draw: x => { x.fillStyle = T.near; x.fillRect(-.25, -.45, .5, .47); } },
+            { name: 'fg', z: -.06, trans: .02, draw: x => { x.fillStyle = N.near; x.fillRect(-.25, -.45, .5, .47); } },
           ],
           glows: { fox: [[0, 0], [lit - .2, 0], [lit + .4, 1]] }, flicker: ['fox'],
           cam: [[0, [-.01, .09, .5, 0, .09, -.11]], [lit, [.01, .095, .44, .02, .095, -.11]], [E.dur, [.03, .1, .36, .04, .1, -.11]]],
-          focus: -.105, aper: 16,
+          focus: -.105, aper: 16, grade: { expo: 1.2, vig: .3 },
         });
       } },
 
     // 11 · The windows aren't empty: a slow, quiet push on the dark facade across the road (still the night theme)
     { id: 'S11', start: at('L11') - .4, in: { type: 'dissolve', dur: .7 }, sfx: [{ t: 0, type: 'wind', d: end('L11') - at('L11') + 1.2, v: .3 }],
       build: E => layered(E, {
-        light: [0, .09, -.13], lightR: .1, lightCol: T.light, key: .3, amb: .15, sky: { stops: T.sky, stars: 60 }, on: false,
+        light: [0, .09, -.13], lightR: .14, lightCol: T.light, key: .7, amb: .5, ambCol: '#7aa894', sky: { stops: NSKY, stars: 60 }, on: false,
         layers: [
-          { name: 'facade', z: -.1, trans: .1, draw: facade(T.mid, '#050b08') },
-          { name: 'fg', z: -.06, trans: .02, draw: ground(T.near, .0, 17) },
+          { name: 'facade', z: -.1, trans: .1, draw: facade('#2c6a50', N.glass) },
+          { name: 'fg', z: -.06, trans: .02, draw: ground(N.near, .0, 17) },
         ],
         cam: [[0, [0, .07, .46, 0, .075, -.1]], [E.dur, [0, .075, .34, 0, .08, -.1]]],
-        focus: -.1, aper: 18, grade: { sat: .8 },
+        focus: -.1, aper: 18, grade: { expo: 1.2, vig: .3 },
       }) },
 
     // 12 · The revelation (allarme): the same facade gone red; a neighbor's dark head in every window and two eyes lit in each
@@ -232,81 +250,81 @@ export function SHOTS(C, DUR) {
       build: E => {
         const pairs = WINS.map(([wx, wy]) => [wx / .1, (wy + .004) / .1]);
         return layered(E, {
-          light: [0, .09, -.13], lightR: .12, lightCol: A.light, key: .5, amb: .25, ambCol: '#6a2020', sky: { stops: A.sky, stars: 0 }, on: false,
+          light: [0, .09, -.13], lightR: .14, lightCol: A.light, key: .75, amb: .45, ambCol: '#b05040', sky: { stops: ASKY, stars: 0 }, on: false,
           layers: [
-            { name: 'facade', z: -.1, trans: .15, draw: facade(A.mid, A.far) },
-            { name: 'heads', z: -.099, trans: .02, draw: x => { x.fillStyle = A.near; for (const [wx, wy] of WINS) { x.beginPath(); x.arc(wx, wy, .009, 0, Math.PI * 2); x.fill(); x.fillRect(wx - .012, wy - .018, .024, .01); } } },
+            { name: 'facade', z: -.1, trans: .15, glow: .9, glowCol: R.lit, draw: facade(R.mid, R.lit), glowDraw: g => { g.fillStyle = '#fff'; for (const [wx, wy] of WINS) g.fillRect(wx - .014, wy - .018, .028, .036); } },
+            { name: 'heads', z: -.099, trans: .02, draw: x => { x.fillStyle = '#0a0202'; for (const [wx, wy] of WINS) { x.beginPath(); x.arc(wx, wy, .009, 0, Math.PI * 2); x.fill(); x.fillRect(wx - .012, wy - .018, .024, .01); } } },
             { name: 'eyes', z: -.098, trans: .3, glow: 3, glowCol: A.glow, shadow: false, recv: false,
               draw: x => lurkers(x, { cx: 0, by: 0, s: .1, col: A.accent, pairs, gap: .06 }), glowDraw: g => lurkers(null, { cx: 0, by: 0, s: .1, pairs, gap: .06 }, g) },
-            { name: 'fg', z: -.06, trans: .02, draw: ground(A.near, .0, 17) },
+            { name: 'fg', z: -.06, trans: .02, draw: ground(R.near, .0, 17) },
           ],
           glows: { eyes: [[0, 0], [E.word('L12', 1), 0], [E.word('L12', 1) + .1, 1]] },
           cam: [[0, [0, .078, .3, 0, .08, -.1]], [E.word('L12', 9) - .05, [0, .078, .28, 0, .08, -.1]], [E.word('L12', 9) + .1, [0, .08, .24, 0, .08, -.1]], [E.dur, [.004, .08, .23, 0, .08, -.1]]],
-          focus: -.099, aper: 22, grade: { contrast: .12 },
+          focus: -.099, aper: 22, grade: { expo: 1.2, vig: .3 },
         });
       } },
 
     // 13 · One knock. Two. Three: through the peephole (overlay), your porch, and far down the path the tall shadow, eyes lit
     { id: 'S13', start: at('L13') - .15, sfx: [1, 2, 3].map(k => ({ t: .15 + C.L13.dur * (k + .5) / 4, type: 'crack', v: 1 })),
       build: E => layered(E, {
-        light: [0, .1, -.13], lightR: .1, lightCol: A.light, key: .4, amb: .2, ambCol: '#5a1a1a', sky: { stops: A.sky }, on: false,
+        light: [0, .1, -.13], lightR: .14, lightCol: A.light, key: .7, amb: .45, ambCol: '#b05040', sky: { stops: ASKY }, on: false,
         layers: [
-          { name: 'yard', z: -.12, trans: .2, draw: x => { x.fillStyle = A.far; x.fillRect(-.25, -.45, .5, .52); houses(x, { x0: -.24, x1: .24, by: .07, h: .04, seed: 5, col: A.far, glass: A.mid, lit: false }); } },
+          { name: 'yard', z: -.12, trans: .2, draw: x => { x.fillStyle = R.ground; x.fillRect(-.25, -.45, .5, .52); houses(x, { x0: -.24, x1: .24, by: .07, h: .04, seed: 5, col: R.far, glass: R.glass, lit: false }); } },
           { name: 'shadow', z: -.1, trans: .04, glow: 2.6, glowCol: '#ffffff', w: .08, h: .12, x: 0, y: .085,
-            draw: x => tallShadow(x, { cx: 0, by: -.045, s: .09, col: A.near }), glowDraw: g => tallShadow(null, { cx: 0, by: -.045, s: .09 }, g) },
-          { name: 'porch', z: -.07, trans: .04, draw: x => { x.fillStyle = A.near; x.fillRect(-.25, -.45, .5, .47); x.fillRect(-.25, -.45, .07, .9); x.fillRect(.18, -.45, .07, .9); } },
+            draw: x => tallShadow(x, { cx: 0, by: -.045, s: .09, col: '#050101' }), glowDraw: g => tallShadow(null, { cx: 0, by: -.045, s: .09 }, g) },
+          { name: 'porch', z: -.07, trans: .04, draw: x => { x.fillStyle = R.near; x.fillRect(-.25, -.45, .5, .47); x.fillRect(-.25, -.45, .07, .9); x.fillRect(.18, -.45, .07, .9); } },
         ],
         cam: [[0, [0, .08, .4, 0, .085, -.1]], [E.dur, [0, .085, .34, 0, .088, -.1]]],
-        focus: -.1, aper: 18,
+        focus: -.1, aper: 18, grade: { expo: 1.2, vig: .3 },
       }) },
 
     // 14 · "Rule three says you let us in": hard cut, the shadow is suddenly right at the door, cut by the frame, eyes at the top
     { id: 'S14', start: at('L14') - .1, sfx: [{ t: .02, type: 'whoosh', v: .7 }, { t: .05, type: 'thunder', v: .55 }],
       build: E => layered(E, {
-        light: [0, .14, -.13], lightR: .12, lightCol: A.light, key: .35, amb: .15, ambCol: '#4a1010', sky: { stops: A.sky }, on: false,
+        light: [0, .14, -.13], lightR: .14, lightCol: A.light, key: .7, amb: .45, ambCol: '#b05040', sky: { stops: ASKY }, on: false,
         layers: [
-          { name: 'yard', z: -.12, trans: .2, draw: x => { x.fillStyle = A.far; x.fillRect(-.25, -.45, .5, .5); } },
+          { name: 'yard', z: -.12, trans: .2, draw: x => { const gr = x.createLinearGradient(0, .05, 0, -.2); gr.addColorStop(0, '#a8301f'); gr.addColorStop(1, R.ground); x.fillStyle = gr; x.fillRect(-.25, -.45, .5, .5); } },
           { name: 'shadow', z: -.09, trans: .03, glow: 3, glowCol: '#ffffff', w: .2, h: .32, x: 0, y: -.02,
             draw: x => tallShadow(x, { cx: 0, by: -.16, s: .3, col: '#050101' }), glowDraw: g => tallShadow(null, { cx: 0, by: -.16, s: .3 }, g) },
-          { name: 'porch', z: -.07, trans: .04, draw: x => { x.fillStyle = A.near; x.fillRect(-.25, -.45, .5, .42); x.fillRect(-.25, -.45, .07, .9); x.fillRect(.18, -.45, .07, .9); } },
+          { name: 'porch', z: -.07, trans: .04, draw: x => { x.fillStyle = R.near; x.fillRect(-.25, -.45, .5, .42); x.fillRect(-.25, -.45, .07, .9); x.fillRect(.18, -.45, .07, .9); } },
         ],
         move: { shadow: [[0, [0, 0, 0]], [E.dur, [0, -.004, 0]]] },
         cam: [[0, [0, .1, .36, 0, .1, -.09]], [E.dur, [0, .102, .33, 0, .102, -.09]]],
-        focus: -.09, aper: 18, grade: { contrast: .15 },
+        focus: -.09, aper: 18, grade: { expo: 1.2, vig: .3 },
       }) },
 
     // 15 · The choice: inside, you with your back to the door, scared; the door frame around you, a red line of light under it
     { id: 'S15', start: at('L15') - .3, in: { type: 'dissolve', dur: .4 }, sfx: [{ t: 0, type: 'wind', d: end('L15') - at('L15') + 1, v: .35 }],
       build: E => layered(E, {
-        light: [0, .02, -.12], lightR: .1, lightCol: A.glow, key: .6, amb: .3, ambCol: '#5a2020', sky: { stops: A.sky }, on: false,
+        light: [0, .02, -.12], lightR: .12, lightCol: A.glow, key: .8, amb: .5, ambCol: '#c08070', sky: { stops: ASKY }, on: false,
         layers: [
           { name: 'wall', z: -.12, trans: .05, glow: 2.2, glowCol: A.glow,
-            draw: x => { x.fillStyle = A.mid; x.fillRect(-.25, -.45, .5, .9); x.fillStyle = A.near; x.fillRect(-.05, -.02, .1, .2); doorFrame(x, { cx: 0, by: -.02, w: .1, h: .2, col: A.far }); },
+            draw: x => { x.fillStyle = R.mid; x.fillRect(-.25, -.45, .5, .9); x.fillStyle = '#1a0504'; x.fillRect(-.05, -.02, .1, .2); doorFrame(x, { cx: 0, by: -.02, w: .1, h: .2, col: R.ground }); },
             glowDraw: g => { g.fillStyle = '#fff'; g.fillRect(-.05, -.022, .1, .004); } },
-          { name: 'you', z: -.08, trans: .02, draw: x => person(x, { ...YOU, cx: 0, by: -.01, s: .14, face: 'scared' }) },
-          { name: 'fg', z: -.05, trans: .02, draw: x => { x.fillStyle = '#060101'; x.fillRect(-.25, -.45, .5, .43); } },
+          { name: 'you', z: -.08, trans: .02, ...FACE, draw: x => person(x, { ...YOU, cx: 0, by: -.01, s: .14, face: 'scared' }), glowDraw: g => faceGlow(g, { cx: 0, by: -.01, s: .14, face: 'scared' }) },
+          { name: 'fg', z: -.05, trans: .02, draw: x => { x.fillStyle = '#1a0504'; x.fillRect(-.25, -.45, .5, .43); } },
         ],
         glows: { wall: [[0, 1]] }, flicker: ['wall'],
         cam: [[0, [-.02, .07, .44, 0, .07, -.08]], [E.dur, [.01, .075, .36, 0, .078, -.08]]],
-        focus: -.08, aper: 18,
+        focus: -.08, aper: 18, grade: { expo: 1.15 },
       }) },
 
     // 16 · The end, held under ANSWER or SILENT: your house from across the road, all dark; the tall shadow at your door,
     //      the neighbors in the street facing it, and the fox's lantern, the only light, on the corner of the roof
     { id: 'S16', start: at('L16') - .3, in: { type: 'dissolve', dur: .6 }, sfx: [{ t: 0, type: 'wind', d: DUR - at('L16') + .5, v: .35 }, { t: .6, type: 'shimmer', v: .4 }],
       build: E => layered(E, {
-        light: [0, .1, -.13], lightR: .14, lightCol: A.light, key: .4, amb: .2, sky: { stops: A.sky, stars: 80 }, on: false,
+        light: [0, .1, -.13], lightR: .16, lightCol: A.light, key: .7, amb: .45, ambCol: '#b05040', sky: { stops: ASKY, stars: 80 }, on: false,
         layers: [
-          { name: 'house', z: -.11, trans: .15, draw: x => { x.fillStyle = A.far; x.fillRect(-.25, -.45, .5, .51); house(x, { cx: 0, by: .06, w: .14, h: .08, roof: .05, cols: 3, rows: 2, col: A.far, glass: A.near, lit: false }); } },
+          { name: 'house', z: -.11, trans: .15, draw: x => { x.fillStyle = R.mid; x.fillRect(-.25, -.45, .5, .51); house(x, { cx: 0, by: .06, w: .14, h: .08, roof: .05, cols: 3, rows: 2, col: R.mid, glass: R.glass, lit: false }); } },
           foxAt(.072, .14, .03, -.108, 'watch', true),
           { name: 'shadow', z: -.105, trans: .04, glow: 2.4, glowCol: '#ffffff', w: .05, h: .07, x: 0, y: .09,
-            draw: x => tallShadow(x, { cx: 0, by: -.03, s: .06, col: A.near }), glowDraw: g => tallShadow(null, { cx: 0, by: -.03, s: .06 }, g) },
-          { name: 'ppl', z: -.08, trans: .04, draw: x => [-.09, -.05, .05, .09].forEach(cx => neighbor(x, { cx, by: .03, s: .06, lantern: false, back: true, col: A.near })) },
-          { name: 'fg', z: -.05, trans: .02, draw: ground('#050101', .0, 29) },
+            draw: x => tallShadow(x, { cx: 0, by: -.03, s: .06, col: '#050101' }), glowDraw: g => tallShadow(null, { cx: 0, by: -.03, s: .06 }, g) },
+          { name: 'ppl', z: -.08, trans: .04, draw: x => [-.09, -.05, .05, .09].forEach(cx => neighbor(x, { cx, by: .03, s: .06, lantern: false, back: true, col: '#0a0202' })) },
+          { name: 'fg', z: -.05, trans: .02, draw: ground(R.near, .0, 29) },
         ],
         glows: { fox: [[0, 1]] }, flicker: ['fox'],
         cam: [[0, [-.02, .085, .5, 0, .085, -.1]], [E.dur, [.01, .09, .44, 0, .09, -.1]]],
-        focus: -.1, aper: 14,
+        focus: -.1, aper: 14, grade: { expo: 1.2, vig: .3 },
       }) },
   ];
 }
