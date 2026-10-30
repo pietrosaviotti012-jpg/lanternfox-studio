@@ -1,0 +1,35 @@
+name: wxtest
+on:
+  push:
+    branches: [whisperx]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: |
+          curl -sL https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-linux64-gpl.tar.xz | tar -xJ -C /tmp
+          echo /tmp/ffmpeg-master-latest-linux64-gpl/bin >> "$GITHUB_PATH"
+      - run: |
+          python -m venv /tmp/wx
+          time /tmp/wx/bin/pip install -q --extra-index-url https://download.pytorch.org/whl/cpu whisperx
+          /tmp/wx/bin/pip list 2>/dev/null | grep -iE "^(whisperx|torch|ctranslate2) "
+      - run: |
+          mkdir -p /tmp/p/vo; cp voices/pov.wav /tmp/p/vo/L01.wav; cp voices/cupo.wav /tmp/p/vo/L02.wav
+          /tmp/wx/bin/python -c "
+          import json
+          from faster_whisper import WhisperModel
+          m = WhisperModel('base.en', device='cpu', compute_type='int8')
+          out = {}
+          for k in ['L01', 'L02']:
+              s, _ = m.transcribe(f'/tmp/p/vo/{k}.wav', language='en', word_timestamps=True)
+              out[k] = [[w.word.strip(), round(w.start, 3), round(w.end, 3)] for x in s for w in x.words]
+          json.dump(out, open('/tmp/p/vo/words.json', 'w'))
+          print(out['L01'][-3:])"
+      - run: |
+          time /tmp/wx/bin/python tools/align.py /tmp/p
+          /tmp/wx/bin/python -c "import json; d = json.load(open('/tmp/p/vo/words.json')); print(d['L01'][-3:]); print(len(d['L01']), len(d['L02']))"
