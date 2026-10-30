@@ -71,6 +71,7 @@ Skill: `going-viral`, `viral-hook-writer`, `reel-scripter`, `on-screen-text-writ
 - `music`: l'umore di ogni scena (`calm`, `storm`, `hush`, `rise`, `warm`, `end`).
 
 ## 4. Regia (`regia`)
+Prima di disegnare: tema di colore in `pipeline/VISIVO.md`, figure in `pipeline/FIGURE.md`. **La volpe è in ogni video,** anche solo in un angolo e senza parlare (`foxCameo`). `script.json` deve avere `theme`.
 Skill: `lemo-opuscar` (leggi `STYLE.md` di paper-lantern e `DIRECTOR.md`), il tabellone di `launch-video`. Scrive `shots.js` con il kit (`engine/kit/shot.js` + `engine/kit/motifs.js`, esempio completo: `productions/2026-10-28-lighthouse-fox/shots.js`):
 - prima di cominciare leggi **`pipeline/VISIVO.md`**, la guida di ricerca e sviluppo visivo: un evento visivo ogni 1,5-2,5 s, `em`, `hit`, `card`, `fx`;
 - 10-18 inquadrature, ognuna ancorata a una riga (`start: at('L04') - .4`); sui cambi veloci tagli netti, sui momenti calmi dissolvenze di 0,5-0,8 s;
@@ -81,6 +82,7 @@ Skill: `lemo-opuscar` (leggi `STYLE.md` di paper-lantern e `DIRECTOR.md`), il ta
 Controllo: `sh tools/stills.sh <produzione> <cartella> 2 8 15 …` e guarda i fotogrammi prima di andare avanti.
 
 ## 5. Voce (`voce`)
+Rubrica di 31 voci, voci diverse per riga (`speaker`) e quando fare gli sbalzi: `pipeline/VOCE.md`. Il Copione la legge prima di scrivere `act`.
 Il narratore cambia con il formato: la voce la sceglie `tools/voice.py` da `meta.format`, usando le clip in `voices/` (voci sintetiche, approvate dall'utente il 2026-10-28):
 - `pov` per Your Call;
 - `professore` per What if;
