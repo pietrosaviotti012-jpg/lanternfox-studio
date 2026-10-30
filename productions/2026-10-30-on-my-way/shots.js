@@ -1,6 +1,6 @@
 // On My Way · Part 1 (Your Call) — shot list. At 11:52 pm your mom texts "on my way, 10 min", but she has been on your couch
 // since ten, smiling at a TV that is off. The mom in the car can't find the house; the fox with the lantern sits under the
-// streetlamp, staring at your front door; the couch creaks behind you, a whisper asks who you're texting, and headlights turn
+// streetlamp, staring at your front door; the couch creaks behind you, the dead TV turns on and asks who you're texting, and headlights turn
 // into your street. The end holds both moms in one picture (the car at the kerb, the silhouette in the window) for TEXT or COUCH.
 // Subjects sit between 15 % and 52 % of the frame height (the series tag is above, the pop captions below).
 // Starts are anchored to narration lines (C), effects to the line timings (E.cue / E.cueEnd / E.word).
@@ -9,9 +9,13 @@ import { fox, house, houses, streetlamp, neighbor, pines, phone, foreground, per
 import { text } from './engine/paper.js';
 import { seg, ss, lerp } from './engine/lib.js';
 
-const NIGHT = [[0, '#0a1330'], [.5, '#172a58'], [.8, '#2e4478'], [1, '#43598a']];
-const DARK = [[0, '#05081a'], [.6, '#0c1430'], [1, '#18244a']];
-const ROOM = [[0, '#06080f'], [1, '#121730']];
+const NIGHT = [[0, '#060a1c'], [.5, '#0e1734'], [.8, '#18264a'], [1, '#243458']];   // darker, colder than the usual night
+const DARK = [[0, '#030510'], [.6, '#070b1e'], [1, '#0e1530']];
+const ROOM = [[0, '#030409'], [1, '#0a0d1e']];
+// the whole film a step darker and colder: every shot's grade is pulled down, desaturated and vignetted harder
+const dim = s => ({ ...s, build: async E => { const r = await s.build(E), g0 = r.grade;
+  r.grade = t => { const g = g0(t); return { ...g, expo: g.expo * .74, sat: g.sat * .68, vig: Math.max(g.vig, .7), contrast: g.contrast + .1, gain: g.gain || [.9, .95, 1.08] }; };
+  return r; } });
 const NOGLOW = { trans: 0, shadow: false, recv: false };
 const YOU = { coat: '#f2b632', hat: false };                       // you: the yellow puffer, the colour that reads at a glance
 const MOM = { coat: '#7a3f55', hair: '#3a2a22', pants: '#2a2533' };  // mom: a plum cardigan and a bun
@@ -49,9 +53,9 @@ const reveal = (L, n, t, t0, d = .5) => { const k = ss(seg(t, t0, t0 + d)); L[n]
 
 export function SHOTS(C, DUR) {
   const at = id => C[id].at, end = id => C[id].end;
-  return [
+  const list = [
     // 1 · The hook: you in the dark living room, the phone lighting your face; the "Mom: on my way" card drops on frame 0
-    { id: 'S1', start: 0, sfx: [{ t: .15, type: 'chime', v: .6 }, { t: .3, type: 'click', v: .4 }],
+    { id: 'S1', start: 0, sfx: [{ t: .15, type: 'chime', v: .6 }, { t: .3, type: 'click', v: .4 }, { t: 0, type: 'wind', d: 7, v: .3 }],
       build: E => layered(E, {
         light: [.04, .1, -.1], lightR: .1, lightCol: '#a8c0ff', key: .9, amb: .6, sky: { stops: NIGHT, stars: 90 }, on: false,
         layers: [
@@ -129,7 +133,7 @@ export function SHOTS(C, DUR) {
       }) },
 
     // 6 · On the couch, mom watches TV, smiling, her face lit blue by the screen; the TV's back in the near corner
-    { id: 'S6', start: at('L06') - .35, in: { type: 'dissolve', dur: .6 }, sfx: [{ t: .3, type: 'shimmer', v: .3 }],
+    { id: 'S6', start: at('L06') - .35, in: { type: 'dissolve', dur: .6 }, sfx: [{ t: .3, type: 'shimmer', v: .2 }, { t: 1.2, type: 'crack', v: .35 }, { t: 1.25, type: 'steps', n: 1, every: .3, v: .5 }],
       build: E => layered(E, {
         light: [.0, .1, -.06], lightR: .1, lightCol: '#8fb0ff', key: .85, amb: .45, ambCol: '#5a6a9a', sky: { stops: ROOM }, on: false,
         layers: [
@@ -226,7 +230,9 @@ export function SHOTS(C, DUR) {
       }) },
 
     // 12 · Behind you, the couch creaks: you at the window (from behind); in the dark room, mom rises from the couch
-    { id: 'S12', start: at('L12') - .2, sfx: [{ t: .2 + C.L12.dur * .6, type: 'paper', v: 1.3 }, { t: .2 + C.L12.dur * .55, type: 'thunder', v: .55 }],
+    { id: 'S12', start: at('L12') - .2, sfx: [{ t: .2 + C.L12.dur * .4, type: 'crack', v: .9 }, { t: .2 + C.L12.dur * .45, type: 'steps', n: 2, every: .55, v: 1.2 },
+      { t: .2 + C.L12.dur * .75, type: 'crack', v: .6 }, { t: .2 + C.L12.dur * .6, type: 'paper', v: 1.1 }, { t: .2 + C.L12.dur * .55, type: 'thunder', v: .45 },
+      { t: .2 + C.L12.dur + .3, type: 'steps', n: 4, every: .75, v: .9 }],
       build: E => {
         const up = E.cue('L12') + C.L12.dur * .55;
         return layered(E, {
@@ -245,19 +251,25 @@ export function SHOTS(C, DUR) {
         });
       } },
 
-    // 13 · "Who are you texting, sweetheart?": close on her face in the dark, only the smile and two glints catch the light
-    { id: 'S13', start: at('L13') - .2, sfx: [{ t: .1, type: 'whoosh', v: .4 }],
-      build: E => layered(E, {
-        light: [.0, .14, -.06], lightR: .05, lightCol: '#ffb0a0', key: .25, amb: .12, sky: { stops: [[0, '#02030a'], [1, '#080a18']] }, on: false,
-        layers: [
-          { name: 'face', z: -.08, trans: .3, glow: 2, glowCol: '#ffd0c0', w: .2, h: .3, x: 0, y: .1,
-            draw: x => neighbor(x, { cx: 0, by: -.18, s: .32, lantern: false, smile: true, col: '#07080f' }),
-            glowDraw: g => { neighbor(null, { cx: 0, by: -.18, s: .32, lantern: false, smile: true }, g); g.fillStyle = '#fff'; for (const d of [-1, 1]) { g.beginPath(); g.arc(d * .009, .118, .0018, 0, Math.PI * 2); g.fill(); } } },
-        ],
-        glows: { face: [[0, 0], [.4, .8]] },
-        cam: [[0, [0, .13, .36, 0, .13, -.08]], [E.dur, [0, .125, .28, 0, .125, -.08]]],
-        focus: -.08, aper: 18, grade: { sat: .6, contrast: .2 },
-      }) },
+    // 13 · The dead TV turns on by itself: a cold glow in the black room, her silhouette between you and the screen;
+    //      her question is written on the screen (the `tv` overlay), never said by the narrator. Slow push in.
+    { id: 'S13', start: at('L13') - .2, sfx: [{ t: .05, type: 'click', v: .6 }, { t: .1, type: 'crack', v: .5 }, { t: 0, type: 'wind', d: C.L13.dur + 1.2, v: .35 }],
+      build: E => {
+        const on = E.word('L13', 3);
+        return layered(E, {
+          light: [.0, .13, -.08], lightR: .09, lightCol: '#9fb4ff', key: .3, amb: .1, sky: { stops: [[0, '#010207'], [1, '#05070f']] }, on: false,
+          layers: [
+            { name: 'wall', z: -.12, trans: .06, draw: x => { x.fillStyle = '#0c1024'; x.fillRect(-.25, -.45, .5, .9); } },
+            { name: 'tv', z: -.1, trans: .03, glow: 2.6, glowCol: '#b8c8ff', draw: x => tvSet(x, { cx: 0, by: .04, w: .22, h: .2, col: '#020308', glass: '#1a2040' }),
+              glowDraw: g => tvSet(null, { cx: 0, by: .04, w: .22, h: .2, on: true }, g) },
+            { name: 'mom', z: -.07, trans: .02, w: .12, h: .16, x: -.06, y: .08, draw: x => neighbor(x, { cx: 0, by: -.07, s: .15, lantern: false, back: true, col: '#030409' }) },
+            { name: 'fg', z: -.05, trans: .02, draw: floor(-.02, '#020308') },
+          ],
+          glows: { tv: [[0, 0], [on - .1, 0], [on + .05, .9], [on + .15, .3], [on + .3, 1]] }, flicker: ['tv'],
+          cam: [[0, [0, .12, .46, 0, .12, -.09]], [E.dur, [-.01, .118, .36, 0, .12, -.09]]],
+          focus: [[0, -.07], [on, -.1]], aper: 18, grade: { sat: .6, contrast: .2 },
+        });
+      } },
 
     // 14 · Headlights turn into your street: the car rounds the corner, beams sweeping over the dark houses
     { id: 'S14', start: at('L14') - .25, in: { type: 'dissolve', dur: .4 }, sfx: [{ t: .1, type: 'whoosh', v: .7 }, { t: 0, type: 'wind', d: end('L14') - at('L14') + 1.2, v: .4 }],
@@ -302,4 +314,5 @@ export function SHOTS(C, DUR) {
         });
       } },
   ];
+  return list.map(dim);
 }
