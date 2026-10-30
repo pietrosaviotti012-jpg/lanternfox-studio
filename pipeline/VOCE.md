@@ -1,6 +1,6 @@
 # La voce: rubrica e sbalzi
 
-La guida di Copione e Voce. Nasce dalla misura di 8 reel virali (`research/analisi/`, 2026-10-30): 45 cambi di voce messi in fila con le parole dette in quel momento.
+La guida di Copione e Voce. Nasce dalla misura di 10 reel virali (`research/analisi/`, 2026-10-30): 58 cambi di voce trovati, e quelli di 6 reel messi in fila con le parole dette in quel momento. Le regole sono una sintesi: da confermare con i numeri dei nostri video.
 
 ## La rubrica
 `voices/RUBRICA.json` elenca 29 voci sintetiche, 14 maschili e 15 femminili, con tipo e uso. La licenza di ogni voce Piper è in `voices/LICENZE-PIPER.md`: niente voci con licenza non commerciale. `uomo-del-nord` è CC-BY-SA: se si usa, citarla nella descrizione del video. Ogni voce è una clip in `voices/<id>.wav`.
