@@ -82,7 +82,7 @@ Skill: `lemo-opuscar` (leggi `STYLE.md` di paper-lantern e `DIRECTOR.md`), il ta
 Controllo: `sh tools/stills.sh <produzione> <cartella> 2 8 15 …` e guarda i fotogrammi prima di andare avanti.
 
 ## 5. Voce (`voce`)
-Rubrica di 31 voci, voci diverse per riga (`speaker`) e quando fare gli sbalzi: `pipeline/VOCE.md`. Il Copione la legge prima di scrivere `act`.
+Rubrica di 29 voci, voci diverse per riga (`speaker`) e quando fare gli sbalzi: `pipeline/VOCE.md`. Il Copione la legge prima di scrivere `act`.
 Il narratore cambia con il formato: la voce la sceglie `tools/voice.py` da `meta.format`, usando le clip in `voices/` (voci sintetiche, approvate dall'utente il 2026-10-28):
 - `pov` per Your Call;
 - `professore` per What if;

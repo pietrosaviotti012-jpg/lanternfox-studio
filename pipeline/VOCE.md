@@ -3,7 +3,7 @@
 La guida di Copione e Voce. Nasce dalla misura di 8 reel virali (`research/analisi/`, 2026-10-30): 45 cambi di voce messi in fila con le parole dette in quel momento.
 
 ## La rubrica
-`voices/RUBRICA.json` elenca 31 voci sintetiche, 15 maschili e 16 femminili, con tipo e uso. Ogni voce è una clip in `voices/<id>.wav`.
+`voices/RUBRICA.json` elenca 29 voci sintetiche, 14 maschili e 15 femminili, con tipo e uso. La licenza di ogni voce Piper è in `voices/LICENZE-PIPER.md`: niente voci con licenza non commerciale. `uomo-del-nord` è CC-BY-SA: se si usa, citarla nella descrizione del video. Ogni voce è una clip in `voices/<id>.wav`.
 - **Il narratore** del video: `"voice": {"preset": "<id>"}` in `script.json`. Senza, decide il formato.
 - **Un'altra voce per una riga** (dialoghi, personaggi): `"speaker": "<id>"` sulla riga. Esempio: `{"id": "L07", "text": "Don't open the door.", "speaker": "sussurro"}`.
 - Massimo 3 voci nello stesso video, più gli effetti: oltre non si capisce chi parla.
