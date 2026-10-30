@@ -13,5 +13,6 @@ for j in script.json meta.json; do
   node -e "JSON.parse(require('fs').readFileSync(process.argv[1],'utf8'))" "$1/$j" || { echo "ERRORE: $1/$j non è JSON valido"; fail=1; }
 done
 rm -rf "$T"
+node "$STUDIO/tools/themes_check.mjs" >/dev/null || { echo "ERRORE: un tema di colore non si legge (node tools/themes_check.mjs)"; fail=1; }
 [ $fail = 0 ] && echo "check: tutto a posto"
 exit $fail

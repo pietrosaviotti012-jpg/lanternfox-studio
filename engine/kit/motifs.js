@@ -732,3 +732,89 @@ export function car(x, o, g) {
   if (g) { g.fillStyle = '#fff'; g.beginPath(); g.ellipse(X(.48), by + h * .45, w * .02, h * .08, 0, 0, TAU); g.fill(); }
   return [X(.5), by + h * .45];
 }
+
+// —— Figures: monsters and animals (rules in pipeline/FIGURE.md). Each is a single readable silhouette with at most one lit detail. ——
+// All take cx, by (bottom centre), s (height in metres), col; glow details go to g; flip mirrors the ones with a direction.
+
+// A polygon from unit points (x across, y up, both × s) around cx, by
+function shape(x, cx, by, s, pts, col, flip = 1) {
+  if (!x) return;
+  x.fillStyle = col; x.beginPath();
+  pts.forEach(([u, v], i) => (i ? x.lineTo(cx + u * s * flip, by + v * s) : x.moveTo(cx + u * s * flip, by + v * s)));
+  x.closePath(); x.fill();
+}
+const dots = (t, cx, by, s, list, r, col, flip = 1) => {
+  if (!t) return; t.fillStyle = col;
+  for (const [u, v] of list) { t.beginPath(); t.arc(cx + u * s * flip, by + v * s, r * s, 0, TAU); t.fill(); }
+};
+
+// Fear lives in what you don't see: a tall thin shadow, too long arms, no face but two points of light. o.eyes: colour of the eyes
+export function tallShadow(x, o, g) {
+  const { cx, by, s, col = '#05060a', eyes = '#ffffff', flip = false } = o, f = flip ? -1 : 1;
+  shape(x, cx, by, s, [[-.05, 0], [-.07, .3], [-.11, .62], [-.3, .05], [-.33, .07], [-.15, .74], [-.09, .84], [-.075, .96], [0, 1], [.075, .96], [.09, .84],
+    [.15, .74], [.33, .07], [.3, .05], [.11, .62], [.07, .3], [.05, 0]], col, f);
+  const e = [[-.03, .93], [.03, .93]];
+  dots(x, cx, by, s, e, .009, eyes, f); dots(g, cx, by, s, e, .012, '#fff', f);
+}
+// Eyes in the dark: pairs of eyes only. The cheapest monster and often the best. o.pairs: [[u, v], …] in s units
+export function lurkers(x, o, g) {
+  const { cx, by, s, col = '#ffe08a', pairs = [[0, .5]], gap = .05 } = o;
+  for (const [u, v] of pairs) {
+    const e = [[u - gap / 2, v], [u + gap / 2, v]];
+    dots(x, cx, by, s, e, .012, col); dots(g, cx, by, s, e, .016, '#fff');
+  }
+}
+// Something big behind the hill: a hunched mass with a row of spines. Show part of it, cut by the frame or a sheet.
+export function hulk(x, o, g) {
+  const { cx, by, s, col = '#07080d', eye = '#ff5b4d', flip = false } = o, f = flip ? -1 : 1;
+  const pts = [[-.7, 0], [-.66, .3], [-.54, .56], [-.5, .66], [-.44, .6], [-.38, .8], [-.31, .7], [-.22, .92], [-.14, .78], [-.04, 1], [.05, .82], [.2, .9], [.34, .72],
+    [.5, .68], [.62, .54], [.66, .42], [.56, .36], [.6, .24], [.46, .26], [.5, 0]];
+  shape(x, cx, by, s, pts, col, f);
+  dots(x, cx, by, s, [[.46, .55]], .018, eye, f); dots(g, cx, by, s, [[.46, .55]], .024, '#fff', f);
+}
+// Wolf, standing in profile, facing right
+export function wolf(x, o, g) {
+  const { cx, by, s, col = '#1a1f2c', eye = '#ffe08a', flip = false } = o, f = flip ? -1 : 1;
+  shape(x, cx, by, s, [[-.9, .62], [-1.2, .36], [-1.12, .32], [-.84, .5], [-.8, 0], [-.7, 0], [-.64, .34], [.2, .36], [.26, 0], [.36, 0], [.42, .42], [.56, .68], [.6, .94],
+    [.68, .8], [.74, .94], [.8, .76], [1.08, .64], [1.08, .58], [.8, .54], [.64, .44], [.5, .78], [-.5, .82]], col, f);
+  dots(x, cx, by, s, [[.78, .7]], .022, eye, f); dots(g, cx, by, s, [[.78, .7]], .03, '#fff', f);
+}
+// Raven perched, facing right
+export function raven(x, o) {
+  const { cx, by, s, col = '#0b0c12', eye = '#ffd34d', flip = false } = o, f = flip ? -1 : 1;
+  shape(x, cx, by, s, [[-.05, 0], [-.02, .2], [-.72, .06], [-.3, .44], [-.12, .72], [.14, .92], [.28, .96], [.4, .9], [.64, .82], [.4, .76], [.34, .56], [.22, .28], [.08, .2], [.08, 0]], col, f);
+  dots(x, cx, by, s, [[.3, .86]], .025, eye, f);
+}
+// Deer standing, antlers up: quiet, gentle or uncanny depending on the light
+export function deer(x, o) {
+  const { cx, by, s, col = '#3a2a22', flip = false } = o, f = flip ? -1 : 1;
+  shape(x, cx, by, s, [[-.5, .5], [-.46, 0], [-.4, 0], [-.34, .3], [.14, .3], [.18, 0], [.24, 0], [.28, .36], [.36, .72], [.4, .78], [.56, .7], [.6, .74], [.46, .86], [.42, .92],
+    [.34, .9], [.24, .62], [-.3, .56]], col, f);
+  if (!x) return;
+  x.strokeStyle = col; x.lineWidth = s * .018; x.lineCap = 'round';
+  const line = (pts) => { x.beginPath(); pts.forEach(([u, v], i) => (i ? x.lineTo(cx + u * s * f, by + v * s) : x.moveTo(cx + u * s * f, by + v * s))); x.stroke(); };
+  line([[.38, .9], [.3, 1.1], [.2, 1.22]]); line([[.33, 1.04], [.42, 1.16]]); line([[.28, 1.1], [.16, 1.1]]);
+}
+// Cat sitting, seen from behind or in shadow: two ears are enough
+export function cat(x, o, g) {
+  const { cx, by, s, col = '#0d0e14', eyes = false } = o;
+  shape(x, cx, by, s, [[-.3, 0], [-.34, .3], [-.22, .56], [-.2, .72], [-.24, .98], [-.1, .84], [.1, .84], [.24, .98], [.2, .72], [.22, .56], [.34, .3], [.3, 0]], col);
+  if (eyes) { dots(x, cx, by, s, [[-.09, .72], [.09, .72]], .03, eyes); dots(g, cx, by, s, [[-.09, .72], [.09, .72]], .04, '#fff'); }
+}
+// Owl on a branch, front view
+export function owl(x, o, g) {
+  const { cx, by, s, col = '#4a3a2c', chest = '#b89a70', eyes = '#ffd34d' } = o;
+  shape(x, cx, by, s, [[-.3, 0], [-.38, .4], [-.34, .78], [-.32, 1], [-.12, .9], [.12, .9], [.32, 1], [.34, .78], [.38, .4], [.3, 0]], col);
+  shape(x, cx, by, s, [[-.18, .05], [-.2, .4], [0, .55], [.2, .4], [.18, .05]], chest);
+  dots(x, cx, by, s, [[-.14, .72], [.14, .72]], .1, chest); dots(x, cx, by, s, [[-.14, .72], [.14, .72]], .055, eyes); dots(g, cx, by, s, [[-.14, .72], [.14, .72]], .05, '#fff');
+}
+// The fox's cameo: she is in every video even when she says nothing. Small, in a corner of the set, lantern lit, looking in.
+// o.pose: 'watch' (sitting, the default), 'window' (only head and ears over an edge, by = the edge)
+export function foxCameo(x, o, g) {
+  const { cx, by, s, pose = 'watch', flip = false, col = '#e8743b', cream = '#f6e3c8' } = o, f = flip ? -1 : 1;
+  if (pose === 'watch') return fox(x, { cx, by, s, flip, lantern: true }, g);
+  const ear = [[-.5, .3], [-.42, 1], [-.1, .62], [.1, .62], [.42, 1], [.5, .3], [.2, 0], [-.2, 0]];
+  shape(x, cx, by, s * .5, ear, col, f);
+  shape(x, cx, by, s * .5, [[-.34, .18], [0, 0], [.34, .18], [0, .1]], cream, f);
+  dots(x, cx, by, s * .5, [[-.2, .32], [.2, .32]], .045, '#0e1532', f);
+}

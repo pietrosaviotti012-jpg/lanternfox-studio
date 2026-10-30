@@ -3,6 +3,7 @@
 //
 // A production folder holds: index.html (from engine/index.html), script.json, vo/dur.json, vo/words.json,
 // shots.js (export function SHOTS(C, DUR) → [{ id, start, in?, build }]) and meta.json.
+import { theme } from './kit/themes.js';
 import * as THREE from 'three';
 import { Pipe } from './post.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
@@ -15,6 +16,12 @@ const Q = new URLSearchParams(location.search), SSAA = +(Q.get('ssaa') || 2);
 const base = new URL('../', import.meta.url);   // the production folder (engine/ is copied inside it)
 const load = async (p, fallback) => { const r = await fetch(new URL(p, base)); if (!r.ok) { if (fallback !== undefined) return fallback; throw new Error(`missing ${p}`); } return r.json(); };
 const script = await load('script.json');
+// the colour theme ("misteri/notte", engine/kit/themes.js): caption highlight and series tag follow it
+if (script.theme) {
+  const [fmt, mood] = script.theme.split('/'), T = theme(fmt, mood);
+  document.documentElement.style.setProperty('--em', T.em);
+  document.documentElement.style.setProperty('--tag', T.tag);
+}
 const dur = await load('vo/dur.json', null);
 const WORDS = await load('vo/words.json', {});
 

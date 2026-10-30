@@ -18,7 +18,7 @@ html, body { margin: 0; background: #000; overflow: hidden; }
 #pop span { display: inline-block; transform: scale(var(--k, 1)); transform-origin: 50% 70%; }
 /* the series tag: what this is, from frame 0 (the context of the hook), and where we are in the story */
 #hud { position: absolute; left: 70px; top: 150px; font-family: Anton; letter-spacing: .04em; color: #fbf3e4; opacity: 0; }
-#hud .tag { display: inline-block; padding: 6px 14px 4px; font-size: 34px; background: #c8342b; color: #fff; }
+#hud .tag { display: inline-block; padding: 6px 14px 4px; font-size: 34px; background: var(--tag, #c8342b); color: #fff; }
 #hud .part { display: inline-block; margin-left: 12px; font-size: 34px; color: #ffcf4a; }
 #hud .clock { margin-top: 10px; font-size: 38px; text-shadow: 0 3px 12px rgba(0,0,0,.8); }
 /* cover (?cover=1): the still used as Reel cover: one big promise, readable as a thumbnail */
