@@ -1,0 +1,45 @@
+# The voice directory: makes the missing clips of voices/RUBRICA.json and keeps each Piper voice's licence next to them.
+name: voices
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['voices/RUBRICA.json', 'voices/make_refs.py']
+
+permissions:
+  contents: write
+
+jobs:
+  make:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Tools
+        run: pip install kokoro-onnx soundfile numpy piper-tts
+      - name: Models
+        run: |
+          mkdir -p /tmp/k /tmp/p
+          B=https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0
+          curl -sfL "$B/kokoro-v1.0.onnx" -o /tmp/k/kokoro-v1.0.onnx
+          curl -sfL "$B/voices-v1.0.bin" -o /tmp/k/voices-v1.0.bin
+          H=https://huggingface.co/rhasspy/piper-voices/resolve/main
+          : > voices/LICENZE-PIPER.md
+          for v in $(python -c "import json; [print(x['voice']) for x in json.load(open('voices/RUBRICA.json',encoding='utf8')) if x['engine']=='piper']"); do
+            n=$(basename "$v"); d=$(dirname "$v")
+            curl -sfL "$H/$v.onnx" -o "/tmp/p/$n.onnx"
+            curl -sfL "$H/$v.onnx.json" -o "/tmp/p/$n.onnx.json"
+            { echo "## $n"; curl -sfL "$H/$d/MODEL_CARD"; echo; } >> voices/LICENZE-PIPER.md
+          done
+          cat voices/LICENZE-PIPER.md
+      - name: Clips
+        run: python voices/make_refs.py /tmp/k /tmp/p
+      - name: Keep them
+        run: |
+          git config user.name "Lantern Fox Voce"; git config user.email "voce@lanternfox.tales"
+          git add voices
+          git diff --cached --quiet || { git commit -m "Voices: clips for the directory"; git pull --rebase origin main && git push; }

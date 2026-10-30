@@ -35,7 +35,7 @@ if not voice.get("prompt"):
         print(f"voice: narrator '{preset}'", flush=True)
 
 def key(L):
-    return hashlib.sha1(json.dumps([L["text"], L.get("say"), L.get("act", {}), L.get("vfx"), voice, 2], sort_keys=True).encode()).hexdigest()[:12]
+    return hashlib.sha1(json.dumps([L["text"], L.get("say"), L.get("act", {}), L.get("vfx"), L.get("speaker"), voice, 2], sort_keys=True).encode()).hexdigest()[:12]
 
 # Whisper writes small numbers as digits ("One millionth" heard as "1 millionth"): both sides become digits
 NUMBERS = {w: str(i) for i, w in enumerate("zero one two three four five six seven eight nine ten eleven twelve".split())}
@@ -51,6 +51,16 @@ if todo:
     print(f"voice: {len(todo)} line(s) to generate", flush=True)
     model = ChatterboxTTS.from_pretrained(device="cpu")
 
+# a line can have its own voice from the directory (voices/RUBRICA.json): "speaker": "mostro", for dialogue and characters
+def prompt_for(L):
+    who = L.get("speaker")
+    if not who:
+        return voice.get("prompt")
+    path = os.path.join(VOICES, who + ".wav")
+    if not os.path.exists(path):
+        sys.exit(f"voice: the speaker '{who}' of {L['id']} is missing (voices/{who}.wav)")
+    return path
+
 def synth(L, attempt):
     import torch
     act = L.get("act", {})
@@ -58,7 +68,7 @@ def synth(L, attempt):
     # words in capitals ("Comment GO or STAY") are read letter by letter: the narrator gets them in lower case
     spoken = L.get("say") or re.sub(r"\b[A-Z]{2,}\b", lambda m: m.group(0).lower(), L["text"])
     wav = model.generate(spoken, exaggeration=float(act.get("intensity", .5)), cfg_weight=float(act.get("pace", .45)),
-                         **({"audio_prompt_path": voice["prompt"]} if voice.get("prompt") else {}))
+                         **({"audio_prompt_path": prompt_for(L)} if prompt_for(L) else {}))
     x = wav.squeeze().cpu().numpy().astype(np.float32)
     with tempfile.TemporaryDirectory() as d:
         a, b = os.path.join(d, "a.wav"), os.path.join(d, "b.wav")
