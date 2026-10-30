@@ -70,6 +70,7 @@ cat, errors, tmp = {}, [], tempfile.mkdtemp()
 for fam, spec in LIST.items():
     kind = spec["kind"]; os.makedirs(os.path.join(OUT, fam), exist_ok=True)
     for i, item in enumerate(spec["items"], 1):
+        if isinstance(item, dict) and item.get("skip"): continue   # refused after listening: the numbering of the others stays
         s, start, dur = (item, 0, 0) if isinstance(item, str) else (item["s"], item.get("start", 0), item.get("dur", 0))
         name = f"{fam}/{i}.ogg"; dst = os.path.join(OUT, name)
         try:
