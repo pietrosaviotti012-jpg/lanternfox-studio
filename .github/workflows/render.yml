@@ -76,6 +76,18 @@ jobs:
           node tools/office.mjs "$VIDEO" '{"dept":"voce","status":"working","task":"Registro il narratore riga per riga"}'
           python tools/voice.py "${{ steps.which.outputs.dir }}" || { node tools/office.mjs '{"dept":"voce","status":"error","task":"Una riga non si capisce: va riscritta"}'; exit 1; }
           node tools/office.mjs '{"dept":"voce","status":"done","task":"Narrazione pronta e controllata"}' '{"dept":"animazione","status":"working","task":"Disegno i fotogrammi su 6 macchine insieme"}'
+      - name: Word times cache
+        uses: actions/cache@v4
+        with:
+          path: /home/runner/.cache/torch
+          key: torch-align-v1
+      - name: Sharper word times (it never stops the chain)
+        continue-on-error: true
+        timeout-minutes: 12
+        run: |
+          python -m venv /tmp/wx
+          /tmp/wx/bin/pip install -q --extra-index-url https://download.pytorch.org/whl/cpu whisperx
+          /tmp/wx/bin/python tools/align.py "${{ steps.which.outputs.dir }}"
       - uses: actions/upload-artifact@v4
         with:
           name: vo

@@ -107,7 +107,7 @@ Il narratore cambia con il formato: la voce la sceglie `tools/voice.py` da `meta
 - `fiaba` per le fiabe.
 
 Per forzarne un'altra: `"voice": {"preset": "cupo"}` in `script.json`.
-`python tools/voice.py <produzione>` (Chatterbox, poi Whisper controlla ogni riga e scrive i tempi delle parole). Se una riga non si capisce, riscrivila più semplice (o aggiungi `"say"` con la pronuncia) e rilancia: rifà solo quella.
+`python tools/voice.py <produzione>` (Chatterbox, poi Whisper controlla ogni riga e scrive i tempi delle parole). Su GitHub `tools/align.py` (WhisperX) rende quei tempi più precisi, in un ambiente a parte: se non riesce restano quelli di Whisper e la catena va avanti. Se una riga non si capisce, riscrivila più semplice (o aggiungi `"say"` con la pronuncia) e rilancia: rifà solo quella.
 
 ## 6-8. Animazione, musica, montaggio (`animazione`, `musica`, `montaggio`)
 Li fa GitHub Actions: un commit su `productions/<id>/` con il file `READY` avvia `render.yml`, che esegue `tools/build.sh` (eventi → musica del formato → fotogrammi → mix con i suoni del formato → −14 LUFS → poster e foglio dei provini) e manda gli eventi all'ufficio.
