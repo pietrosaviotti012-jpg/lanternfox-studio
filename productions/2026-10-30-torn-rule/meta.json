@@ -1,0 +1,31 @@
+{
+  "id": "2026-10-30-torn-rule",
+  "title": "TEST · The Torn Rule · Part 1",
+  "title_it": "TEST · La regola strappata · Parte 1",
+  "format": "rules",
+  "series": "The Torn Rule",
+  "episode": 1,
+  "request": "test-risorse-20261030",
+  "test": true,
+  "publish": false,
+  "idea": "At 3:07 am every phone in the city gets the same four rules, but rule three arrives torn in half and your neighbors somehow know the rest; every light goes dark except a fox's lantern on a roof, your neighbors stand at their windows staring at your door, three knocks, and a deep voice says rule three means you let them in. Rule four: never answer in your own voice. ANSWER or SILENT?",
+  "hook": "At 3:07 am, every phone in the city got the same four rules. Rule three arrived torn in half. And somehow, your neighbors already know the rest of it.",
+  "cover": {
+    "kicker": "THE TORN RULE · PART 1",
+    "text": "Rule three is *torn*",
+    "t": 23.5
+  },
+  "caption": "TEST VIDEO, NOT FOR PUBLISHING.\n\nAt 3:07 am, every phone in the city gets four rules. 📱\nRule three arrives torn in half. Your neighbors already know the rest. 🚪\n\nRule four: never answer in your own voice.\n\nComment ANSWER or SILENT. Part 2 follows the most-commented answer. 🦊🏮",
+  "hashtags": [
+    "#rules",
+    "#scarystory",
+    "#creepy",
+    "#yourcall",
+    "#animatedstory",
+    "#papercut",
+    "#lanternfoxtales"
+  ],
+  "first_comment": "ANSWER or SILENT? What do you think rule three really said? 🦊🏮",
+  "ai_label": true,
+  "platforms": []
+}

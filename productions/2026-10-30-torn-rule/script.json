@@ -1,0 +1,327 @@
+{
+ "title": "TEST · The Torn Rule · Part 1",
+ "series": "The Torn Rule",
+ "format": "rules",
+ "theme": "regole/notte",
+ "voice": {
+  "preset": "cupo"
+ },
+ "captions": "pop",
+ "hud": {
+  "tag": "THE TORN RULE",
+  "part": "PART 1",
+  "clock": "3:07 AM"
+ },
+ "fx": "dust",
+ "lead": 0.4,
+ "tail": 3.4,
+ "lines": [
+  {
+   "id": "L01",
+   "text": "At 3:07 am, every phone in the city got the same four rules.",
+   "say": "At three oh seven a.m., every phone in the city got the same four rules.",
+   "em": [
+    "four",
+    "rules"
+   ],
+   "gap": 0.3,
+   "act": {
+    "intensity": 0.5,
+    "pace": 0.32,
+    "speed": 0.97
+   },
+   "card": {
+    "app": "Emergency alert",
+    "title": "4 RULES · READ THEM NOW",
+    "body": "Rule 1: Stay inside until 6:00 am.",
+    "hold": 3.6
+   }
+  },
+  {
+   "id": "L02",
+   "text": "Rule three arrived torn in half.",
+   "em": [
+    "torn"
+   ],
+   "gap": 0.35,
+   "act": {
+    "intensity": 0.5,
+    "pace": 0.32,
+    "speed": 0.95
+   }
+  },
+  {
+   "id": "L03",
+   "text": "And somehow, your neighbors already know the rest of it.",
+   "em": [
+    "already"
+   ],
+   "hit": true,
+   "gap": 0.6,
+   "act": {
+    "intensity": 0.6,
+    "pace": 0.32,
+    "speed": 0.95,
+    "gain_db": 0.5
+   }
+  },
+  {
+   "id": "L04",
+   "text": "Rule one. Stay inside until 6 am.",
+   "say": "Rule one. Stay inside until six a.m.",
+   "speaker": "uomo-radio",
+   "vfx": "radio",
+   "em": [
+    "inside"
+   ],
+   "gap": 0.4,
+   "act": {
+    "intensity": 0.5,
+    "pace": 0.34,
+    "speed": 0.97,
+    "gain_db": 1
+   },
+   "tv": {
+    "title": "EMERGENCY ALERT",
+    "rule": "RULE 1",
+    "text": "STAY INSIDE",
+    "ticker": "UNTIL 6:00 AM · DO NOT LEAVE YOUR HOME · THIS IS NOT A TEST"
+   }
+  },
+  {
+   "id": "L05",
+   "text": "Rule two. Every light stays off.",
+   "em": [
+    "off"
+   ],
+   "gap": 0.4,
+   "act": {
+    "intensity": 0.45,
+    "pace": 0.32,
+    "speed": 0.95,
+    "gain_db": -1
+   },
+   "tv": {
+    "title": "EMERGENCY ALERT",
+    "rule": "RULE 2",
+    "text": "KEEP EVERY LIGHT OFF",
+    "ticker": "NO LAMPS · NO CANDLES · NO SCREENS FACING A WINDOW"
+   }
+  },
+  {
+   "id": "L06",
+   "text": "Rule four. Never answer in your own voice.",
+   "em": [
+    "own",
+    "voice"
+   ],
+   "gap": 0.6,
+   "act": {
+    "intensity": 0.5,
+    "pace": 0.32,
+    "speed": 0.95,
+    "gain_db": -0.5
+   }
+  },
+  {
+   "id": "L07",
+   "text": "Rule three just stops. If someone knocks three times...",
+   "em": [
+    "knocks"
+   ],
+   "clock": "3:19 AM",
+   "gap": 0.7,
+   "act": {
+    "intensity": 0.45,
+    "pace": 0.3,
+    "speed": 0.95,
+    "gain_db": -2
+   }
+  },
+  {
+   "id": "L08",
+   "text": "Don't let anyone finish rule three.",
+   "speaker": "sussurro",
+   "em": [
+    "finish"
+   ],
+   "gap": 0.5,
+   "act": {
+    "intensity": 0.4,
+    "pace": 0.3,
+    "speed": 0.95,
+    "gain_db": -3
+   },
+   "phone": {
+    "app": "messages",
+    "from": "Unknown number",
+    "thread": [
+     {
+      "me": false,
+      "text": "don't let anyone finish rule three"
+     }
+    ]
+   }
+  },
+  {
+   "id": "L09",
+   "text": "You look outside. Every window is dark.",
+   "em": [
+    "dark"
+   ],
+   "gap": 0.4,
+   "act": {
+    "intensity": 0.45,
+    "pace": 0.32,
+    "speed": 0.95,
+    "gain_db": -1
+   }
+  },
+  {
+   "id": "L10",
+   "text": "Except one tiny light, on the roof across the road.",
+   "em": [
+    "light"
+   ],
+   "gap": 0.9,
+   "act": {
+    "intensity": 0.45,
+    "pace": 0.32,
+    "speed": 0.95,
+    "gain_db": -1.5
+   }
+  },
+  {
+   "id": "L11",
+   "text": "Then you notice the windows aren't empty.",
+   "em": [
+    "empty"
+   ],
+   "gap": 0.8,
+   "act": {
+    "intensity": 0.4,
+    "pace": 0.3,
+    "speed": 0.95,
+    "gain_db": -4
+   }
+  },
+  {
+   "id": "L12",
+   "text": "Your neighbors stand in them, all of them, staring at your door.",
+   "em": [
+    "staring"
+   ],
+   "hit": true,
+   "tint": true,
+   "gap": 0.9,
+   "act": {
+    "intensity": 0.75,
+    "pace": 0.3,
+    "speed": 0.95,
+    "gain_db": 0.5
+   }
+  },
+  {
+   "id": "L13",
+   "text": "One knock. Two. Three.",
+   "em": [
+    "three"
+   ],
+   "clock": "3:33 AM",
+   "tint": true,
+   "peephole": true,
+   "gap": 0.25,
+   "act": {
+    "intensity": 0.65,
+    "pace": 0.36,
+    "speed": 1.05,
+    "gain_db": 2
+   }
+  },
+  {
+   "id": "L14",
+   "text": "Rule three says you let us in.",
+   "speaker": "mostro",
+   "quote": true,
+   "em": [
+    "let",
+    "in"
+   ],
+   "tint": true,
+   "peephole": true,
+   "gap": 0.9,
+   "act": {
+    "intensity": 0.6,
+    "pace": 0.3,
+    "speed": 0.95,
+    "gain_db": -0.5
+   }
+  },
+  {
+   "id": "L15",
+   "text": "So do you answer in someone else's voice, or stay silent?",
+   "em": [
+    "answer",
+    "silent"
+   ],
+   "gap": 0.4,
+   "act": {
+    "intensity": 0.6,
+    "pace": 0.34,
+    "speed": 0.95,
+    "gain_db": 1.5
+   }
+  },
+  {
+   "id": "L16",
+   "text": "Your call. Comment ANSWER or SILENT.",
+   "em": [
+    "answer",
+    "silent"
+   ],
+   "gap": 0.2,
+   "act": {
+    "intensity": 0.55,
+    "pace": 0.34,
+    "speed": 0.97,
+    "gain_db": 2
+   }
+  }
+ ],
+ "choice": {
+  "question": "Someone is knocking. Do you answer?",
+  "a": {
+   "word": "ANSWER",
+   "sub": "in someone else's voice"
+  },
+  "b": {
+   "word": "SILENT",
+   "sub": "say nothing at all"
+  },
+  "note": "THE MAJORITY WRITES PART 2"
+ },
+ "next": {
+  "title": "PART 2",
+  "sub": "Follow for part 2"
+ },
+ "bpm": 60,
+ "seed": 31,
+ "music": [
+  {
+   "at": "S1",
+   "mood": "hush"
+  },
+  {
+   "at": "S6",
+   "mood": "rise"
+  },
+  {
+   "at": "S12",
+   "mood": "storm"
+  },
+  {
+   "at": "S16",
+   "mood": "end"
+  }
+ ]
+}
