@@ -3,7 +3,7 @@
 Stelle lette dall'API di GitHub il 2026-10-30. Sono giudizi dalla descrizione e dalla licenza: **nessuno di questi è stato provato**. Nostro motore: Lemo-Opuscar, voce Chatterbox, controllo Faster-Whisper. Vincolo: niente GPU, tutto su GitHub Actions gratuito.
 
 ## Da provare, in quest'ordine
-1. **WhisperX** (m-bain/whisperX, 24.947 stelle, BSD-2): tempi parola per parola più precisi di Faster-Whisper. Servono ai sottotitoli pop e a far cadere i suoni sulla parola giusta. Si cambia solo un pezzo di `tools/voice.py`.
+1. **WhisperX** (m-bain/whisperX, 24.947 stelle, BSD-2): tempi parola per parola più precisi di Faster-Whisper. Servono ai sottotitoli pop e a far cadere i suoni sulla parola giusta. Provato il 2026-10-30 su 13 righe di The Lighthouse Fox, misurando dove il suono inizia e finisce davvero: fine della riga, errore medio da 260 a 96 ms; inizio della riga, nessun vantaggio (37 ms contro 32). Allineamento 3,7 s sulla CPU, modello da 360 MB. Non ancora nel render: va installato insieme a Chatterbox, e un conflitto fermerebbe la casetta Voce.
 2. **Kokoro** (hexgrad/kokoro, 9.793 stelle, Apache-2.0): voce leggera che gira bene senza GPU. Utile per le voci di contorno, se Chatterbox è lenta.
 3. **VibeVoice** (microsoft/VibeVoice, 55.054 stelle, MIT): voci con più personaggi nello stesso dialogo. Da provare per i Your Call parlati; va verificato se regge su macchine senza GPU.
 4. **ACE-Step** (ace-step/ACE-Step, 5.003 stelle, Apache-2.0): genera musica originale. Servirebbe una GPU: buono più avanti, se le tracce FreePD diventano ripetitive.
