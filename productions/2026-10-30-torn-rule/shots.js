@@ -80,7 +80,7 @@ export function SHOTS(C, DUR) {
   const at = id => C[id].at, end = id => C[id].end;
   return [
     // 1 · The hook: you by the dark window, the phone lighting your face green; the "4 RULES" alert drops on frame 0
-    { id: 'S1', start: 0, sfx: [{ t: .1, type: 'chime', v: .7 }, { t: .3, type: 'click', v: .4 }, { t: 0, type: 'wind', d: 6, v: .3 }],
+    { id: 'S1', start: 0, sfx: [{ t: 0, type: 'wind', d: 6, v: .5 }, { t: .1, type: 'crack', v: .5 }, { t: .2, type: 'thunder', v: .5 }, { t: .3, type: 'click', v: .3 }],
       build: E => layered(E, {
         light: [.03, .09, -.08], lightR: .09, lightCol: T.light, key: .8, amb: .4, ambCol: '#4a6a5a', sky: { stops: T.sky, stars: 70 }, on: false,
         layers: [
@@ -94,7 +94,7 @@ export function SHOTS(C, DUR) {
       }) },
 
     // 2 · Rule three arrived torn in half: the phone close up, four rule lines on the screen, the third ripped with a jagged tear
-    { id: 'S2', start: at('L02') - .15, sfx: [{ t: .05, type: 'whoosh', v: .5 }, { t: .15 + C.L02.dur * .5, type: 'paper', v: .9 }],
+    { id: 'S2', start: at('L02') - .15, sfx: [{ t: .05, type: 'whoosh', v: .5 }, { t: .15 + C.L02.dur * .5, type: 'paper', v: 1.2 }, { t: .15 + C.L02.dur * .5, type: 'thunder', v: .4 }],
       build: E => {
         const rip = E.word('L02', 3);
         return layered(E, {
@@ -115,7 +115,7 @@ export function SHOTS(C, DUR) {
       } },
 
     // 3 · Snapback: across the road your neighbors already stand in their yards, all facing your house, thin smiles catching the light
-    { id: 'S3', start: at('L03') - .1, sfx: [{ t: .05, type: 'thunder', v: .45 }, { t: .1, type: 'crack', v: .45 }, { t: 0, type: 'wind', d: 5, v: .35 }],
+    { id: 'S3', start: at('L03') - .1, sfx: [{ t: .05, type: 'thunder', v: .6 }, { t: .1, type: 'crack', v: .5 }, { t: 0, type: 'wind', d: 5, v: .5 }],
       build: E => layered(E, {
         light: [0, .1, -.13], lightR: .14, lightCol: T.light, key: .45, amb: .25, sky: { stops: T.sky, stars: 120 }, on: false,
         layers: [
@@ -132,7 +132,7 @@ export function SHOTS(C, DUR) {
       }) },
 
     // 4 · Rule one, on every TV: your living room lit green by the screen, you on the couch from behind (the alert is the tv overlay)
-    { id: 'S4', start: at('L04') - .2, sfx: [{ t: .1, type: 'click', v: .6 }, { t: .15, type: 'chime', v: .4 }],
+    { id: 'S4', start: at('L04') - .2, sfx: [{ t: .1, type: 'click', v: .6 }, { t: .15, type: 'crack', v: .35 }, { t: .3, type: 'thunder', v: .3 }],
       build: E => layered(E, {
         light: [0, .1, -.1], lightR: .1, lightCol: T.glow, key: .6, amb: .25, ambCol: '#3a6a50', sky: { stops: ROOM }, on: false,
         layers: [
@@ -148,7 +148,7 @@ export function SHOTS(C, DUR) {
       }) },
 
     // 5 · Rule two, every light stays off: the city skyline, windows going dark row by row on "off"
-    { id: 'S5', start: at('L05') - .15, sfx: [{ t: 0, type: 'wind', d: 4, v: .35 }],
+    { id: 'S5', start: at('L05') - .15, sfx: [{ t: 0, type: 'wind', d: 4, v: .5 }, { t: .15 + C.L05.dur * .8, type: 'whoosh', v: .5 }, { t: .15 + C.L05.dur * .85, type: 'thunder', v: .4 }],
       build: E => {
         const off = E.word('L05', 5);
         const row = (n, z, col, by, h, seed) => ({ name: n, z, trans: .2, glow: 2.6, glowCol: T.light,
@@ -164,7 +164,7 @@ export function SHOTS(C, DUR) {
       } },
 
     // 6 · Rule four: the rules card in cream, black type, "OWN VOICE" in red; flat and still, inside the margins
-    { id: 'S6', start: at('L06') - .3, in: { type: 'dissolve', dur: .4 }, sfx: [{ t: .1, type: 'paper', v: .8 }],
+    { id: 'S6', start: at('L06') - .3, in: { type: 'dissolve', dur: .4 }, sfx: [{ t: .1, type: 'paper', v: .8 }, { t: 0, type: 'wind', d: end('L06') - at('L06') + 1, v: .35 }],
       build: E => layered(E, {
         light: [0, .08, -.13], lightR: .2, lightCol: '#fff4e0', key: .9, amb: .7, ambCol: '#d8d0c0', sky: { stops: [[0, '#1a1712'], [1, '#2a251c']] }, on: false,
         layers: [
@@ -176,7 +176,7 @@ export function SHOTS(C, DUR) {
       }) },
 
     // 7 · Rule three just stops: the same card, same framing; rule three now in red and the torn piece fallen a little lower
-    { id: 'S7', start: at('L07') - .2, sfx: [{ t: .2 + C.L07.dur * 6 / 9, type: 'paper', v: 1 }],
+    { id: 'S7', start: at('L07') - .2, sfx: [{ t: .2 + C.L07.dur * 6 / 9, type: 'paper', v: 1.2 }, { t: .2 + C.L07.dur * 6 / 9, type: 'thunder', v: .45 }, { t: 0, type: 'wind', d: C.L07.dur + 1, v: .35 }],
       build: E => {
         return layered(E, {
           light: [0, .05, -.13], lightR: .2, lightCol: '#fff4e0', key: .9, amb: .6, ambCol: '#d8d0c0', sky: { stops: [[0, '#050403'], [1, '#0d0b08']] }, on: false,
@@ -190,7 +190,7 @@ export function SHOTS(C, DUR) {
       } },
 
     // 8 · The whisper: you in the dark room, scared, the phone lighting you from below (the unknown-number chat is the overlay)
-    { id: 'S8', start: at('L08') - .2, sfx: [{ t: .1, type: 'chime', v: .45 }],
+    { id: 'S8', start: at('L08') - .2, sfx: [{ t: .1, type: 'click', v: .35 }, { t: .2, type: 'whoosh', v: .4 }, { t: 0, type: 'wind', d: C.L08.dur + 1, v: .4 }],
       build: E => layered(E, {
         light: [.03, .07, -.05], lightR: .07, lightCol: T.glow, key: .8, amb: .45, sky: { stops: ROOM }, on: false,
         layers: [
@@ -203,7 +203,7 @@ export function SHOTS(C, DUR) {
       }) },
 
     // 9 · You look outside: through your window the whole city is dark, not one lamp
-    { id: 'S9', start: at('L09') - .3, in: { type: 'dissolve', dur: .5 }, sfx: [{ t: 0, type: 'wind', d: end('L09') - at('L09') + 1, v: .4 }],
+    { id: 'S9', start: at('L09') - .3, in: { type: 'dissolve', dur: .5 }, sfx: [{ t: 0, type: 'wind', d: end('L09') - at('L09') + 1, v: .5 }, { t: .3 + C.L09.dur * .7, type: 'thunder', v: .3 }],
       build: E => layered(E, {
         light: [0, .1, -.13], lightR: .14, lightCol: T.light, key: .7, amb: .5, ambCol: '#7aa894', sky: { stops: NSKY, stars: 160 }, on: false,
         moon: { x: .045, y: .175, r: .016, gain: 1.6 },
@@ -217,7 +217,7 @@ export function SHOTS(C, DUR) {
       }) },
 
     // 10 · Except one tiny light: on the roof across the road, in the top corner, the fox sits with her lantern lit
-    { id: 'S10', start: at('L10') - .2, sfx: [{ t: .5, type: 'shimmer', v: .5 }],
+    { id: 'S10', start: at('L10') - .2, sfx: [{ t: 0, type: 'wind', d: C.L10.dur + 1, v: .45 }, { t: .5, type: 'shimmer', v: .25 }],
       build: E => {
         const lit = E.word('L10', 3);
         return layered(E, {
@@ -234,7 +234,7 @@ export function SHOTS(C, DUR) {
       } },
 
     // 11 · The windows aren't empty: a slow, quiet push on the dark facade across the road (still the night theme)
-    { id: 'S11', start: at('L11') - .4, in: { type: 'dissolve', dur: .7 }, sfx: [{ t: 0, type: 'wind', d: end('L11') - at('L11') + 1.2, v: .3 }],
+    { id: 'S11', start: at('L11') - .4, in: { type: 'dissolve', dur: .7 }, sfx: [{ t: 0, type: 'wind', d: end('L11') - at('L11') + 1.2, v: .45 }, { t: .4 + C.L11.dur * .6, type: 'steps', n: 2, every: .6, v: .6, pan: .3 }],
       build: E => layered(E, {
         light: [0, .09, -.13], lightR: .14, lightCol: T.light, key: .7, amb: .5, ambCol: '#7aa894', sky: { stops: NSKY, stars: 60 }, on: false,
         layers: [
@@ -246,7 +246,7 @@ export function SHOTS(C, DUR) {
       }) },
 
     // 12 · The revelation (allarme): the same facade gone red; a neighbor's dark head in every window and two eyes lit in each
-    { id: 'S12', start: at('L12') - .1, sfx: [{ t: .05, type: 'thunder', v: .7 }, { t: .1, type: 'crack', v: .6 }],
+    { id: 'S12', start: at('L12') - .1, sfx: [{ t: .05, type: 'thunder', v: .8 }, { t: .1, type: 'crack', v: .6 }, { t: .05, type: 'whoosh', v: .6 }, { t: 0, type: 'wind', d: C.L12.dur + 1, v: .45 }],
       build: E => {
         const pairs = WINS.map(([wx, wy]) => [wx / .1, (wy + .004) / .1]);
         return layered(E, {
@@ -265,7 +265,7 @@ export function SHOTS(C, DUR) {
       } },
 
     // 13 · One knock. Two. Three: through the peephole (overlay), your porch, and far down the path the tall shadow, eyes lit
-    { id: 'S13', start: at('L13') - .15, sfx: [1, 2, 3].map(k => ({ t: .15 + C.L13.dur * (k + .5) / 4, type: 'crack', v: 1 })),
+    { id: 'S13', start: at('L13') - .15, sfx: [...[1, 2, 3].map(k => ({ t: .15 + C.L13.dur * (k - 1) / 3, type: 'steps', n: 1, every: .4, v: 1.3 })), { t: .15 + C.L13.dur * 2 / 3, type: 'thunder', v: .5 }],
       build: E => layered(E, {
         light: [0, .1, -.13], lightR: .14, lightCol: A.light, key: .7, amb: .45, ambCol: '#b05040', sky: { stops: ASKY }, on: false,
         layers: [
@@ -279,7 +279,7 @@ export function SHOTS(C, DUR) {
       }) },
 
     // 14 · "Rule three says you let us in": hard cut, the shadow is suddenly right at the door, cut by the frame, eyes at the top
-    { id: 'S14', start: at('L14') - .1, sfx: [{ t: .02, type: 'whoosh', v: .7 }, { t: .05, type: 'thunder', v: .55 }],
+    { id: 'S14', start: at('L14') - .1, sfx: [{ t: .02, type: 'whoosh', v: .7 }, { t: .05, type: 'thunder', v: .75 }, { t: .1, type: 'crack', v: .5 }],
       build: E => layered(E, {
         light: [0, .14, -.13], lightR: .14, lightCol: A.light, key: .7, amb: .45, ambCol: '#b05040', sky: { stops: ASKY }, on: false,
         layers: [
@@ -294,7 +294,7 @@ export function SHOTS(C, DUR) {
       }) },
 
     // 15 · The choice: inside, you with your back to the door, scared; the door frame around you, a red line of light under it
-    { id: 'S15', start: at('L15') - .3, in: { type: 'dissolve', dur: .4 }, sfx: [{ t: 0, type: 'wind', d: end('L15') - at('L15') + 1, v: .35 }],
+    { id: 'S15', start: at('L15') - .3, in: { type: 'dissolve', dur: .4 }, sfx: [{ t: 0, type: 'wind', d: end('L15') - at('L15') + 1, v: .5 }, { t: end('L15') - at('L15') + .2, type: 'steps', n: 3, every: .55, v: .7, pan: -.3 }],
       build: E => layered(E, {
         light: [0, .02, -.12], lightR: .12, lightCol: A.glow, key: .8, amb: .5, ambCol: '#c08070', sky: { stops: ASKY }, on: false,
         layers: [
@@ -311,7 +311,7 @@ export function SHOTS(C, DUR) {
 
     // 16 · The end, held under ANSWER or SILENT: your house from across the road, all dark; the tall shadow at your door,
     //      the neighbors in the street facing it, and the fox's lantern, the only light, on the corner of the roof
-    { id: 'S16', start: at('L16') - .3, in: { type: 'dissolve', dur: .6 }, sfx: [{ t: 0, type: 'wind', d: DUR - at('L16') + .5, v: .35 }, { t: .6, type: 'shimmer', v: .4 }],
+    { id: 'S16', start: at('L16') - .3, in: { type: 'dissolve', dur: .6 }, sfx: [{ t: 0, type: 'wind', d: DUR - at('L16') + .5, v: .45 }, { t: end('L16') - at('L16') + .4, type: 'thunder', v: .5 }, { t: .6, type: 'shimmer', v: .2 }],
       build: E => layered(E, {
         light: [0, .1, -.13], lightR: .16, lightCol: A.light, key: .7, amb: .45, ambCol: '#b05040', sky: { stops: ASKY, stars: 80 }, on: false,
         layers: [
