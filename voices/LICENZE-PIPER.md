@@ -17,40 +17,6 @@ See: https://brycebeattie.com/files/tts/
 
 US English female voice. Single speaker. Trained from scratch for 1000 epochs on medium quality settings using the LJ Speech dataset. I reencoded the recordings to a bit rate of 22500 Hz so it would match other voices released for Piper TTS.
 
-## en_US-hfc_male-medium
-# Model card for hfc_male (medium)
-
-* Language: en_US (English, United States)
-* Speakers: 1
-* Quality: medium
-* Samplerate: 22,050Hz
-
-## Dataset
-
-* URL: https://ast-astrec.nict.go.jp/en/release/hi-fi-captain/
-* License: https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en
-
-## Training
-
-Finetuned from U.S. English lessac voice (medium quality).
-
-## en_US-hfc_female-medium
-# Model card for hfc_female (medium)
-
-* Language: en_US (English, United States)
-* Speakers: 1
-* Quality: medium
-* Samplerate: 22,050Hz
-
-## Dataset
-
-* URL: https://ast-astrec.nict.go.jp/en/release/hi-fi-captain/
-* License: https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en
-
-## Training
-
-Finetuned from U.S. English lessac voice (medium quality).
-
 ## en_GB-cori-high
 # Model card for cori (high)
 
