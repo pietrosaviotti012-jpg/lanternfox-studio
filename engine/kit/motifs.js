@@ -818,3 +818,49 @@ export function foxCameo(x, o, g) {
   shape(x, cx, by, s * .5, [[-.34, .18], [0, 0], [.34, .18], [0, .1]], cream, f);
   dots(x, cx, by, s * .5, [[-.2, .32], [.2, .32]], .045, '#0e1532', f);
 }
+
+// —— Added for "What If the Moon Disappeared Tonight?": a hatchling sea turtle, a branch of coral, the Moon as a paper disc ——
+
+// A hatchling sea turtle seen from above, heading up (+y): shell, head, four flippers. o.rot turns it (radians, 0 = up);
+// o.k (0..1) swings the flippers for a crawl. Its eye catches the light in g.
+export function turtle(x, o, g) {
+  const { cx, cy, s, rot = 0, k = 0, col = '#2a2a1e', shell = '#4a4630' } = o;
+  const sw = Math.sin(k * TAU) * .35;
+  const draw = (c, fillShell, fillBody) => {
+    c.save(); c.translate(cx, cy); c.rotate(rot);
+    c.fillStyle = fillBody;
+    for (const [d, fy, len, a] of [[-1, .12, .42, .7 + sw], [1, .12, .42, .7 - sw], [-1, -.22, .22, 2.3 - sw], [1, -.22, .22, 2.3 + sw]]) {
+      c.save(); c.translate(d * s * .2, fy * s); c.rotate(-d * a); c.beginPath(); c.ellipse(0, len * s / 2, s * .06, len * s / 2, 0, 0, TAU); c.fill(); c.restore();
+    }
+    c.beginPath(); c.ellipse(0, s * .42, s * .11, s * .13, 0, 0, TAU); c.fill();
+    c.fillStyle = fillShell; c.beginPath(); c.ellipse(0, 0, s * .24, s * .33, 0, 0, TAU); c.fill();
+    c.restore();
+  };
+  if (x) draw(x, shell, col);
+  if (g) { g.save(); g.translate(cx, cy); g.rotate(rot); g.fillStyle = '#fff';
+    for (const d of [-1, 1]) { g.beginPath(); g.arc(d * s * .06, s * .48, s * .025, 0, TAU); g.fill(); } g.restore(); }
+}
+
+// A branching coral on the sea floor; the tips are polyps that burn in g (they "wait" in the dark). bx, by = foot, s = height
+export function coral(x, o, g) {
+  const { cx, by, s, col = '#1d4a58', seed = 4, n = 7 } = o, R = mulberry(seed), tips = [];
+  const branch = (px, py, a, len, w, d) => {
+    const qx = px + Math.sin(a) * len, qy = py + Math.cos(a) * len;
+    if (x) { x.strokeStyle = col; x.lineWidth = w; x.lineCap = 'round'; x.beginPath(); x.moveTo(px, py); x.lineTo(qx, qy); x.stroke(); }
+    if (d <= 0) { tips.push([qx, qy]); return; }
+    branch(qx, qy, a - .35 - R() * .3, len * (.62 + R() * .2), w * .7, d - 1);
+    branch(qx, qy, a + .35 + R() * .3, len * (.62 + R() * .2), w * .7, d - 1);
+  };
+  for (let i = 0; i < n; i++) branch(cx + (R() - .5) * s * .3, by, (i / (n - 1) - .5) * 1.4, s * (.28 + R() * .1), s * .05, 2);
+  if (x) { x.fillStyle = col; for (const [px, py] of tips) { x.beginPath(); x.arc(px, py, s * .02, 0, TAU); x.fill(); } }
+  if (g) { g.fillStyle = '#fff'; for (const [px, py] of tips) { g.beginPath(); g.arc(px, py, s * .014, 0, TAU); g.fill(); } }
+  return tips;
+}
+
+// The Moon as a cut-paper disc: pale paper with a few darker seas on x; the whole disc burns in g (fade its glow to make it go)
+export function paperMoon(x, o, g) {
+  const { cx, cy, r, col = '#e9e2c8', sea = '#c9c0a2' } = o;
+  if (x) { x.fillStyle = col; x.beginPath(); x.arc(cx, cy, r, 0, TAU); x.fill();
+    x.fillStyle = sea; for (const [u, v, rr] of [[-.3, .25, .28], [.2, .35, .2], [.28, -.12, .26], [-.15, -.38, .18], [-.45, -.05, .14]]) { x.beginPath(); x.arc(cx + u * r, cy + v * r, rr * r, 0, TAU); x.fill(); } }
+  if (g) { g.fillStyle = '#fff'; g.beginPath(); g.arc(cx, cy, r, 0, TAU); g.fill(); }
+}

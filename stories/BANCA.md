@@ -24,10 +24,11 @@ La Ricerca aggiunge ogni giorno 3-5 voci nuove (dalle mode del momento, da Reddi
 - **Le luci di Marfa (Texas, dal 1880 circa)**: luci che fluttuano sul deserto; dire che la spiegazione più probabile sono i fari delle auto. (dal 2026-10-29)
 - **L'isola Hy-Brasil (leggenda)**: un'isola rotonda segnata sulle carte nautiche per secoli a ovest dell'Irlanda, visibile un giorno ogni sette anni. Dire che è leggenda e che sparì dalle carte nell'Ottocento. (dal 2026-10-29)
 - **La nave Octavius (leggenda, 1775)**: una baleniera trovata alla deriva con l'equipaggio congelato e il diario di bordo fermo a 13 anni prima. Raccontarla come leggenda: le fonti sono tarde. (dal 2026-10-29)
+- **La grande bufala della Luna (1835)**: un giornale di New York racconta per sei giorni che un telescopio ha visto uomini-pipistrello sulla Luna, e la città ci crede. Fatto vero e documentato (The Sun, agosto 1835). (dal 2026-10-30, sera)
 
 ## What if
 - ⭐ What if every star went out tonight? → `productions/2026-10-28-stars-go-out`
-- ⭐ What if the Moon disappeared for one night? (Le maree, gli animali, il buio.)
+- ⭐ What if the Moon disappeared for one night? (Le maree, gli animali, il buio.) → `productions/2026-10-30-moon-gone`
 - ⭐ What if you could hear every thought in a room for one minute?
 - What if the Earth stopped spinning for one second?
 - What if you woke up and everyone had forgotten you?
@@ -39,6 +40,8 @@ La Ricerca aggiunge ogni giorno 3-5 voci nuove (dalle mode del momento, da Reddi
 - What if the sun didn't rise tomorrow? (Alle 6:40 il cielo resta nero. Le piante, il freddo, le stelle di giorno: cosa succede ora per ora, con i fatti veri.) (dal 2026-10-29, dal "the sun should be up" di *Eyes Down*)
 
 - What if you could see Wi-Fi? (Una nebbia che si muove per casa, le stanze più luminose, il router come un falò. Chiusa: "Would you still sleep next to it?") (dal 2026-10-30)
+- What if the Moon moved away 3.8 cm every second instead of every year? (dal 2026-10-30, sera: seguito naturale della Luna, collana "il cielo")
+- What if the Sun were the size of the Moon in the sky? (I fatti veri sulla distanza, la luce che cambia colore.) (dal 2026-10-30, sera)
 - What if sound stopped for one minute? ("You don't hear the crash. You see it." Chiusa: "Would you notice first, or would your dog?") (dal 2026-10-29, sera)
 
 ## Your Call (seconda persona, scelta finale)
