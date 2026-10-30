@@ -90,7 +90,7 @@ try {
   await upload(metadata);
 }
 await cf("POST", `${acc}/workers/scripts/${NAME}/subdomain`, { enabled: true, previews_enabled: false });
-await cf("PUT", `${acc}/workers/scripts/${NAME}/schedules`, [{ cron: "7 * * * *" }]); // riarma la sveglia ogni ora
+await cf("PUT", `${acc}/workers/scripts/${NAME}/schedules`, [{ cron: "*/10 * * * *" }]); // ogni 10 minuti: riarma la sveglia e fa il giro di controllo (watch)
 saveEnv("OFFICE_URL", url);
 saveEnv("CLOUDFLARE_KV_NAMESPACE_ID", kv);
 console.log(`Ufficio pubblicato: ${url}${withSecrets ? " (password e segreto caricati)" : ""}`);

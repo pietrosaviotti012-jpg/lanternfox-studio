@@ -1,11 +1,13 @@
 """Music box score for a production: python tools/score.py <production folder>
 
-Synthesised in numpy (no samples, nothing to license): a music box (metal-tine partials), a soft pad and a low bed.
+A real track of the format's pack (sounds/PACCHETTI.json: "track" in script.json picks another family, "carillon" forces the box), its level following the moods.
+Without one, the fables' music box, synthesised in numpy: metal-tine partials, a soft pad and a low bed.
 The shape comes from script.json "music": [{"at": "S1", "mood": "calm"}, …] and the shot times in events.json.
 Moods: calm (melody + pad), storm (low drone, no tune), hush (a few high notes), rise (an arpeggio climbing every
 beat), warm (melody doubled an octave up + pad), end (a last chord left to ring). Writes out/music.wav (48 kHz stereo).
 """
 import json, os, sys
+from packs import CAT, SOUNDS, choose, number, pack_of
 import numpy as np
 import soundfile as sf
 from scipy.signal import butter, sosfilt
@@ -22,6 +24,26 @@ for i, m in enumerate(plan):
     t0 = shots.get(m["at"], m.get("t", 0)) + m.get("offset", 0)
     t1 = shots.get(plan[i + 1]["at"], DUR) + plan[i + 1].get("offset", 0) if i + 1 < len(plan) else DUR
     sections.append((t0, t1, m["mood"]))
+
+_, pack = pack_of(prod)
+family = script.get("track") or (pack.get("music") or [None])[number(prod) % max(1, len(pack.get("music") or [1]))]
+if family in CAT:
+    e = choose(prod, family)
+    x, sr = sf.read(os.path.join(SOUNDS, e["file"]), dtype="float32", always_2d=True)
+    want = int(DUR * SR)
+    while len(x) < want:   # a track shorter than the film comes round again, with a 2-second crossfade
+        f = 2 * SR; r = np.linspace(0, 1, f, dtype=np.float32)[:, None]
+        x = np.concatenate([x[:-f], x[-f:] * (1 - r) + x[:f] * r, x[f:]])
+    x = x[:want].copy()
+    LEVEL = {"hush": .45, "calm": .6, "warm": .65, "rise": .85, "storm": 1, "end": .7}
+    t = np.arange(want) / SR
+    points = sorted([(t0, LEVEL.get(mood, .7)) for t0, _, mood in sections] + [(max(t0, t1 - 1.2), LEVEL.get(mood, .7) if mood != "rise" else 1) for t0, t1, mood in sections])
+    x *= np.interp(t, [p[0] for p in points], [p[1] for p in points])[:, None].astype(np.float32)
+    fade = int(1.5 * SR); x[-fade:] *= np.linspace(1, 0, fade, dtype=np.float32)[:, None]
+    os.makedirs(os.path.join(prod, "out"), exist_ok=True)
+    sf.write(os.path.join(prod, "out", "music.wav"), x / max(1e-6, np.abs(x).max()) * .7, SR)
+    print("music", e["file"], round(DUR, 2), "s,", len(sections), "sections:", ", ".join(m for _, _, m in sections))
+    sys.exit()
 
 BPM = script.get("bpm", 66); BEAT = 60 / BPM
 KEY = 62   # D

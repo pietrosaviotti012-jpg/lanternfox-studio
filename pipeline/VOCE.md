@@ -21,6 +21,41 @@ La guida di Copione e Voce. Nasce dalla misura di 10 reel virali (`research/anal
 | **Il tempo stringe,** elenchi di numeri o azioni | più veloce e forte | `speed` 1.05, `gain_db` +2, `gap` .2 |
 | **Il finale con la scelta** ("Comment A or B") | forte e chiara, torna il narratore | `gain_db` +2, nessun effetto |
 
+## Pause: quanto dura ogni silenzio
+Il `gap` è il silenzio dopo la riga. Sono la parte della recitazione che ci costa meno e si sente di più.
+
+| Dopo cosa | `gap` | Perché |
+|---|---|---|
+| Una riga del gancio (primi 5 secondi) | .15-.3 | Chi guarda deve restare: qui niente vuoti |
+| Una frase normale del racconto | .3-.45 | Il respiro naturale |
+| Le voci di un elenco o un conto alla rovescia | .15-.25 | Crea fretta |
+| La riga prima della rivelazione | .7-1 | Chi guarda deve restare sospeso |
+| La rivelazione | .5-.8 | Lascia il tempo di capire |
+| La domanda finale, prima di "Your call" | .4-.6 | Il tempo di scegliere |
+| "Your call. Comment GO or STAY." | .2 | Il film finisce sulla scelta, non sul vuoto |
+
+- **Mai sopra 1,3 secondi,** e un silenzio oltre 1 secondo solo due volte per video: su un telefono un vuoto lungo sembra un video bloccato.
+- **Nel silenzio lungo succede qualcosa:** un rumore, un'ombra, una luce. Solo voce ferma e immagine ferma insieme fanno scorrere via.
+- **Nel totale** le pause fanno il 15-20% della durata della voce.
+
+## Pause dentro la riga e parole forti
+- **Una riga, un'idea, una parola forte:** quella in `em`. Se servono due parole forti, sono due righe.
+- **La pausa dentro la frase** è la punteggiatura di `"say"`: la virgola è breve, i puntini sono lunghi. `"text": "It wasn't me."`, `"say": "It wasn't... me."` I sottotitoli restano quelli di `text`. Una pausa vera, più di mezzo secondo, sono due righe con il `gap` in mezzo.
+- **La frase che si spezza:** chiudi la riga con il trattino, `gap` .05, e la riga dopo parte subito, più forte: è un'interruzione.
+- **Numeri e ore** si dicono più lenti: `speed` .9 sulla riga, e scrivi in `say` il numero a parole se Chatterbox sbaglia ("two oh seven am").
+- **Il nome che fa paura** si dice piano, non forte: `gain_db` −2, `speed` .88.
+
+## La voce e i suoni
+- **Prima il suono, poi la voce:** dopo un colpo forte (`thunder`, `boom`, `knock`) la riga parte .3-.5 secondi dopo. Mai una parola importante sopra un colpo.
+- **La parola, poi il suono:** se la riga annuncia il suono ("Then it knocks."), il suono arriva nel `gap` dopo la riga, non prima.
+- **Sussurro e voce bassa:** niente musica forte sotto. Quella scena ha umore `hush`.
+- **Dopo un sussurro** torna il narratore normale, non più forte: lo sbalzo basta.
+
+## Domande e finale
+- **Una domanda vera sale, una domanda retorica scende.** "Who's at the door?" sale. Per farla salire: frase corta, punto interrogativo, nessuna parola dopo.
+- **L'ultima riga non rallenta:** `speed` .97-1, `gain_db` +2. Il rallentamento finale suona come una fine, e noi vogliamo un commento.
+- **La Parte 2** apre con il risultato detto piano e chiaro, `gap` .5, poi riparte il racconto.
+
 ## Regole
 1. **I primi 5 secondi sono piatti e decisi:** il gancio non si recita, si dice. Il primo sbalzo arriva sulla svolta, di solito tra 5 e 8 secondi.
 2. **Un cambio, poi si torna.** Dopo una riga "altra", il narratore riprende subito nel tono normale: è il ritorno che fa sentire lo sbalzo.

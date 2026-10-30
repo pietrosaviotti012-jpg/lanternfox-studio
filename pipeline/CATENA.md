@@ -54,7 +54,24 @@ Le idee forti diventano voci di `stories/BANCA.md`. Quello che vede di nuovo nel
 Se il connettore Reddit di Composio è attivo, guarda i post più votati del mese in r/UnresolvedMysteries, r/nosleep, r/LetsNotMeet e r/Glitch_in_the_Matrix: solo per capire quali premesse funzionano, mai per copiarle.
 
 ## 2. Soggetto (`soggetto`)
-Skill: `series-planner`, `content-calendar`. Sceglie il video del giro: il formato tocca a rotazione (guarda `productions/` per vedere gli ultimi formati usati), e un formato che funziona (Statistiche) può tornare più spesso. Le serie (Your Call) continuano con la parte dopo, seguendo la scelta più commentata (si legge dal diario della Community).
+Skill: `series-planner`, `content-calendar`. **Prima di tutto chiedi all'Ufficio se tocca una Parte 2** (dal banco di lavoro di Composio): due giorni dopo l'uscita di una Parte 1 si contano i commenti e la Parte 2 passa davanti a tutto, anche alla rotazione, alla richiesta di formato del payload e alle note. Se ne toccano due, fai la più vecchia: l'altra la prende il giro dopo. Una nota dell'utente che dice di non farla vale più di questa regola.
+```python
+due = requests.get(OFFICE_URL + "/parts/due", headers=H, timeout=30).json()["due"]
+# [{"id", "title", "part2", "published_at", "date", "instagram_url", "youtube_url"}]
+p = due[0]
+yt = requests.get(OFFICE_URL + "/parts/comments", headers=H, params={"id": p["id"]}, timeout=60).json()["youtube"]   # [{"author", "text"}]
+media, _ = run_composio_tool("INSTAGRAM_GET_IG_USER_MEDIA", {"ig_user_id": "me", "limit": 50, "fields": "id,permalink"}, account="instagram_sain-curr")
+m = next((x for x in media["data"]["data"] if p["instagram_url"] and x["permalink"].split("?")[0] == p["instagram_url"].split("?")[0]), None)
+ig = run_composio_tool("INSTAGRAM_GET_IG_MEDIA_COMMENTS", {"ig_media_id": m["id"], "fields": "id,text,username,parent_id"}, account="instagram_sain-curr")[0]["data"]["data"] if m else []
+```
+Le due parole della scelta sono nell'ultima riga di `productions/<id>/script.json` ("Comment GO or STAY"). Conta **un voto a persona** su Instagram e YouTube: vale il commento che contiene una sola delle due parole, come parola intera, maiuscole o minuscole, e vale una volta per autore. Salta i commenti di `lanternfox.tales`, del nostro canale e le risposte (`parent_id`). I commenti di TikTok non si leggono da qui. Poi scrivi il risultato all'Ufficio, che lo mostra nel calendario:
+```python
+requests.post(OFFICE_URL + "/parts/votes", headers=H, timeout=30, json={"id": p["id"], "counts": {"GO": 3, "STAY": 1}, "winner": "GO", "by": "comments"})
+# con zero voti o pari: "by": "fox", e "winner" è la scelta della volpe
+```
+La cartella è `productions/<data>-<slug>-2`, il titolo è esattamente `p["part2"]`, stesso `format` e stessa `series` della Parte 1. Le regole della storia sono in `pipeline/formati/your-call.md`, "La Parte 2". Nel resoconto all'Ufficio scrivi i voti.
+
+Se non tocca nessuna Parte 2, sceglie il video del giro: il formato tocca a rotazione (guarda `productions/` per vedere gli ultimi formati usati), e un formato che funziona (Statistiche) può tornare più spesso.
 Il formato si sceglie fra le schede di **`pipeline/formati/`**: sono le ricette dei video virali studiati, con gli elementi di scena obbligatori. Copione e Regia seguono la scheda scelta. Le idee della sera prima sono in `research/<data>.md`.
 La storia la prende da **`stories/BANCA.md`**: prima le ⭐, poi le altre. Segui le regole in testa al file: niente testi copiati, persone reali solo se storiche, la leggenda dichiarata. Poi segna la storia come usata. La Ricerca aggiunge alla banca 3-5 voci nuove a ogni giro.
 Crea `productions/<data>-<slug>/meta.json` (titolo, `format`, serie, episodio, idea in una riga, `cover`) e aggiorna il calendario dell'ufficio (`{"calendar": {"date", "title", "status": "planned"}}`).
@@ -68,10 +85,10 @@ Skill: `going-viral`, `viral-hook-writer`, `reel-scripter`, `on-screen-text-writ
 - 9-16 righe, 30-60 secondi di voce in tutto; frasi corte; un finale con la scelta o la domanda;
 - ogni riga ha la sua recitazione `act`: `intensity` 0,3 (calmo) … 0,8 (intenso), `pace` 0,35-0,5 (più basso = più lento), `speed` 0,84-0,94, `gain_db` −4 (sussurro) … +1,5 (culmine);
 - `gap` dopo ogni riga (0,2-1,3 s): i silenzi prima della svolta contano;
-- `music`: l'umore di ogni scena (`calm`, `storm`, `hush`, `rise`, `warm`, `end`).
+- `music`: l'umore di ogni scena (`calm`, `storm`, `hush`, `rise`, `warm`, `end`): decide quanto è forte la musica.
 
 ## 4. Regia (`regia`)
-Prima di disegnare: tema di colore in `pipeline/VISIVO.md`, figure in `pipeline/FIGURE.md`. **La volpe è in ogni video,** anche solo in un angolo e senza parlare (`foxCameo`). `script.json` deve avere `theme`.
+Prima di disegnare: tema di colore in `pipeline/VISIVO.md`, figure in `pipeline/FIGURE.md`, suoni in `pipeline/SUONI.md`. **La volpe è in ogni video,** anche solo in un angolo e senza parlare (`foxCameo`). `script.json` deve avere `theme`.
 Skill: `lemo-opuscar` (leggi `STYLE.md` di paper-lantern e `DIRECTOR.md`), il tabellone di `launch-video`. Scrive `shots.js` con il kit (`engine/kit/shot.js` + `engine/kit/motifs.js`, esempio completo: `productions/2026-10-28-lighthouse-fox/shots.js`):
 - prima di cominciare leggi **`pipeline/VISIVO.md`**, la guida di ricerca e sviluppo visivo: un evento visivo ogni 1,5-2,5 s, `em`, `hit`, `card`, `fx`;
 - 10-18 inquadrature, ognuna ancorata a una riga (`start: at('L04') - .4`); sui cambi veloci tagli netti, sui momenti calmi dissolvenze di 0,5-0,8 s;
@@ -93,7 +110,7 @@ Per forzarne un'altra: `"voice": {"preset": "cupo"}` in `script.json`.
 `python tools/voice.py <produzione>` (Chatterbox, poi Whisper controlla ogni riga e scrive i tempi delle parole). Se una riga non si capisce, riscrivila più semplice (o aggiungi `"say"` con la pronuncia) e rilancia: rifà solo quella.
 
 ## 6-8. Animazione, musica, montaggio (`animazione`, `musica`, `montaggio`)
-Li fa GitHub Actions: un commit su `productions/<id>/` con il file `READY` avvia `render.yml`, che esegue `tools/build.sh` (eventi → carillon → fotogrammi → mix → −14 LUFS → poster e foglio dei provini) e manda gli eventi all'ufficio.
+Li fa GitHub Actions: un commit su `productions/<id>/` con il file `READY` avvia `render.yml`, che esegue `tools/build.sh` (eventi → musica del formato → fotogrammi → mix con i suoni del formato → −14 LUFS → poster e foglio dei provini) e manda gli eventi all'ufficio.
 
 ## 9. Controllo qualità (`qualita`)
 È automatico: `tools/quality.py` gira su GitHub dopo il montaggio e il risultato appare in Approva accanto al video. Non ferma mai la catena: misura volume, scene buie, gancio, durata e parole capibili. Non sa giudicare sottotitoli sopra il soggetto o qualità della storia: quello resta all'utente. In origine si controllavano:

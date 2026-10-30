@@ -221,8 +221,10 @@ function emptyState() {
   };
 }
 
+// the state lives in the Durable Object: one copy everywhere. KV can answer with a copy up to 60 seconds old,
+// and saving on top of it brought finished houses back to "at work". KV stays as a backup.
 async function loadState(env) {
-  const raw = await env.DATA.get("state");
+  const raw = (await clock(env).getState()) ?? (await env.DATA.get("state"));
   if (!raw) return emptyState();
   const state = { ...emptyState(), ...JSON.parse(raw) };
   for (const d of DEPTS) state.departments[d] = { ...emptyState().departments[d], ...(state.departments[d] || {}) };
@@ -241,7 +243,9 @@ async function saveState(env, state) {
   const open = (p) => p.status === "waiting" || p.status === "approved";
   c.seen = c.seen.slice(-600); c.log = c.log.slice(-60);
   c.pending = c.pending.filter(open).concat(c.pending.filter((p) => !open(p)).slice(-10));
-  await env.DATA.put("state", JSON.stringify(state));
+  const text = JSON.stringify(state);
+  await clock(env).putState(text);
+  await env.DATA.put("state", text).catch(() => {});
 }
 
 function clip(text, n) {
@@ -274,6 +278,7 @@ async function applyEvent(env, event) {
     if (event.task !== undefined) dept.task = clip(event.task, 280);
     if (event.output !== undefined) dept.output = clip(event.output, 1200);
     dept.updated_at = now;
+    dept.video = event.video_id ? clip(event.video_id, 80) : null;   // two renders can run together: each house knows for which video it works
     if (event.task || event.output) state.log.push({ at: now, dept: event.dept, status, text: clip(event.task || event.output, 280) });
   }
   if (event.queue) {
@@ -298,6 +303,7 @@ async function applyEvent(env, event) {
     const c = event.chain, ch = state.chain || {};
     state.chain = c.ok ? { ...ch, failed: ch.failed?.id === c.id ? null : ch.failed, last_ok: { id: c.id, at: now, url: c.url } }
       : { ...ch, failed: { id: clip(c.id, 80), step: clip(c.step, 30), url: clip(c.url, 200), at: now } };
+    if (c.ok) tidy(state, now);
     if (!c.ok) await pushAll(env, { title: "La catena si è fermata", body: `${c.id}: ${c.step}. Puoi farla ripartire dall'ufficio`, url: "/", urgent: true });
   }
   if (event.op) {   // the watchman reports on a command or an example
@@ -409,6 +415,7 @@ async function restart(env, state, kind, target, now) {
 }
 
 // a chosen publishing time: an ISO date within the next 8 days, or nothing (= the next slot); false when it is not valid
+// (exact = a time the user typed: the watch below publishes at that time, not at the next slot)
 function validAfter(after) {
   if (after == null || after === "") return null;
   const t = Date.parse(after);
@@ -416,6 +423,7 @@ function validAfter(after) {
 }
 // the day an approved video goes out: the first publishing slot at or after now (or its chosen time)
 function outDate(env, item) {
+  if (item.publish_exact && item.publish_after) return romeDay(Date.parse(item.publish_after));
   const from = Math.max(Date.now(), Date.parse(item.publish_after || 0) || 0);
   const hours = String(env.PUBLISH_AT_UTC || "22").split(",").map(Number).sort((a, b) => a - b);
   for (let d = 0; d < 9; d++) for (const h of hours) {
@@ -431,6 +439,26 @@ function calendarPut(state, day) {
   state.calendar.sort((a, b) => a.date.localeCompare(b.date));
 }
 
+// A video that ends with a choice is "<series> · Part 1": two days after it first goes out, the Soggetto counts the comments and makes Part 2.
+// The Office only keeps the date: Part 2 waits in the calendar, and comes back here until it is made.
+const PART2_DAYS = 2;
+const romeDay = (t) => new Date(t + 3600e3).toISOString().slice(0, 10);
+const firstOut = (q) => Object.values(q.published || {}).filter((p) => p?.url && p.at).map((p) => p.at).sort()[0];
+function parts2(state) {
+  const today = romeDay(Date.now());
+  return state.queue.filter((q) => /\bPart 1\s*$/i.test(q.title || "") && !/^TEST/i.test(q.title) && firstOut(q)).map((q) => {
+    const part2 = q.title.replace(/Part 1\s*$/i, "Part 2"), date = romeDay(Date.parse(firstOut(q)) + PART2_DAYS * 864e5);
+    return { id: q.id, title: q.title, part2, published_at: firstOut(q), date: date < today ? today : date, due: date <= today,
+      instagram_url: q.published?.instagram?.url || "", youtube_url: q.published?.youtube?.url || "", votes: q.part_votes || null };
+  }).filter((p) => !state.queue.some((q) => q.title === p.part2));
+}
+function planParts(state) {
+  for (const p of parts2(state)) {
+    const row = state.calendar.find((c) => c.title === p.part2);
+    if (!row || (row.status === "planned" && row.date < p.date)) calendarPut(state, { ...row, date: p.date, title: p.part2, status: "planned" });
+  }
+}
+
 // Il Generale, the fox who guards the chain: when the user calls him he walks the whole village and restarts what is broken.
 //   - a house that stopped (error), or one "at work" with no news for over two hours (stuck): restarted, the render only once;
 //   - a production slot of today that did not start 40 minutes after its time: a new video;
@@ -441,15 +469,18 @@ const CHAIN_DEPTS = ["ricerca", "soggetto", "copione", "regia", ...RENDER_DEPTS]
 // the Office's own slips: a house still "at work" on a video that is already finished (it never said "done"),
 // and GitHub commands or examples "in progress" for hours. Returns what it put right.
 function tidy(state, now) {
+  planParts(state);
   const fixed = [], t = Date.parse(now), vid = state.video?.id;
-  const finished = vid && state.queue.some((q) => q.id === vid);
   for (const id of CHAIN_DEPTS) {
-    const d = state.departments[id];
-    if (finished && d?.status === "working" && Date.parse(d.updated_at || 0) <= Date.parse(state.queue.find((q) => q.id === vid).created_at || now)) {
+    const d = state.departments[id];   // the video this house was working on: its own, or for old events the last one announced
+    const q = d?.status === "working" && state.queue.find((x) => x.id === (d.video || vid) && x.status !== "redo");
+    if (q && Date.parse(d.updated_at || 0) <= Date.parse(q.created_at || now) + 60e3) {
       state.departments[id] = { ...d, status: "done", task: d.task ? `${d.task} (finito)` : "Finito", updated_at: now };
       fixed.push(`${id[0].toUpperCase() + id.slice(1)} risultava al lavoro, ma il video era già finito`);
     }
   }
+  const rev = state.departments.revisione;
+  if (rev?.status === "waiting" && !state.queue.some((q) => q.status === "pending")) state.departments.revisione = { ...rev, status: "done", updated_at: now };
   for (const o of state.ops) if (["waiting", "running"].includes(o.status) && t - Date.parse(o.at) > 3 * 3600e3) {
     o.status = "failed"; o.result = "nessuna risposta da GitHub dopo 3 ore"; fixed.push(`un comando per GitHub era fermo da ore`);
   }
@@ -500,6 +531,32 @@ async function wakeWatchman(env) {
   return r.status;
 }
 
+async function publishNow(env, state, item, why) {
+  const now = new Date().toISOString(), started = await fireRoutine(env, "PUBLISH", `Pubblica adesso: ${item.id}`);
+  const ok = started >= 200 && started < 300;
+  if (ok) item.now_at = now;
+  state.departments.pubblicazione = { status: ok ? "working" : "error", task: ok ? `Pubblico adesso: ${item.title}` : "Non riesco ad avviare la pubblicazione: controlla la routine", output: "", updated_at: now };
+  if (ok) state.log.push({ at: now, dept: "pubblicazione", status: "working", text: `${why} "${item.title}"` });
+  return { ok, started };
+}
+
+// Every ten minutes, with nobody watching: houses left at work are put right, videos with a chosen time go out,
+// and a house really stuck for over two hours is restarted by the Generale, once a day for each house.
+async function watch(env) {
+  const state = await loadState(env), now = new Date().toISOString(), t = Date.now(), before = JSON.stringify(state);
+  tidy(state, now);
+  for (const q of state.queue) if (q.status === "approved" && q.publish_exact && t >= Date.parse(q.publish_after)
+    && !(q.now_at && t - Date.parse(q.now_at) < RESERVE_MS) && PLATFORMS.some((p) => !sent(q.published?.[p]))) await publishNow(env, state, q, "All'orario che hai scelto esce");
+  const done = state.auto_guard?.day === romeDay(t) ? state.auto_guard.depts : [];
+  const stuck = Object.keys(RESTART).filter((id) => { const d = state.departments[id]; return d?.status === "working" && d.updated_at && t - Date.parse(d.updated_at) > 2 * 3600e3 && !done.includes(id); });
+  if (stuck.length) {
+    state.auto_guard = { day: romeDay(t), depts: [...done, ...stuck] };
+    const g = await guardRound(env, state, now);
+    await pushAll(env, { title: "Il Generale è intervenuto da solo", body: clip(g.text, 120), url: "/" });
+  }
+  if (JSON.stringify(state) !== before) await saveState(env, state);
+}
+
 async function fireRoutine(env, which, text) {
   const id = env[`ROUTINE_${which}_ID`], token = env[`ROUTINE_${which}_TOKEN`];
   if (!id || !token) return 0;
@@ -531,6 +588,9 @@ function nextDaily(ms, hour) {
 }
 
 export class Clock extends DurableObject {
+  getState() { return this.ctx.storage.get("state"); }
+  putState(text) { return this.ctx.storage.put("state", text); }
+
   hour() {
     return Number(this.env.DAILY_HOUR_UTC || 6);
   }
@@ -581,7 +641,8 @@ const clock = (env) => env.CLOCK.get(env.CLOCK.idFromName("lanternfox"));
 
 export default {
   async scheduled(event, env, ctx) {
-    ctx.waitUntil(clock(env).ensure()); // il Cron Trigger, se scatta, si limita a riarmare la sveglia
+    ctx.waitUntil(clock(env).ensure()); // il Cron Trigger riarma la sveglia
+    ctx.waitUntil(watch(env));
   },
 
   async fetch(request, env, ctx) {
@@ -697,6 +758,38 @@ export default {
       }
       return json({ today: new Date(Date.now() + 3600e3).toISOString().slice(0, 10), notes: notes.map(({ date, text, at }) => ({ date, text, at })) });
     }
+    // Part 2: what is due (the Soggetto asks first), the YouTube comments of a Part 1, and the count of the choice
+    if (url.pathname.startsWith("/parts/")) {
+      if (!(await publishOk(request, env))) return json({ error: "non autorizzato" }, 401);
+      const state = await loadState(env), now = new Date().toISOString();
+      if (url.pathname === "/parts/due") {
+        planParts(state); await saveState(env, state);
+        const all = parts2(state);
+        return json({ due: all.filter((p) => p.due), upcoming: all.filter((p) => !p.due) });
+      }
+      const body = request.method === "POST" ? await request.json().catch(() => ({})) : {};
+      const item = state.queue.find((q) => q.id === (url.searchParams.get("id") || body.id));
+      if (!item) return json({ error: "video non trovato" }, 404);
+      if (url.pathname === "/parts/comments") {
+        const video = /shorts\/([\w-]+)/.exec(item.published?.youtube?.url || "")?.[1], token = await youtubeToken(env);
+        if (!video || !token) return json({ youtube: [], error: video ? "YouTube non collegato" : "non è su YouTube" });
+        const j = await fetch(`https://www.googleapis.com/youtube/v3/commentThreads?part=snippet&videoId=${video}&maxResults=100&textFormat=plainText`, { headers: { Authorization: `Bearer ${token}` } }).then((r) => r.json());
+        return json({ youtube: (j.items || []).map((t) => t.snippet.topLevelComment.snippet).map((s) => ({ author: s.authorDisplayName, text: s.textOriginal })), error: j.error ? clip(j.error.message, 200) : "" });
+      }
+      if (url.pathname === "/parts/votes" && request.method === "POST") {
+        const counts = Object.fromEntries(Object.entries(body.counts || {}).map(([k, v]) => [clip(k, 30), +v || 0]));
+        const text = Object.entries(counts).map(([k, v]) => `${k} ${v}`).join(" · ");
+        item.part_votes = { counts, winner: clip(body.winner, 30), by: body.by === "fox" ? "fox" : "comments", at: now };
+        const part2 = item.title.replace(/Part 1\s*$/i, "Part 2"), row = state.calendar.find((c) => c.title === part2);
+        const note = body.by === "fox" ? `Nessuna maggioranza (${text || "nessun voto"}): sceglie la volpe, ${item.part_votes.winner}` : `Scelta del pubblico: ${item.part_votes.winner} (${text})`;
+        if (row) row.note = note;
+        state.log.push({ at: now, dept: "soggetto", status: "done", text: `${part2}: ${note}` });
+        await saveState(env, state);
+        return json({ ok: true });
+      }
+      return json({ error: "percorso sconosciuto" }, 404);
+    }
+
     // Statistiche (Abaco): the Community's evening round brings Instagram's numbers, the Office adds YouTube's and matches them to our videos
     if (url.pathname === "/stats/collect" && request.method === "POST") {
       if (!(await publishOk(request, env))) return json({ error: "non autorizzato" }, 401);
@@ -782,6 +875,7 @@ export default {
       const name = { instagram: "Instagram", youtube: "YouTube", tiktok: "TikTok" }[platform];
       state.log.push({ at: now, dept: "pubblicazione", status: error ? "error" : "done", text: error ? `${name}: non pubblicato (${clip(error, 120)})` : draft ? `${name}: "${item.title}" è nelle bozze, da pubblicare dall'app` : `Uscito su ${name}: "${item.title}"` });
       const done = PLATFORMS.every((p) => sent(item.published[p]));
+      planParts(state);
       if (done) {
         item.status = "published";
         const date = now.slice(0, 10);
@@ -957,7 +1051,7 @@ export default {
     }
 
     if (url.pathname === "/approve" && request.method === "POST") {
-      const { id, decision, note, after } = await request.json();
+      const { id, decision, note, after, exact } = await request.json();
       if (!["approved", "redo"].includes(decision)) return json({ error: "decisione non valida" }, 400);
       const when = validAfter(after);
       if (when === false) return json({ error: "orario non valido" }, 400);
@@ -967,14 +1061,14 @@ export default {
       item.status = decision;
       item.note = clip(note, 1000);
       item.decided_at = new Date().toISOString();
-      if (decision === "approved") { if (when) item.publish_after = when; else delete item.publish_after; }
+      if (decision === "approved") { if (when) item.publish_after = when; else delete item.publish_after; item.publish_exact = Boolean(when && exact); }
       if (decision === "approved") calendarPut(state, { date: outDate(env, item), title: item.title, status: "approved" });
       // approved videos wait for the publishing routine's slot (PUBLISH_AT_UTC); "redo" starts the Regia routine with the note
       const started = decision === "redo" ? await fireRoutine(env, "REDO", `id: ${id}\nnote: ${item.note}`) : 0;
       const redoOk = started >= 200 && started < 300;
       state.departments.revisione = { status: "done", task: decision === "approved" ? `Approvato: ${item.title}` : `Da rifare: ${item.note || item.title}`,
         output: "", updated_at: item.decided_at };
-      if (decision === "redo") state.departments.regia = { status: redoOk ? "working" : "error",
+      if (decision === "redo") state.departments.regia = { video: id, status: redoOk ? "working" : "error",
         task: redoOk ? `Rifaccio "${item.title}": ${clip(item.note, 160)}` : "Non riesco ad avviare il rifacimento: controlla la routine Regia", output: "", updated_at: item.decided_at };
       state.log.push({ at: item.decided_at, dept: "revisione", status: "done",
         text: decision === "approved" ? `Hai approvato "${item.title}": esce all'orario di pubblicazione` : `Hai chiesto di rifare "${item.title}"` });
@@ -983,14 +1077,15 @@ export default {
     }
     // move an approved video to another slot ("Sposta a domani" / "Riporta a oggi" in Approva); after: null = the next slot
     if (url.pathname === "/approve/when" && request.method === "POST") {
-      const { id, after } = await request.json().catch(() => ({}));
+      const { id, after, exact } = await request.json().catch(() => ({}));
       const when = validAfter(after);
       if (when === false) return json({ error: "orario non valido" }, 400);
       const state = await loadState(env), item = state.queue.find((q) => q.id === id && q.status === "approved");
       if (!item) return json({ error: "video non approvato o non trovato" }, 404);
       if (when) item.publish_after = when; else delete item.publish_after;
+      item.publish_exact = Boolean(when && exact);
       calendarPut(state, { date: outDate(env, item), title: item.title, status: "approved" });
-      state.log.push({ at: new Date().toISOString(), dept: "pubblicazione", status: "done", text: `"${item.title}" esce ${when ? "dal " + when.slice(0, 10) : "al prossimo orario"}` });
+      state.log.push({ at: new Date().toISOString(), dept: "pubblicazione", status: "done", text: `"${item.title}": hai cambiato l'orario di uscita (${outDate(env, item)})` });
       await saveState(env, state);
       return json({ ok: true });
     }
@@ -1097,14 +1192,8 @@ export default {
       const state = await loadState(env);
       const item = state.queue.find((q) => q.id === id && q.status === "approved");
       if (!item) return json({ error: "video non approvato o non trovato" }, 404);
-      const now = new Date().toISOString();
       if (item.now_at && Date.now() - Date.parse(item.now_at) < 10 * 60e3) return json({ ok: true, already: true });   // a second tap
-      const started = await fireRoutine(env, "PUBLISH", `Pubblica adesso: ${id}`);
-      const ok = started >= 200 && started < 300;
-      if (ok) item.now_at = now;
-      state.departments.pubblicazione = { status: ok ? "working" : "error", task: ok ? `Pubblico adesso: ${item.title}` : "Non riesco ad avviare la pubblicazione: controlla la routine",
-        output: "", updated_at: now };
-      if (ok) state.log.push({ at: now, dept: "pubblicazione", status: "working", text: `Hai chiesto di pubblicare subito "${item.title}"` });
+      const { ok, started } = await publishNow(env, state, item, "Hai chiesto di pubblicare subito");
       await saveState(env, state);
       return json({ ok, status: started }, ok ? 200 : 502);
     }

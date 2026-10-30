@@ -830,6 +830,7 @@ function reviewCard(q) {
   const actions = q.status === "pending"
     ? `<label for="note-${esc(q.id)}" class="note">Se va rifatto, cosa cambiare</label>
        <textarea id="note-${esc(q.id)}" placeholder="Per esempio: la voce più lenta nel finale"></textarea>
+       <p class="note" style="margin:0 0 8px">Se approvi esce ${esc(whenText(nextSlot(Date.now())))}. Potrai cambiare l'orario subito dopo.</p>
        <div class="row"><button class="btn primary" data-approve="${esc(q.id)}">Pubblica</button><button class="btn" data-redo="${esc(q.id)}">Rifai</button>${dlButton(q)}</div>`
     : q.status === "redo" ? `<p class="decided">Da rifare (chiesto alle ${fmtTime(q.decided_at)})${q.note ? `: ${esc(q.note)}` : ""}</p><p class="note" style="margin:0">La Regia sistema il copione e le scene, poi la nuova versione arriva qui in circa mezz'ora.</p>`
     : publishedBlock(q);
@@ -848,7 +849,9 @@ function nextSlot(from) {   // the first publishing slot at or after "from" (ms)
   }
   return new Date(from);
 }
-const outAt = (q) => nextSlot(Math.max(Date.now(), Date.parse(q.publish_after || 0) || 0));
+const outAt = (q) => q.publish_exact && Date.parse(q.publish_after) > Date.now() - 15 * 60e3 ? new Date(q.publish_after) : nextSlot(Math.max(Date.now(), Date.parse(q.publish_after || 0) || 0));
+const whenLong = (at) => at.toLocaleString("it-IT", { weekday: "long", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit", timeZone: "Europe/Rome" }).replace(/,? (alle )?(ore )?(\d\d:\d\d)$/, " alle $3");
+const inputTime = (at) => new Date(at.getTime() - at.getTimezoneOffset() * 60e3).toISOString().slice(0, 16);   // for <input type="datetime-local">
 const whenText = (at) => `${romeDay(at) === romeDay(Date.now()) ? "oggi" : romeDay(at) === romeDay(Date.now() + 864e5) ? "domani" : fmtDay(romeDay(at))} alle ${fmtTime(at.toISOString())}`;
 // how many videos go out today: already out (first platform) plus the approved ones waiting for a slot today
 function todayCount(exceptId) {
@@ -879,10 +882,16 @@ function publishedBlock(q) {
     <label class="note" for="c-${esc(q.id)}">Didascalia (con gli hashtag)</label><textarea id="c-${esc(q.id)}" class="field" maxlength="2200">${esc(q.caption || "")}</textarea>
     <div class="row"><button class="btn primary" data-edit="${esc(q.id)}">Salva le modifiche</button></div></details>` : "";
   const now = edit + `<div class="row">${q.status === "approved" ? `<button class="btn primary" data-now="${esc(q.id)}">Pubblica adesso</button>
-    ${later ? `<button class="btn" data-when="${esc(q.id)}" data-after="">Al prossimo orario</button>`
-      : `<button class="btn" data-when="${esc(q.id)}" data-after="${nextSlot(at.getTime() + 60e3).toISOString()}">Sposta al giro dopo</button>`}` : ""}${dlButton(q)}</div>`;
+` : ""}${dlButton(q)}</div>`;
+  // the time it goes out, written big, and how to change it: the next slots with one tap, or any time
+  const slots = []; for (let s = nextSlot(Date.now()), k = 0; k < 4; k++, s = nextSlot(s.getTime() + 6 * 60e3)) slots.push(s);
+  const out = q.status === "approved" ? `<div class="outbox"><span class="note">Andrà online</span><b>${esc(whenLong(at))}</b><span class="note">${inMin(at)}, su Instagram e YouTube</span>
+    <details class="edit"><summary>Cambia orario</summary><div class="row">${slots.map((s) => `<button class="btn${Math.abs(s - at) < 60e3 ? " primary" : ""}" data-when="${esc(q.id)}" data-after="${s.toISOString()}">${esc(whenText(s))}</button>`).join("")}</div>
+    <label class="note" for="w-${esc(q.id)}">Oppure scegli giorno e ora (fino a 8 giorni)</label><input id="w-${esc(q.id)}" class="field" style="min-height:0" type="datetime-local" value="${inputTime(at)}" min="${inputTime(new Date())}" max="${inputTime(new Date(Date.now() + 7.9 * 864e5))}">
+    <div class="row"><button class="btn primary" data-whenat="${esc(q.id)}">Salva questo orario</button></div>
+    <p class="note" style="margin:8px 0 0">Un orario scelto da te parte entro 10 minuti da quell'ora.</p></details></div>` : "";
   return `<p class="decided">${q.status === "published" ? "Pubblicato" : "Approvato"} alle ${fmtTime(q.decided_at)}</p>
-    <ul class="chips">${row("instagram", "Instagram")}${row("youtube", "YouTube")}${pub.tiktok ? row("tiktok", "TikTok") : ""}</ul>${now}
+    ${out}<ul class="chips">${row("instagram", "Instagram")}${row("youtube", "YouTube")}${pub.tiktok ? row("tiktok", "TikTok") : ""}</ul>${now}
     ${pub.tiktok?.url ? "" : pub.tiktok?.draft ? `<p class="note" style="margin:0 0 8px">Su TikTok il video è nelle bozze: apri l'app, tocca la notifica, incolla la didascalia e premi Pubblica.</p>
     <div class="row"><button class="btn" data-copy="${esc(q.id)}">Copia didascalia</button></div>`
     : `<p class="note" style="margin:0 0 8px">TikTok per ora si pubblica a mano: apri il video, salvalo e caricalo dall'app con la didascalia.</p>
@@ -900,7 +909,7 @@ function renderDays() {
     const vids = (state.calendar || []).filter((c) => c.date === date);   // both videos of the day, each with how it went
     const st = i < 0 ? "skipped" : "planned";
     out.push(`<li class="${date === today ? "today" : ""}"><span class="d">${fmtDay(date)}<small>${date === today ? "oggi" : ""}</small></span>
-      ${vids.length ? `<span class="vids">${vids.map((c) => `<span class="vid"><span>${esc(c.title)}</span><span class="pill ${c.status}">${label[c.status] || c.status}</span></span>`).join("")}</span>`
+      ${vids.length ? `<span class="vids">${vids.map((c) => `<span class="vid"><span>${esc(c.title)}${c.note ? `<small class="note" style="display:block">${esc(c.note)}</small>` : ""}</span><span class="pill ${c.status}">${label[c.status] || c.status}</span></span>`).join("")}</span>`
         : `<span><span class="note">${i < 0 ? "—" : "Il Soggetto li sceglie la mattina stessa"}</span></span><span class="pill ${st}">${label[st]}</span>`}
       <span class="mine">${(state.notes || []).filter((n) => n.date === date).map((n) => `<span class="mynote" title="${n.read_by?.length ? "Letta da: " + esc(n.read_by.map((d) => BY_ID[d]?.name || d).join(", ")) : "Ancora nessun reparto l'ha letta"}">✎ ${esc(n.text)}${n.read_by?.length ? ` <small class="read">👁 ${n.read_by.length}</small>` : ""}
         <button class="x" data-unnote="${esc(n.id)}" aria-label="Togli la nota">×</button></span>`).join("")}
@@ -1110,12 +1119,25 @@ $("queue").addEventListener("click", async (e) => {
     render.queueSig = null; load();
     return;
   }
-  const w = e.target.closest("[data-when]");   // "Sposta al giro dopo" / "Al prossimo orario"
+  const wa = e.target.closest("[data-whenat]");   // "Salva questo orario": a day and time typed by the user
+  if (wa) {
+    const at = new Date(document.getElementById("w-" + wa.dataset.whenat)?.value || NaN);
+    if (!(at > Date.now())) { toast("Scegli un orario che deve ancora arrivare"); return; }
+    if (demo) { toast("Nella prova non si sposta niente"); return; }
+    wa.disabled = true;
+    const r = await fetch("/approve/when", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: wa.dataset.whenat, after: at.toISOString(), exact: true }) });
+    toast(r.ok ? `Esce ${whenLong(at)}` : "Non sono riuscito a spostarlo: riprova");
+    wa.closest("details").open = false;   // an open editor keeps the card from refreshing
+    render.queueSig = null; load();
+    return;
+  }
+  const w = e.target.closest("[data-when]");   // one of the next publishing slots
   if (w) {
     if (demo) { toast("Nella prova non si sposta niente"); return; }
     w.disabled = true;
     const r = await fetch("/approve/when", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: w.dataset.when, after: w.dataset.after || null }) });
     toast(r.ok ? `Esce ${whenText(outAt({ publish_after: w.dataset.after }))}` : "Non sono riuscito a spostarlo: riprova");
+    if (w.closest("details")) w.closest("details").open = false;
     render.queueSig = null; load();
     return;
   }
@@ -1141,7 +1163,7 @@ $("queue").addEventListener("click", async (e) => {
   b.disabled = false;
   if (!r.ok) { toast("Non sono riuscito a salvare la scelta: riprova"); return; }
   const res = await r.json().catch(() => ({}));
-  toast(decision === "approved" ? `Approvato: esce ${whenText(outAt({ publish_after: after }))}, oppure premi Pubblica adesso`
+  toast(decision === "approved" ? `Approvato: esce ${whenText(outAt({ publish_after: after }))}. Puoi cambiare l'orario qui sotto`
     : res.started ? "La Regia sta rifacendo il video con la tua nota" : "Nota salvata, ma la Regia non è partita: controlla la routine");
   load();
 });

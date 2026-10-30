@@ -18,9 +18,9 @@ mkdir -p "$P/out"
 cd "$LIB"
 
 node core/render/events.mjs "$P" --size 1080x1920 --out "$P/events.json"
-office '{"dept":"musica","status":"working","task":"Compongo il carillon sulle scene"}'
+office '{"dept":"musica","status":"working","task":"Preparo la musica sulle scene"}'
 $PY "$STUDIO/tools/score.py" "$P"
-office '{"dept":"musica","status":"done","task":"Carillon pronto"}' '{"dept":"animazione","status":"working","task":"Disegno i fotogrammi del film"}'
+office '{"dept":"musica","status":"done","task":"Musica pronta"}' '{"dept":"animazione","status":"working","task":"Disegno i fotogrammi del film"}'
 if [ -n "$SEGMENTS" ]; then   # slices already rendered elsewhere (tools/segment.mjs): join them losslessly
   ls "$SEGMENTS"/seg_*.mp4 | sort -V | sed "s/.*/file '&'/" > "$P/out/segments.txt"
   ffmpeg -v error -y -f concat -safe 0 -i "$P/out/segments.txt" -c copy "$P/out/video.mp4"

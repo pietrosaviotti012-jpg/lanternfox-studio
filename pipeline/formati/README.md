@@ -27,4 +27,4 @@ Vedi `pipeline/VISIVO.md` per il dettaglio. In breve:
 - per riga: `em`, `hit`, `clock`, `card` (notifica), `phone` (schermata del telefono), `tv` (allerta con regole), `cctv` (monitor di sicurezza), `peephole` (spioncino), `timer`, `bar` (aggiorna i valori), `tint` (rosso), `quote` (frase di un altro personaggio), `name` (nome e ruolo), `vfx` (voce: `radio`, `phone`, `whisper`, `child`, `robot`).
 - nelle scene (`engine/kit/motifs.js`): `person` (personaggio con testa tonda: espressioni `calm`, `scared`, `surprised`, `sleeping`).
 
-Ogni formato ha il suo tema di colore in `engine/kit/themes.js` e un narratore in `pipeline/VOCE.md`.
+Ogni formato ha il suo tema di colore in `engine/kit/themes.js`, un narratore in `pipeline/VOCE.md` e il suo pacchetto di suoni in `pipeline/SUONI.md`.

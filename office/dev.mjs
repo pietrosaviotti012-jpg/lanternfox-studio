@@ -46,7 +46,7 @@ createServer((req, res) => {
         else sample.notes.push({ id: "note-" + Date.now().toString(36), date: b.date, text: b.text, at: new Date().toISOString() });
       } else {
         const q = (sample.queue || []).find((x) => x.id === b.id);
-        if (q) { if (b.decision) Object.assign(q, { status: b.decision, decided_at: new Date().toISOString() }); if (b.after) q.publish_after = b.after; else delete q.publish_after; }
+        if (q) { if (b.decision) Object.assign(q, { status: b.decision, decided_at: new Date().toISOString() }); if (b.after) q.publish_after = b.after; else delete q.publish_after; q.publish_exact = Boolean(b.after && b.exact); }
       }
       res.writeHead(200, { "Content-Type": "application/json" }); res.end(JSON.stringify({ ok: true, notes: sample.notes }));
     });

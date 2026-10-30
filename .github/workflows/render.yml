@@ -69,6 +69,8 @@ jobs:
           path: /home/runner/.cache/huggingface
           key: hf-chatterbox-whisper-v1
       - name: Voce
+        env:
+          VIDEO_ID: ${{ steps.which.outputs.id }}
         run: |
           VIDEO=$(node -e "const m=require('./${{ steps.which.outputs.dir }}/meta.json'); console.log(JSON.stringify({video:{id:'${{ steps.which.outputs.id }}',title:m.title,series:m.series||''}}))")
           node tools/office.mjs "$VIDEO" '{"dept":"voce","status":"working","task":"Registro il narratore riga per riga"}'
@@ -151,10 +153,12 @@ jobs:
         env:
           SEGMENTS: ${{ github.workspace }}/segs
           PY: python
+          VIDEO_ID: ${{ needs.voice.outputs.id }}
         run: sh tools/build.sh "${{ needs.voice.outputs.dir }}"
       - name: Quality check (it never stops the chain)
         env:
           P: ${{ needs.voice.outputs.dir }}
+          VIDEO_ID: ${{ needs.voice.outputs.id }}
         run: |
           node tools/office.mjs '{"dept":"qualita","status":"working","task":"Guardo il film finito: volume, scene buie, gancio, parole"}'
           pip install -q faster-whisper "av<19" || true
@@ -179,6 +183,7 @@ jobs:
         env:
           P: ${{ needs.voice.outputs.dir }}
           ID: ${{ needs.voice.outputs.id }}
+          VIDEO_ID: ${{ needs.voice.outputs.id }}
           BASE: ${{ steps.release.outputs.base }}
         run: |
           node -e "

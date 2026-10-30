@@ -10,7 +10,8 @@ const envFile = join(dirname(fileURLToPath(import.meta.url)), '..', '.env');
 const local = existsSync(envFile) ? Object.fromEntries(readFileSync(envFile, 'utf8').split(/\r?\n/).filter(l => l.includes('=') && !l.startsWith('#'))
   .map(l => [l.slice(0, l.indexOf('=')), l.slice(l.indexOf('=') + 1)])) : {};
 const URL_ = process.env.OFFICE_URL || local.OFFICE_URL, SECRET = process.env.STUDIO_SECRET || local.STUDIO_SECRET;
-const events = process.argv.slice(2).map(a => JSON.parse(a));
+// in a render, VIDEO_ID says for which video the house is working: two renders can run at the same time
+const events = process.argv.slice(2).map(a => JSON.parse(a)).map(e => e.dept && process.env.VIDEO_ID ? { ...e, video_id: process.env.VIDEO_ID } : e);
 if (!URL_ || !SECRET) { console.warn('office: OFFICE_URL / STUDIO_SECRET not set, event not sent'); process.exit(0); }
 try {
   const r = await fetch(URL_ + '/events', { method: 'POST', body: JSON.stringify(events),

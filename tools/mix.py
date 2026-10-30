@@ -2,10 +2,12 @@
 
 voice (vo/<id>.wav at each line's time) → compressed, high-passed, RMS about −18 dB, forward
 music (out/music.wav) → about 10 dB under the voice, ducked 5.5 dB while someone speaks
-foley from events.json (each shot's "sfx" list): paper and light sounds, rain, wind, waves, thunder, steps
+foley from events.json (each shot's "sfx" list): real recordings from sounds/, by the format's pack (tools/packs.py), or the synthesised paper and light sounds
+ambience of the format under the whole film ("bed" in script.json picks another family, false removes it)
 → out/mix.wav (48 kHz stereo, peak-limited). The final −14 LUFS is done by Lemo's mux.sh.
 """
 import json, os, sys
+from packs import CAT, SOUNDS, choose, number, pack_of
 import numpy as np
 import soundfile as sf
 
@@ -19,7 +21,9 @@ ev = json.load(open(os.path.join(prod, "events.json")))
 DUR = ev["dur"]
 N = int((DUR + 1) * SR)
 voice = np.zeros((N, 2), np.float32); fx = np.zeros((N, 2), np.float32)
-rng = np.random.default_rng(5)
+rng = np.random.default_rng(number(os.path.basename(os.path.normpath(prod))) % 2**32)
+fmt, pack = pack_of(prod)
+script = json.load(open(os.path.join(prod, "script.json"), encoding="utf8"))
 
 def rms(x): return float(np.sqrt(np.mean(x ** 2)) + 1e-9)
 
@@ -71,16 +75,43 @@ def steps(n, every, v=1):
     return x * v
 def paper(v=1): d = .6; t = t_(d); return norm(bp(noise(d), 900, 5000) * (np.abs(np.sin(2 * np.pi * 9 * t)) ** 3) * env_exp(d, .25)) * v
 
+# —— real recordings: a file of the family, at a level set by what it is. Long sounds loop to the length asked for ——
+played = {}
+def sample(fam, d, cap=6):
+    n = played[fam] = played.get(fam, -1) + 1
+    e = choose(prod, fam, n)
+    x, sr = sf.read(os.path.join(SOUNDS, e["file"]), dtype="float32")
+    x = x if x.ndim == 1 else x.mean(1)
+    if sr != SR: x = np.interp(np.arange(0, len(x) * SR / sr) * sr / SR, np.arange(len(x)), x).astype(np.float32)
+    want = int((d or min(cap, e["dur"])) * SR)
+    if CAT[fam]["kind"] != "oneshot" and len(x) > want:   # a different stretch of the recording each time
+        at = number(prod, fam, n) % (len(x) - want); x = x[at:]
+    while len(x) < want and CAT[fam]["kind"] != "oneshot":
+        f = min(int(.5 * SR), len(x) // 3); r = np.linspace(0, 1, f, dtype=np.float32)
+        x = np.concatenate([x[:-f], x[-f:] * (1 - r) + x[:f] * r, x[f:]])
+    x = x[:want].copy(); f = min(int((.05 if CAT[fam]["kind"] == "oneshot" else .4) * SR), len(x) // 3)
+    if f: x[-f:] *= np.linspace(1, 0, f, dtype=np.float32)
+    if CAT[fam]["kind"] != "oneshot" and f: x[:f] *= np.linspace(0, 1, f, dtype=np.float32)
+    return x * 10 ** ((-24 if CAT[fam]["kind"] == "oneshot" else -31) / 20 - e["rms"] / 20)
+
 GAIN = {"click": -26, "shimmer": -30, "chime": -28, "whoosh": -30, "thunder": -20, "crack": -24, "rain": -30, "wind": -32, "waves": -31, "steps": -27, "paper": -30}
 for e in ev["ev"]:
     k = e["type"]
     if k in ("line", "shot"): continue
     d = e.get("d", 4.0); v = e.get("v", 1.0)
-    x = {"click": lambda: switch(), "shimmer": shimmer, "chime": chime, "whoosh": lambda: sfx.whoosh(.6), "thunder": thunder, "crack": crack,
+    fam = pack.get("swap", {}).get(k, k)
+    if fam in CAT and not fam.startswith("m-"):
+        add(fx, sample(fam, e.get("d", 4.0 if CAT[fam]["kind"] != "oneshot" else None)), e["t"], v * 1.6, pan=e.get("pan", 0)); continue
+    x = {"click": lambda: switch(), "shimmer": shimmer, "chime": chime, "whoosh": lambda: lp(sfx.whoosh(rng.uniform(.35, .9)), rng.uniform(1800, 7000)), "thunder": thunder, "crack": crack,
          "rain": lambda: rain(d), "wind": lambda: wind(d), "waves": lambda: waves(d), "steps": lambda: steps(e.get("n", 8), e.get("every", .4)), "paper": paper}.get(k)
     if x is None: print("unknown sfx", k); continue
     y = x() if callable(x) else x
     add(fx, y.astype(np.float32), e["t"], 10 ** (GAIN.get(k, -30) / 20) * v * 2.4, pan=e.get("pan", 0))
+
+# —— the format's ambience, under everything ——
+bed = script.get("bed", (pack.get("bed") or [None])[number(prod) % max(1, len(pack.get("bed") or [1]))])
+if bed and bed in CAT:
+    add(fx, sample(bed, DUR) * .55, 0)
 
 # —— music, ducked under speech ——
 music, _ = sf.read(os.path.join(prod, "out", "music.wav"), dtype="float32")
