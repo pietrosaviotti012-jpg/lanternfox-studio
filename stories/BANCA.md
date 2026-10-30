@@ -38,6 +38,7 @@ La Ricerca aggiunge ogni giorno 3-5 voci nuove (dalle mode del momento, da Reddi
 - What if the internet went quiet for one day? (Niente mappe, niente pagamenti, il primo vicino che bussa alla porta.) (dal 2026-10-29)
 - What if the sun didn't rise tomorrow? (Alle 6:40 il cielo resta nero. Le piante, il freddo, le stelle di giorno: cosa succede ora per ora, con i fatti veri.) (dal 2026-10-29, dal "the sun should be up" di *Eyes Down*)
 
+- What if you could see Wi-Fi? (Una nebbia che si muove per casa, le stanze più luminose, il router come un falò. Chiusa: "Would you still sleep next to it?") (dal 2026-10-30)
 - What if sound stopped for one minute? ("You don't hear the crash. You see it." Chiusa: "Would you notice first, or would your dog?") (dal 2026-10-29, sera)
 
 ## Your Call (seconda persona, scelta finale)
@@ -51,8 +52,10 @@ La Ricerca aggiunge ogni giorno 3-5 voci nuove (dalle mode del momento, da Reddi
 - ⭐ **Two Alerts** (dal 2026-10-29): alle 2:40 il telefono riceve l'allerta ufficiale "Stay indoors". Un minuto dopo arriva un secondo messaggio, dallo stesso numero: "Ignore the last alert. Leave now." STAY or LEAVE.
 - **Not Delivered** (dal 2026-10-29): durante il blackout scrivi a tua sorella "are you ok?". Il messaggio resta "not delivered" per ore, poi lei risponde da dietro la tua porta: "open, it's me". OPEN or TEXT HER AGAIN.
 
-- ⭐ **On My Way** (dal 2026-10-29, sera): tua madre scrive "on my way, 10 min". Ma è già seduta sul tuo divano. TRUST THE TEXT or THE COUCH. (Il dilemma "quale delle due è vera" è il più commentato della settimana.)
+- ⭐ **On My Way** (dal 2026-10-29, sera): tua madre scrive "on my way, 10 min". Ma è già seduta sul tuo divano. TRUST THE TEXT or THE COUCH. (Il dilemma "quale delle due è vera" è il più commentato della settimana.) → `productions/2026-10-30-on-my-way`
 - ⭐ **The Last Lighthouse** (dal 2026-10-29, sera, formato conto alla rovescia): "The storm will last nine days. You have lamp oil for six." Barra: DAY 1/9 · OIL 6 · FOOD · WATER. Qualcosa sbatte alla porta della cisterna. LIGHT IT or SAVE IT.
+- **The Spare Key** (dal 2026-10-30): all'1:10 senti una chiave nella tua porta. Vivi da solo, la chiave ce l'hai tu. Poi si ferma, e una voce dice "wrong house, sorry": è la tua voce. OPEN or CALL.
+- **The Porch Light** (dal 2026-10-30): la regola di casa è lasciare la luce del portico accesa per chi torna tardi. Stanotte qualcuno la spegne da fuori. TURN IT ON or LEAVE IT.
 - **Rule 3** (dal 2026-10-29, sera, formato regole): la sirena del paese suona due volte l'anno. Stanotte ha suonato tre volte. La regola 3 dice cosa fare, ma nessuno la ricorda.
 
 ## Gialli e storie con colpo di scena

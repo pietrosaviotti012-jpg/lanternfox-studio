@@ -1,0 +1,318 @@
+{
+ "title": "On My Way · Part 1",
+ "series": "On My Way",
+ "format": "your-call",
+ "captions": "pop",
+ "hud": {
+  "tag": "ON MY WAY",
+  "part": "PART 1"
+ },
+ "fx": "dust",
+ "lead": 0.4,
+ "tail": 3.4,
+ "lines": [
+  {
+   "id": "L01",
+   "text": "It's 11:52 pm. Your mom just texted: on my way, ten minutes.",
+   "say": "It's eleven fifty-two p.m. Your mom just texted: on my way, ten minutes.",
+   "em": [
+    "mom"
+   ],
+   "clock": "NIGHT 1 · 11:52 PM",
+   "gap": 0.3,
+   "act": {
+    "intensity": 0.5,
+    "pace": 0.38,
+    "speed": 0.92
+   },
+   "card": {
+    "app": "Messages",
+    "kind": "info",
+    "title": "Mom",
+    "body": "On my way. 10 min ❤️",
+    "hold": 3.4
+   }
+  },
+  {
+   "id": "L02",
+   "text": "Except your mom is sitting on your couch. Right now.",
+   "em": [
+    "couch"
+   ],
+   "hit": true,
+   "gap": 0.5,
+   "act": {
+    "intensity": 0.6,
+    "pace": 0.38,
+    "speed": 0.9,
+    "gain_db": 0.5
+   }
+  },
+  {
+   "id": "L03",
+   "text": "She got home at ten. She made you tea.",
+   "em": [
+    "tea"
+   ],
+   "gap": 0.6,
+   "act": {
+    "intensity": 0.35,
+    "pace": 0.4,
+    "speed": 0.9,
+    "gain_db": -2
+   }
+  },
+  {
+   "id": "L04",
+   "text": "So you text back: Mom, you're already here?",
+   "em": [
+    "already"
+   ],
+   "gap": 0.4,
+   "act": {
+    "intensity": 0.45,
+    "pace": 0.4,
+    "speed": 0.9,
+    "gain_db": -1
+   },
+   "phone": {
+    "app": "messages",
+    "from": "Mom",
+    "thread": [
+     {
+      "me": false,
+      "text": "On my way. 10 min ❤️"
+     },
+     {
+      "me": true,
+      "text": "mom?? you're already here"
+     }
+    ]
+   }
+  },
+  {
+   "id": "L05",
+   "text": "Three dots. Then: No, sweetheart. I'm still in the car.",
+   "em": [
+    "car"
+   ],
+   "gap": 0.6,
+   "act": {
+    "intensity": 0.5,
+    "pace": 0.38,
+    "speed": 0.88,
+    "gain_db": -0.5
+   },
+   "card": {
+    "app": "Messages",
+    "kind": "info",
+    "title": "Mom",
+    "body": "No sweetheart, I'm still in the car 🚗",
+    "hold": 3.2
+   }
+  },
+  {
+   "id": "L06",
+   "text": "On the couch, your mom is watching TV. Smiling.",
+   "em": [
+    "smiling"
+   ],
+   "gap": 0.9,
+   "act": {
+    "intensity": 0.4,
+    "pace": 0.38,
+    "speed": 0.88,
+    "gain_db": -2
+   }
+  },
+  {
+   "id": "L07",
+   "text": "The TV is off.",
+   "em": [
+    "off"
+   ],
+   "hit": true,
+   "tint": true,
+   "hold": 2.2,
+   "gap": 1.2,
+   "act": {
+    "intensity": 0.7,
+    "pace": 0.36,
+    "speed": 0.86,
+    "gain_db": 0.5
+   }
+  },
+  {
+   "id": "L08",
+   "text": "Your phone buzzes again. Is the porch light on? I can't find the house.",
+   "em": [
+    "find"
+   ],
+   "clock": "NIGHT 1 · 11:58 PM",
+   "gap": 0.5,
+   "act": {
+    "intensity": 0.5,
+    "pace": 0.4,
+    "speed": 0.9,
+    "gain_db": -1
+   },
+   "card": {
+    "app": "Messages",
+    "kind": "info",
+    "title": "Mom",
+    "body": "Is the porch light on? I can't find the house.",
+    "hold": 3.6
+   }
+  },
+  {
+   "id": "L09",
+   "text": "You look outside. The porch light is on. The street is empty.",
+   "em": [
+    "empty"
+   ],
+   "gap": 0.5,
+   "act": {
+    "intensity": 0.4,
+    "pace": 0.38,
+    "speed": 0.88,
+    "gain_db": -2
+   }
+  },
+  {
+   "id": "L10",
+   "text": "Almost empty. A fox sits under the streetlamp, holding a lantern.",
+   "em": [
+    "fox",
+    "lantern"
+   ],
+   "gap": 0.4,
+   "act": {
+    "intensity": 0.45,
+    "pace": 0.38,
+    "speed": 0.88,
+    "gain_db": -1.5
+   }
+  },
+  {
+   "id": "L11",
+   "text": "It's staring at your front door.",
+   "em": [
+    "door"
+   ],
+   "gap": 1.1,
+   "act": {
+    "intensity": 0.5,
+    "pace": 0.36,
+    "speed": 0.86,
+    "gain_db": -2.5
+   }
+  },
+  {
+   "id": "L12",
+   "text": "Behind you, the couch creaks.",
+   "em": [
+    "creaks"
+   ],
+   "clock": "NIGHT 1 · 11:59 PM",
+   "gap": 0.7,
+   "act": {
+    "intensity": 0.65,
+    "pace": 0.36,
+    "speed": 0.86,
+    "gain_db": -1
+   }
+  },
+  {
+   "id": "L13",
+   "text": "Who are you texting, sweetheart?",
+   "em": [
+    "sweetheart"
+   ],
+   "quote": true,
+   "vfx": "whisper",
+   "tint": true,
+   "gap": 1.2,
+   "act": {
+    "intensity": 0.55,
+    "pace": 0.36,
+    "speed": 0.86,
+    "gain_db": -4
+   }
+  },
+  {
+   "id": "L14",
+   "text": "Headlights turn into your street.",
+   "em": [
+    "headlights"
+   ],
+   "clock": "NIGHT 1 · 12:02 AM",
+   "gap": 0.5,
+   "act": {
+    "intensity": 0.6,
+    "pace": 0.4,
+    "speed": 0.9,
+    "gain_db": 1.5
+   }
+  },
+  {
+   "id": "L15",
+   "text": "One of them is your mom. Text the car, or trust the couch?",
+   "em": [
+    "car",
+    "couch"
+   ],
+   "gap": 0.4,
+   "act": {
+    "intensity": 0.6,
+    "pace": 0.4,
+    "speed": 0.9
+   }
+  },
+  {
+   "id": "L16",
+   "text": "Your call. Comment TEXT or COUCH.",
+   "em": [
+    "text",
+    "couch"
+   ],
+   "gap": 0.2,
+   "act": {
+    "intensity": 0.55,
+    "pace": 0.42,
+    "speed": 0.92
+   }
+  }
+ ],
+ "choice": {
+  "question": "Who is your real mom?",
+  "a": {
+   "word": "TEXT",
+   "sub": "the one in the car"
+  },
+  "b": {
+   "word": "COUCH",
+   "sub": "the one on the couch"
+  },
+  "note": "THE MAJORITY WRITES PART 2"
+ },
+ "next": {
+  "title": "PART 2",
+  "sub": "Follow for part 2"
+ },
+ "bpm": 60,
+ "seed": 30,
+ "music": [
+  {
+   "at": "S1",
+   "mood": "hush"
+  },
+  {
+   "at": "S7",
+   "mood": "rise"
+  },
+  {
+   "at": "S12",
+   "mood": "storm"
+  }
+ ]
+}

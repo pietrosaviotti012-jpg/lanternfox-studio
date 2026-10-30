@@ -624,7 +624,7 @@ export function oven(x, o, g) {
 
 // A person in the style of the viral survival stories (research/analisi/): a big round head with big eyes, so fear reads
 // at a glance, and one strong colour on the clothes. Front view. y goes up: by = feet, s = height.
-// o.face: 'calm' | 'scared' | 'surprised' | 'sleeping'; o.coat, o.hat (beanie colour or false), o.skin; o.arms: 'down' | 'up'
+// o.face: 'calm' | 'scared' | 'surprised' | 'sleeping' | 'smile'; o.hair (colour, with a bun); o.coat, o.hat (beanie colour or false), o.skin; o.arms: 'down' | 'up'
 export function person(x, o) {
   const { cx, by, s, face = 'calm', coat = '#f2b632', hat = false, skin = '#efe6d8', pants = '#2d3550', arms = 'down', dark = '#16181f' } = o;
   if (!x) return {};
@@ -646,6 +646,10 @@ export function person(x, o) {
   }
   // head
   x.fillStyle = skin; x.beginPath(); x.arc(cx, hy, hr, 0, TAU); x.fill();
+  if (o.hair) {   // (On My Way) hair: a cap over the top of the head and a bun
+    x.fillStyle = o.hair; x.beginPath(); x.arc(cx, hy + hr * .38, hr * .93, -.12, Math.PI + .12); x.fill();
+    x.beginPath(); x.arc(cx, hy + hr * 1.25, hr * .36, 0, TAU); x.fill();
+  }
   if (hat) {
     x.fillStyle = hat; x.beginPath(); x.arc(cx, hy + hr * .15, hr * 1.02, 0, Math.PI); x.fill();
     x.fillRect(cx - hr * 1.05, hy + hr * .05, hr * 2.1, hr * .28);
@@ -668,6 +672,63 @@ export function person(x, o) {
   const my = hy - hr * .42;
   if (face === 'surprised') { x.beginPath(); x.arc(cx, my, hr * .12, 0, TAU); x.fill(); }
   else if (face === 'scared') { x.beginPath(); x.moveTo(cx - hr * .22, my); for (let i = 1; i <= 4; i++) x.lineTo(cx - hr * .22 + i * hr * .11, my + (i % 2 ? hr * .06 : 0)); x.stroke(); }
+  else if (face === 'smile') { x.beginPath(); x.arc(cx, my + hr * .16, hr * .26, Math.PI * 1.15, Math.PI * 1.85); x.stroke(); }
   else if (face === 'calm') { x.beginPath(); x.moveTo(cx - hr * .14, my); x.lineTo(cx + hr * .14, my); x.stroke(); }
   return { head: [cx, hy], r: hr };
+}
+
+// —— Added for "On My Way" (Your Call): a living room with a couch, a TV, a mug of tea, a car with headlights ——
+
+// A couch seen from the front: back cushions, two arms, seat; o.front: only the seat front and arms (a sheet in front of a sitter)
+export function couch(x, o) {
+  const { cx, by, w, h, col = '#5a2f3a', dark = '#2a1620', front = false } = o;
+  const arm = w * .12, seatY = by + h * .42;
+  x.fillStyle = dark; x.fillRect(cx - w / 2 + arm * .3, by - h * .06, w * .04, h * .08); x.fillRect(cx + w / 2 - arm * .3 - w * .04, by - h * .06, w * .04, h * .08);   // feet
+  x.fillStyle = col;
+  if (!front) {
+    x.beginPath(); x.moveTo(cx - w / 2 + arm * .6, seatY); x.lineTo(cx - w / 2 + arm * .6, by + h * .9);
+    x.quadraticCurveTo(cx, by + h * 1.02, cx + w / 2 - arm * .6, by + h * .9); x.lineTo(cx + w / 2 - arm * .6, seatY); x.closePath(); x.fill();
+    x.fillStyle = dark; x.fillRect(cx - w * .006, seatY, w * .012, h * .5); x.fillStyle = col;
+  }
+  x.fillRect(cx - w / 2 + arm * .5, by, w - arm, h * .42);                                   // seat front
+  x.fillStyle = dark; x.fillRect(cx - w / 2 + arm * .5, by + h * .4, w - arm, h * .02); x.fillStyle = col;
+  for (const d of [-1, 1]) { const ax = cx + d * (w / 2 - arm / 2);                           // arms, rounded on top
+    x.fillRect(ax - arm / 2, by, arm, h * .55); x.beginPath(); x.arc(ax, by + h * .55, arm / 2, 0, Math.PI); x.fill(); }
+}
+
+// A TV on a low stand, seen from the front; the screen is dark glass, it burns in g when on (o.on)
+export function tvSet(x, o, g) {
+  const { cx, by, w, h, col = '#0c0f1c', glass = '#1b2036', on = false } = o, sy = by + h * .35, sh = h * .65;
+  if (x) {
+    x.fillStyle = col; x.fillRect(cx - w * .45, by, w * .9, h * .2); x.fillRect(cx - w * .04, by + h * .2, w * .08, h * .15);
+    x.fillRect(cx - w / 2, sy, w, sh); x.fillStyle = glass; x.fillRect(cx - w / 2 + w * .03, sy + w * .03, w * .94, sh - w * .06);
+  }
+  if (g && on) { g.fillStyle = '#fff'; g.fillRect(cx - w / 2 + w * .03, sy + w * .03, w * .94, sh - w * .06); }
+  return [cx, sy + sh / 2];
+}
+
+// A mug on a saucer with three wisps of steam (the steam is its own sheet in the shot if it has to rise)
+export function mug(x, o) {
+  const { cx, by, s, col = '#e9d6ae', steam = true } = o;
+  x.fillStyle = col; x.fillRect(cx - s * .6, by, s * 1.2, s * .08);
+  x.beginPath(); x.moveTo(cx - s * .38, by + s * .08); x.lineTo(cx - s * .42, by + s * .8); x.lineTo(cx + s * .42, by + s * .8); x.lineTo(cx + s * .38, by + s * .08); x.closePath(); x.fill();
+  x.strokeStyle = col; x.lineWidth = s * .09; x.beginPath(); x.arc(cx + s * .46, by + s * .45, s * .18, -Math.PI / 2, Math.PI / 2); x.stroke();
+  if (steam) { x.strokeStyle = 'rgba(233,214,174,.55)'; x.lineWidth = s * .05; x.lineCap = 'round';
+    for (const d of [-.2, 0, .2]) { x.beginPath(); x.moveTo(cx + d * s, by + s * .95); x.bezierCurveTo(cx + d * s + s * .15, by + s * 1.2, cx + d * s - s * .15, by + s * 1.4, cx + d * s, by + s * 1.65); x.stroke(); } }
+}
+
+// A small car seen from the side (facing right): body, cabin, two wheels; the headlight and the windows glow in g
+export function car(x, o, g) {
+  const { cx, by, w, col = '#141a33', glass = '#2c2a44', flip = false } = o, f = flip ? -1 : 1, h = w * .32;
+  const X = v => cx + v * w * f;
+  if (x) {
+    x.fillStyle = col;
+    x.beginPath(); x.moveTo(X(-.5), by + h * .25); x.lineTo(X(-.48), by + h * .62); x.lineTo(X(-.28), by + h * .66); x.lineTo(X(-.16), by + h);
+    x.lineTo(X(.18), by + h); x.lineTo(X(.3), by + h * .66); x.lineTo(X(.48), by + h * .58); x.lineTo(X(.5), by + h * .25); x.closePath(); x.fill();
+    x.fillStyle = glass; x.beginPath(); x.moveTo(X(-.24), by + h * .66); x.lineTo(X(-.14), by + h * .92); x.lineTo(X(.15), by + h * .92); x.lineTo(X(.25), by + h * .66); x.closePath(); x.fill();
+    x.fillStyle = col; x.fillRect(X(0) - w * .01, by + h * .66, w * .02, h * .28);
+    x.fillStyle = '#07080f'; for (const k of [-.3, .3]) { x.beginPath(); x.arc(X(k), by + h * .22, h * .22, 0, TAU); x.fill(); }
+  }
+  if (g) { g.fillStyle = '#fff'; g.beginPath(); g.ellipse(X(.48), by + h * .45, w * .02, h * .08, 0, 0, TAU); g.fill(); }
+  return [X(.5), by + h * .45];
 }
