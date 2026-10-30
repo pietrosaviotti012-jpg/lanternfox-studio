@@ -479,6 +479,8 @@ function tidy(state, now) {
       fixed.push(`${id[0].toUpperCase() + id.slice(1)} risultava al lavoro, ma il video era già finito`);
     }
   }
+  // a video renamed from Approva leaves no row behind under its old title
+  state.calendar = state.calendar.filter((c) => c.status !== "approved" || state.queue.some((q) => q.title === c.title));
   const rev = state.departments.revisione;
   if (rev?.status === "waiting" && !state.queue.some((q) => q.status === "pending")) state.departments.revisione = { ...rev, status: "done", updated_at: now };
   for (const o of state.ops) if (["waiting", "running"].includes(o.status) && t - Date.parse(o.at) > 3 * 3600e3) {
