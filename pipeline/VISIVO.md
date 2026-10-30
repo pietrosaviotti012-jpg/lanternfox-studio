@@ -67,3 +67,9 @@ Ogni video ha un tema: `"theme": "<formato>/<umore>"` in `script.json`, e nelle 
 - **Sistema a schermo:** ora, contatore o lista in alto restano fissi per tutto il video (`hud`, `bar`).
 
 Figure, mostri, animali e la volpe in ogni video: `pipeline/FIGURE.md`.
+
+## Controlli di ogni scena (dal video di prova del 2026-10-30)
+- **Mai una scena quasi nera:** la zona del soggetto deve avere almeno una forma ben separata dal fondo. Nel buio serve sempre una luce (`T.glow`) o un bordo chiaro; il grado di colore non scurisce oltre.
+- **Margini:** testi e schede restano dentro il 10% dai bordi; una camera o un movimento non li taglia mai. Le schede di testo stanno ferme e in piano, senza zoom.
+- **Sottotitoli liberi:** i sottotitoli pop stanno nel 55-70% dell'altezza; schede e titoli non ci finiscono sotto. Sulle righe lette da una scheda spegni i sottotitoli (`"sub": false`).
+- **Le persone si leggono:** volto chiaro (`skin` di base), mai tinto dal buio.
