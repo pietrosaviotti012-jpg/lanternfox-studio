@@ -1,0 +1,23 @@
+[
+ {
+  "t": 0.0,
+  "text": "You just found $20 million. Not in your account. In two suitcases, beside a car nobody's coming back for.",
+  "change": [
+   "brighter (phone, radio, another voice?)"
+  ]
+ },
+ {
+  "t": 34.7,
+  "text": "of the bags. A phone. One unread message. Did you get both cases? Before you can answer,",
+  "change": [
+   "brighter (phone, radio, another voice?)"
+  ]
+ },
+ {
+  "t": 75.0,
+  "text": "What would you choose? Comment, return, or keep? Your vote decides what happens in part two.",
+  "change": [
+   "louder"
+  ]
+ }
+]

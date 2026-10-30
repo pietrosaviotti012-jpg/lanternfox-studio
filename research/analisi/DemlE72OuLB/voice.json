@@ -1,0 +1,45 @@
+[
+ {
+  "t": 7.9,
+  "text": "The plan was simple.",
+  "change": [
+   "brighter (phone, radio, another voice?)"
+  ]
+ },
+ {
+  "t": 20.0,
+  "text": "It's Danny.",
+  "change": [
+   "brighter (phone, radio, another voice?)"
+  ]
+ },
+ {
+  "t": 24.4,
+  "text": "Headlights.",
+  "change": [
+   "quieter (whisper?)",
+   "brighter (phone, radio, another voice?)"
+  ]
+ },
+ {
+  "t": 31.7,
+  "text": "Get in.",
+  "change": [
+   "quieter (whisper?)"
+  ]
+ },
+ {
+  "t": 35.9,
+  "text": "Unknown number.",
+  "change": [
+   "darker (deep, muffled, another voice?)"
+  ]
+ },
+ {
+  "t": 53.6,
+  "text": "Comment A, or B.",
+  "change": [
+   "darker (deep, muffled, another voice?)"
+  ]
+ }
+]

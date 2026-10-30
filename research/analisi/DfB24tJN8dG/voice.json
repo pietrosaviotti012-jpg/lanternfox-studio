@@ -1,0 +1,38 @@
+[
+ {
+  "t": 18.0,
+  "text": "Check the brakes. Check the fuel for a coffee.",
+  "change": [
+   "quieter (whisper?)"
+  ]
+ },
+ {
+  "t": 24.0,
+  "text": "All trains. Mass infection in the city.",
+  "change": [
+   "quieter (whisper?)",
+   "brighter (phone, radio, another voice?)"
+  ]
+ },
+ {
+  "t": 30.0,
+  "text": "Joel's first thought was to stop at the next station and go back for his daughter.",
+  "change": [
+   "brighter (phone, radio, another voice?)"
+  ]
+ },
+ {
+  "t": 57.0,
+  "text": "Speed. Check. Fuel. Check. Doors. Check.",
+  "change": [
+   "brighter (phone, radio, another voice?)"
+  ]
+ },
+ {
+  "t": 66.0,
+  "text": "What did he forget? Tell me in the comments.",
+  "change": [
+   "darker (deep, muffled, another voice?)"
+  ]
+ }
+]

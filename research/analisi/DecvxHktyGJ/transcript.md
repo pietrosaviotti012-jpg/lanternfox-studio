@@ -1,0 +1,37 @@
+# Transcript (en)
+
+- `  0.0` **[HOOK]** You just stole $10 million.
+- `  2.5` **[HOOK]** It's sitting on a motel bed in four duffel bags.
+- `  5.4` And the hard part, it starts now
+- `  7.5` because every dollar leaves a trail.
+- `  9.9` Problem one, you can't even carry it.
+- ` 12.2` A single bill weighs about one gram.
+- ` 14.6` 10 million in hundreds is 100,000 bills.
+- ` 17.9` That's 100 kilos, 220 pounds.
+- ` 20.9` And if the bank gave you 20s, half a ton.
+- ` 23.7` Problem two, banks keep bait money.
+- ` 26.1` Bills with their serial numbers written down
+- ` 28.1` mixed in with the real cash
+- ` 29.9` spend one in the wrong place and it gets flagged.
+- ` 32.5` You have no idea which ones they are.
+- ` 34.7` Rule one, never spend it near where you took it.
+- ` 37.3` Day two, you need it in a bank.
+- ` 39.3` So you walk in with a backpack full of cash.
+- ` 41.9` Here's what you don't know.
+- ` 43.1` Any cash deposit over $10,000,
+- ` 45.5` the bank reports to the federal government automatically
+- ` 48.6` every time.
+- ` 49.4` So you get smart, $9,000.
+- ` 52.0` A different bank every day, just under the line.
+- ` 54.8` Nine, 18, 27, 36,000.
+- ` 59.0` Except that pattern has a name, structuring.
+- ` 61.9` It's a federal crime on its own,
+- ` 63.5` even if the money was clean.
+- ` 64.9` And it's exactly what banks are trained to spot.
+- ` 67.4` Four deposits in and someone is already looking
+- ` 69.8` at a screen with your name on it.
+- ` 71.5` Day three, you've got 9,964,000 dollars you can't touch
+- ` 76.8` and you're sick of motel noodles.
+- ` 78.5` You can hide it or you can spend it.
+- ` 80.7` Comment, hide or spend.
+- ` 82.7` Part two follows what you pick.

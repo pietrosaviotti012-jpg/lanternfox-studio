@@ -1,0 +1,30 @@
+# Transcript (en)
+
+- `  0.2` **[HOOK]** You just robbed a bank, $4.2 million, in one bag, and every cop in this city wants it back.
+- `  7.9` The plan was simple.
+- `  9.9` Meet Danny, under the bridge, midnight.
+- ` 13.4` You're there, Danny isn't.
+- ` 15.6` His phone goes straight to voicemail.
+- ` 18.3` Then your phone buzzes.
+- ` 20.0` It's Danny.
+- ` 21.3` Someone sold us out.
+- ` 22.9` Trust no one.
+- ` 24.4` Headlights.
+- ` 25.4` A black car skids to a stop, right next to you.
+- ` 28.7` The window drops.
+- ` 30.7` It's Danny.
+- ` 31.7` Get in.
+- ` 32.7` Now.
+- ` 34.2` Your phone buzzes again.
+- ` 35.9` Unknown number.
+- ` 37.1` Danny gave your plan to the cops.
+- ` 39.4` Don't get in that car.
+- ` 41.5` The sirens are getting closer.
+- ` 43.7` Danny's not looking at you.
+- ` 45.4` He's watching his mirror.
+- ` 47.1` Your call.
+- ` 48.1` A, get in Danny's car.
+- ` 50.3` B, trust no one.
+- ` 52.6` Go alone.
+- ` 53.6` Comment A, or B.
+- ` 55.4` The comments decide what happens in part 2.

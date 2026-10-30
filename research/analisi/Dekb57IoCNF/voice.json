@@ -1,0 +1,16 @@
+[
+ {
+  "t": 15.8,
+  "text": "the whole city is dark except one window across the street someone just turned on a lamp down on",
+  "change": [
+   "brighter (phone, radio, another voice?)"
+  ]
+ },
+ {
+  "t": 30.0,
+  "text": "your phone buzzes rule one never turn on a light rule two if someone knocks don't answer",
+  "change": [
+   "darker (deep, muffled, another voice?)"
+  ]
+ }
+]

@@ -1,0 +1,58 @@
+[
+ {
+  "t": 5.4,
+  "text": "And the hard part, it starts now",
+  "change": [
+   "brighter (phone, radio, another voice?)"
+  ]
+ },
+ {
+  "t": 23.7,
+  "text": "Problem two, banks keep bait money.",
+  "change": [
+   "brighter (phone, radio, another voice?)"
+  ]
+ },
+ {
+  "t": 37.3,
+  "text": "Day two, you need it in a bank.",
+  "change": [
+   "darker (deep, muffled, another voice?)"
+  ]
+ },
+ {
+  "t": 39.3,
+  "text": "So you walk in with a backpack full of cash.",
+  "change": [
+   "darker (deep, muffled, another voice?)"
+  ]
+ },
+ {
+  "t": 41.9,
+  "text": "Here's what you don't know.",
+  "change": [
+   "darker (deep, muffled, another voice?)"
+  ]
+ },
+ {
+  "t": 54.8,
+  "text": "Nine, 18, 27, 36,000.",
+  "change": [
+   "brighter (phone, radio, another voice?)"
+  ]
+ },
+ {
+  "t": 67.4,
+  "text": "Four deposits in and someone is already looking",
+  "change": [
+   "brighter (phone, radio, another voice?)"
+  ]
+ },
+ {
+  "t": 69.8,
+  "text": "at a screen with your name on it.",
+  "change": [
+   "darker (deep, muffled, another voice?)"
+  ]
+ }
+]
