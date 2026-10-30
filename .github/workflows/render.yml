@@ -86,7 +86,7 @@ jobs:
         timeout-minutes: 12
         run: |
           python -m venv /tmp/wx
-          /tmp/wx/bin/pip install -q --extra-index-url https://download.pytorch.org/whl/cpu whisperx
+          /tmp/wx/bin/pip install -q --extra-index-url https://download.pytorch.org/whl/cpu whisperx "av<19"
           /tmp/wx/bin/python tools/align.py "${{ steps.which.outputs.dir }}"
       - uses: actions/upload-artifact@v4
         with:
