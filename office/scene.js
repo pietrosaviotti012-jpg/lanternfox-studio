@@ -1135,6 +1135,15 @@ $("queue").addEventListener("click", async (e) => {
   load();
 });
 
+// la rubrica delle voci (scheda Numeri): si carica una volta sola, i campioni solo quando premi play
+let voiceList = null;
+function renderVoices(g = "") {
+  $("voices").innerHTML = voiceList.filter((v) => !g || v.genere === g).map((v) => `<li><b>${esc(v.nome)}</b> <span class="note">· ${v.genere === "M" ? "maschile" : "femminile"}, ${esc(v.tipo)}</span>
+    <div class="note">Per: ${esc(v.usa_per)}</div><audio controls preload="none" src="/voices/${esc(v.id)}.wav"></audio></li>`).join("");
+}
+fetch("/voices.json").then((r) => (r.ok ? r.json() : null)).then((list) => { if (list) { voiceList = list; renderVoices(); } }).catch(() => {});
+$("voiceFilter").addEventListener("click", (e) => { const b = e.target.closest("[data-g]"); if (b && voiceList) renderVoices(b.dataset.g); });
+
 // le tue note nel calendario: un campo che si apre sotto il giorno, e la × per toglierle
 $("days").addEventListener("click", async (e) => {
   const add = e.target.closest("[data-note]"), del = e.target.closest("[data-unnote]"), save = e.target.closest("[data-savenote]");

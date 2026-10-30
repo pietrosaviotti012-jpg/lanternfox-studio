@@ -838,6 +838,13 @@ export default {
 
     // the film and its cover, served from here: GitHub hands release files out as downloads
     // (application/octet-stream, attachment, nosniff), which Safari refuses to play in a <video>
+    // the voice directory in the Numeri tab: the list and each sample, from the repository, with the right type for <audio>
+    if (url.pathname === "/voices.json" || /^\/voices\/[\w-]+\.wav$/.test(url.pathname)) {
+      const name = url.pathname === "/voices.json" ? "RUBRICA.json" : url.pathname.slice(8);
+      const r = await fetch(`https://raw.githubusercontent.com/${REPO}/main/voices/${name}`, { cf: { cacheTtl: 3600, cacheEverything: true } });
+      if (!r.ok) return json({ error: "voce non trovata" }, 404);
+      return new Response(r.body, { headers: { ...SECURITY, "Content-Type": name.endsWith(".wav") ? "audio/wav" : "application/json; charset=utf-8", "Cache-Control": "public, max-age=3600" } });
+    }
     const media = url.pathname.match(/^\/media\/([\w-]+)\/(film\.mp4|poster\.jpg)$/);
     if (media) {
       const item = (await loadState(env)).queue.find((q) => q.id === media[1]);

@@ -42,4 +42,4 @@ jobs:
         run: |
           git config user.name "Lantern Fox Voce"; git config user.email "voce@lanternfox.tales"
           git add voices
-          git diff --cached --quiet || { git commit -m "Voices: clips for the directory"; git pull --rebase origin main && git push; }
+          git diff --cached --quiet || { git commit -m "Voices: clips for the directory"; for i in 1 2 3 4; do git pull --rebase origin main && git push && break; sleep 15; done; }

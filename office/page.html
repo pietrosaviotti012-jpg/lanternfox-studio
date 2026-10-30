@@ -224,6 +224,10 @@
   .edit { margin: 0 0 12px; }
   .edit summary { cursor: pointer; color: var(--lamp); font-size: .92rem; margin-bottom: 8px; }
   .edit textarea { min-height: 110px; }
+  .voices { list-style: none; margin: 0 0 18px; padding: 0; display: grid; gap: 8px; }
+  .voices li { padding: 10px 12px; border-radius: 12px; background: #101b40; }
+  .voices b { color: var(--paper); }
+  .voices audio { width: 100%; height: 36px; margin-top: 6px; }
   .ask p { margin: 0 0 8px; color: var(--paper); font-weight: 700; }
   /* a day with its videos: each title with its own state, one under the other */
   .days .vids { grid-column: 2 / 4; display: grid; gap: 8px; }
@@ -373,6 +377,12 @@
     <h2>Numeri</h2>
     <p class="lead">Come vanno i profili. Si aggiornano ogni sera.</p>
     <div id="stats"></div>
+    <h3>La rubrica delle voci</h3>
+    <p class="note" style="margin:-4px 0 10px">Tocca play per ascoltare un campione. I reparti scelgono da qui il narratore e i personaggi.</p>
+    <div class="row" id="voiceFilter" style="margin-bottom:10px">
+      <button class="btn" data-g="">Tutte</button><button class="btn" data-g="M">Maschili</button><button class="btn" data-g="F">Femminili</button>
+    </div>
+    <ul class="voices" id="voices"></ul>
     <h3>GitHub, la catena di montaggio</h3>
     <div id="gh"></div>
   </section>
