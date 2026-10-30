@@ -1,0 +1,16 @@
+[
+ {
+  "t": 5.9,
+  "text": "Emergency alert! Stay silent. They cannot see, but they can hear.",
+  "change": [
+   "brighter (phone, radio, another voice?)"
+  ]
+ },
+ {
+  "t": 17.4,
+  "text": "The fridges go quiet. You can hear yourself breathe.",
+  "change": [
+   "quieter (whisper?)"
+  ]
+ }
+]

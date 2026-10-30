@@ -1,0 +1,37 @@
+# Transcript (en)
+
+- `  0.0` **[HOOK]** It's 2 a.m. You're lying in bed,
+- `  2.6` **[HOOK]** mindlessly scrolling through your phone
+- `  4.9` when suddenly a terrifying air raid siren
+- ` 11.1` shakes the entire house.
+- ` 13.2` Your phone starts vibrating violently.
+- ` 15.3` You look down, nuclear impact imminent.
+- ` 18.6` Estimated time to impact, 60 seconds.
+- ` 22.1` Your blood runs cold.
+- ` 23.7` No time to panic.
+- ` 25.0` You jump out of bed and rush downstairs
+- ` 27.4` screaming for your family.
+- ` 29.4` You need to grab the essentials
+- ` 30.6` and get everyone into the basement before it's too late.
+- ` 33.2` 40 seconds remaining.
+- ` 34.9` Your father rushes out of the garage
+- ` 36.5` with his rifle, an emergency radio, and a flashlight.
+- ` 40.0` Your mother grabs your little brother
+- ` 41.4` and heads straight for the basement.
+- ` 43.4` You sprint back to your room,
+- ` 45.0` snatch your backpack, and rush toward the kitchen.
+- ` 48.0` Your father is already grabbing canned food
+- ` 50.1` and water bottles from the cabinets.
+- ` 52.0` You quickly stuff them into your backpack.
+- ` 54.1` 20 seconds remaining.
+- ` 55.7` Your father heads down into the basement.
+- ` 57.8` You're about to follow when suddenly
+- ` 60.1` you remember two important items you left in your room.
+- ` 63.3` 10 seconds remaining.
+- ` 65.0` You sprint upstairs like lightning,
+- ` 66.9` yank open your drawer, and there they are.
+- ` 69.4` A map and a gas mask.
+- ` 71.4` You grab them and race back downstairs.
+- ` 73.9` Your father is screaming for you to hurry.
+- ` 76.4` One second remaining.
+- ` 77.8` You leap through the basement doorway just in time.

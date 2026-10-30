@@ -1,0 +1,72 @@
+[
+ {
+  "t": 15.3,
+  "text": "You look down, nuclear impact imminent.",
+  "change": [
+   "darker (deep, muffled, another voice?)"
+  ]
+ },
+ {
+  "t": 18.6,
+  "text": "Estimated time to impact, 60 seconds.",
+  "change": [
+   "brighter (phone, radio, another voice?)"
+  ]
+ },
+ {
+  "t": 22.1,
+  "text": "Your blood runs cold.",
+  "change": [
+   "quieter (whisper?)"
+  ]
+ },
+ {
+  "t": 29.4,
+  "text": "You need to grab the essentials",
+  "change": [
+   "louder"
+  ]
+ },
+ {
+  "t": 33.2,
+  "text": "40 seconds remaining.",
+  "change": [
+   "brighter (phone, radio, another voice?)"
+  ]
+ },
+ {
+  "t": 41.4,
+  "text": "and heads straight for the basement.",
+  "change": [
+   "quieter (whisper?)"
+  ]
+ },
+ {
+  "t": 48.0,
+  "text": "Your father is already grabbing canned food",
+  "change": [
+   "darker (deep, muffled, another voice?)"
+  ]
+ },
+ {
+  "t": 50.1,
+  "text": "and water bottles from the cabinets.",
+  "change": [
+   "quieter (whisper?)"
+  ]
+ },
+ {
+  "t": 54.1,
+  "text": "20 seconds remaining.",
+  "change": [
+   "brighter (phone, radio, another voice?)"
+  ]
+ },
+ {
+  "t": 76.4,
+  "text": "One second remaining.",
+  "change": [
+   "brighter (phone, radio, another voice?)"
+  ]
+ }
+]
