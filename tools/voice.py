@@ -40,8 +40,13 @@ def key(L):
 # Whisper writes small numbers as digits ("One millionth" heard as "1 millionth"): both sides become digits
 NUMBERS = {w: str(i) for i, w in enumerate("zero one two three four five six seven eight nine ten eleven twelve".split())}
 
+# and decimals and units too ("Three point eight centimeters" heard as "3 .8 cm")
+UNITS = {"cm": "centimeters", "mm": "millimeters", "km": "kilometers", "kg": "kilograms", "mph": "miles per hour"}
+
 def norm_words(s):
-    return [NUMBERS.get(w, w) for w in re.sub(r"[^a-z0-9' ]", " ", s.lower().replace("—", " ")).split()]
+    s = re.sub(r"(\d)\s*\.\s*(\d)", r"\1 point \2", s.lower().replace("—", " ")).replace("%", " percent")
+    words = " ".join(UNITS.get(w, w) for w in re.sub(r"[^a-z0-9' ]", " ", s).split()).split()
+    return [NUMBERS.get(w, w) for w in words]
 
 todo = [L for L in script["lines"] if hashes.get(L["id"]) != key(L) or not os.path.exists(os.path.join(vo, L["id"] + ".wav"))]
 model = None
