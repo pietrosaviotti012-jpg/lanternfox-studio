@@ -61,6 +61,14 @@ La Ricerca aggiunge ogni giorno 3-5 voci nuove (dalle mode del momento, da Reddi
 - **The Porch Light** (dal 2026-10-30): la regola di casa è lasciare la luce del portico accesa per chi torna tardi. Stanotte qualcuno la spegne da fuori. TURN IT ON or LEAVE IT.
 - **Rule 3** (dal 2026-10-29, sera, formato regole): la sirena del paese suona due volte l'anno. Stanotte ha suonato tre volte. La regola 3 dice cosa fare, ma nessuno la ricorda.
 
+- ⭐ **From: Me** (dal 2026-10-30, sera, formato telefono): alle 3:07 ricevi un messaggio dal tuo numero: "Don't open the door for me." Poi le regole, poi qualcuno bussa con la tua voce. PHONE or DOOR.
+- **The Last Ferry** (dal 2026-10-30, sera, formato conto alla rovescia): "If the flood starts while you're driving the last ferry, you're the safest person in town. Unless you forget one thing." Checklist con le spunte, finale a indovinello "What did he forget?".
+- **Myth or Rule** (dal 2026-10-30, sera, formato regole): nel blackout, cinque cose che tutti credono e una che ti salva; ogni falso mito col timbro "✗ MYTH". Solo fatti veri di sicurezza.
+
+## I soldi che scottano (formato `soldi.md`, dal 2026-10-30)
+- ⭐ **The Wrong Transfer**: "At 2:14 AM, your bank app says you have $4,800,000. Yesterday you had $212." Fatti veri su schede crema (un bonifico sbagliato si può riprendere, spenderlo è reato). Contatore SUSPICION. TELL THE BANK or WAIT.
+- **The Lantern Bag**: sulla spiaggia del faro trovi una borsa con una lanterna e $1,000,000. Un messaggio: "Keep the money. Bring back the lantern." KEEP or RETURN.
+
 ## Gialli e storie con colpo di scena
 - ⭐ **The Tell-Tale Heart** (Poe, pubblico dominio), raccontato da noi in 45 secondi, con la lanterna come filo.
 - ⭐ **The Red-Headed League** (Conan Doyle, pubblico dominio): un uomo pagato per copiare l'enciclopedia. Perché?

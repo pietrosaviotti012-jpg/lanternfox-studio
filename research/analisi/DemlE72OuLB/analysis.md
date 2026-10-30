@@ -29,9 +29,10 @@ Now your survival depends on ONE decision.
 
 #InteractiveStory #BankHeist #YouDecide #StoryTime #Part1 ChooseYourPath
 
-## Cosa vede la Ricerca (da scrivere guardando hook.jpg e sheet.jpg)
-- Gancio:
-- Grafica e personaggi:
-- Voce e suono:
-- Ritmo e scene:
-- Cosa copiare (e in quale formato):
+## Cosa vede la Ricerca (Claude, 2026-10-30, sera)
+- Gancio: "You just robbed a bank. $4.2 million. In one bag. And every cop in this city wants it back." In alto a sinistra l'etichetta rossa PART 1 e un HUD a due righe: HEAT (dieci quadretti rossi che si riempiono) e CASH che corre da $0 a $4,200,000. Il personaggio in tuta arancio da carcerato al volante, banconote che volano, cartello stradale verde HARBOR.
+- Grafica e personaggi: vettoriale piatta scura, notte piovosa, personaggio con testa tonda bianca, sudore e occhi preoccupati, tuta arancio (un solo colore acceso). Radio della polizia come riquadro di testo ("10-211 · BANK ROBBERY · FIRST NATIONAL · SUSPECT: GREEN SEDAN"). Mappa scura con il percorso giallo e il segnaposto "MEET: DANNY · 00:00 · UNDER THE BRIDGE". Lampione con il cono di luce, telefono che chiama ("DANNY · CALLING… · NO ANSWER"). Telefono in mano in primo piano con le chat: Danny "Someone sold us out." + bolla rossa "Trust no one."; poi "UNKNOWN · Danny gave your plan to the cops." + "Don't get in that car." in rosso. Fumetto "GET IN! NOW!". Danny in primo piano con la cicatrice e lo sguardo storto; lo specchietto con le sirene dentro.
+- Voce e suono: voce narrante unica, frasi cortissime ("Headlights." "Get in." "Now."); 6 cambi rilevati: più sussurrata su "Headlights" e "Get in", più scura su "Unknown number".
+- Ritmo e scene: il rilevatore vede un solo taglio perché è animazione continua, ma nel foglio c'è un'immagine nuova ogni 1,5 s; parole chiave gialle e rosse nei sottotitoli in maiuscolo. L'HEAT sale di un quadretto a ogni brutta notizia.
+- Finale: "YOUR CALL." in grande, due righe A (giallo) "GET IN DANNY'S CAR" e B (rosso) "TRUST NO ONE. GO ALONE." che entrano una per volta, poi "COMMENT A OR B · the comments decide what happens in part 2".
+- Cosa copiare (e in quale formato): Your Call. Il barometro HEAT a quadretti accanto al contatore dei soldi (pericolo e premio insieme, sempre visibili). Due messaggi che si accusano a vicenda (il complice e lo sconosciuto): stesso dilemma di *Two Alerts*, ancora forte. Le opzioni A/B scritte come frasi brevi con un verbo, non come parole sole.

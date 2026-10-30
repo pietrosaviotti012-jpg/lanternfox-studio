@@ -11,6 +11,7 @@ Le schede nascono dai video studiati dalla Ricerca (`research/analisi/`). Quando
 | Le regole dell'emergenza | `regole.md` | *DON'T OPEN IT* (50 mila like) | allerta in tv con regole numerate, spioncino, il piano che non esiste |
 | What if | `what-if.md` | — | domanda impossibile, conseguenze passo per passo |
 | Misteri e leggende vere | `misteri.md` | — | fatto preciso, la leggenda dichiarata |
+| I soldi che scottano | `soldi.md` | *You just stole $10 million* (940 mila like) | cifra enorme nel gancio, contatore del sospetto, fatti veri su schede crema, HIDE/SPEND |
 
 ## Cosa hanno in comune i video che funzionano (tutti e quattro i modelli)
 - **Un'immagine nuova ogni 1,5 secondi**, anche quando la scena non cambia: il telefono passa a un'altra schermata, un numero sale, un oggetto entra.
