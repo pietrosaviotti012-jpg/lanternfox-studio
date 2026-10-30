@@ -533,6 +533,36 @@ async function wakeWatchman(env) {
   return r.status;
 }
 
+// One public TikTok post through Zernio, to see if its app may do what ours may not: the first video that goes out after this moment, once only.
+// The result comes back on the next round of the watch, and the user decides whether to keep it.
+const ZERNIO = "https://zernio.com/api/v1", ZERNIO_TIKTOK = "6ae4e55fdfe8162fad8b43f0", TIKTOK_TRIAL_FROM = "2026-10-31T15:50:00Z";
+async function tiktokTrial(env, state, item) {
+  const t = state.tiktok_trial ||= {}, now = new Date().toISOString();
+  if (t.video || !env.ZERNIO_API_KEY || Date.now() < Date.parse(TIKTOK_TRIAL_FROM)) return;
+  t.video = item.id; t.at = now;
+  const r = await fetch(`${ZERNIO}/posts`, { method: "POST", headers: { Authorization: `Bearer ${env.ZERNIO_API_KEY}`, "Content-Type": "application/json" }, body: JSON.stringify({
+    content: clip(item.caption, 2200), mediaItems: [{ type: "video", url: item.preview_url }], platforms: [{ platform: "tiktok", accountId: ZERNIO_TIKTOK }], publishNow: true,
+    tiktokSettings: { draft: false, privacy_level: "PUBLIC_TO_EVERYONE", allow_comment: true, allow_duet: false, allow_stitch: false, videoMadeWithAi: true, content_preview_confirmed: true, express_consent_given: true } }) }).catch((e) => ({ ok: false, json: async () => ({ error: e.message }) }));
+  const j = await r.json().catch(() => ({})), post = j.post || j;
+  if (r.ok && (post._id || post.id)) t.post_id = post._id || post.id;
+  else await tiktokTrialEnd(env, state, item, "", clip(j.error || j.message || "Zernio non ha accettato il video", 200));
+}
+async function tiktokTrialCheck(env, state) {
+  const t = state.tiktok_trial;
+  if (!t?.post_id || t.result) return;
+  const j = await fetch(`${ZERNIO}/posts/${t.post_id}`, { headers: { Authorization: `Bearer ${env.ZERNIO_API_KEY}` } }).then((r) => r.json()).catch(() => ({}));
+  const post = j.post || j, p = post.platforms?.[0] || {}, item = state.queue.find((q) => q.id === t.video);
+  if (post.status === "published" || p.status === "published") await tiktokTrialEnd(env, state, item, p.platformPostUrl || "https://www.tiktok.com/@lanternfoxtales", "");
+  else if (/fail|error/i.test(`${post.status} ${p.status}`)) await tiktokTrialEnd(env, state, item, "", clip(p.errorMessage || p.error || post.error || "TikTok ha rifiutato il video", 200));
+}
+async function tiktokTrialEnd(env, state, item, url, error) {
+  const now = new Date().toISOString(), title = item?.title || "il video";
+  state.tiktok_trial.result = error ? "refused" : "published"; state.tiktok_trial.detail = error || url;
+  if (item && !error) item.published = { ...(item.published || {}), tiktok: { url: clip(url, 400), at: now } };
+  state.log.push({ at: now, dept: "pubblicazione", status: error ? "error" : "done", text: error ? `Prova TikTok con Zernio non riuscita: ${error}` : `Prova TikTok riuscita: "${title}" è uscito con Zernio` });
+  await pushAll(env, error ? { title: "Prova TikTok non riuscita", body: error, url: "/" } : { title: "Uscito su TikTok con Zernio", body: title, url });
+}
+
 async function publishNow(env, state, item, why) {
   const now = new Date().toISOString(), started = await fireRoutine(env, "PUBLISH", `Pubblica adesso: ${item.id}`);
   const ok = started >= 200 && started < 300;
@@ -547,6 +577,7 @@ async function publishNow(env, state, item, why) {
 async function watch(env) {
   const state = await loadState(env), now = new Date().toISOString(), t = Date.now(), before = JSON.stringify(state);
   tidy(state, now);
+  await tiktokTrialCheck(env, state);
   for (const q of state.queue) if (q.status === "approved" && q.publish_exact && t >= Date.parse(q.publish_after)
     && !(q.now_at && t - Date.parse(q.now_at) < RESERVE_MS) && PLATFORMS.some((p) => !sent(q.published?.[p]))) await publishNow(env, state, q, "All'orario che hai scelto esce");
   const done = state.auto_guard?.day === romeDay(t) ? state.auto_guard.depts : [];
@@ -878,6 +909,7 @@ export default {
       state.log.push({ at: now, dept: "pubblicazione", status: error ? "error" : "done", text: error ? `${name}: non pubblicato (${clip(error, 120)})` : draft ? `${name}: "${item.title}" è nelle bozze, da pubblicare dall'app` : `Uscito su ${name}: "${item.title}"` });
       const done = PLATFORMS.every((p) => sent(item.published[p]));
       planParts(state);
+      if (!error && !draft && link) await tiktokTrial(env, state, item);
       if (done) {
         item.status = "published";
         const date = now.slice(0, 10);
