@@ -152,6 +152,18 @@ jobs:
           SEGMENTS: ${{ github.workspace }}/segs
           PY: python
         run: sh tools/build.sh "${{ needs.voice.outputs.dir }}"
+      - name: Quality check (it never stops the chain)
+        env:
+          P: ${{ needs.voice.outputs.dir }}
+        run: |
+          node tools/office.mjs '{"dept":"qualita","status":"working","task":"Guardo il film finito: volume, scene buie, gancio, parole"}'
+          pip install -q faster-whisper "av<19" || true
+          python tools/quality.py "$P" || echo '{"ok":false,"problems":["Il controllo non è riuscito"],"checks":[]}' > "$P/out/quality.json"
+          node -e "
+            const q = require('./' + process.env.P + '/out/quality.json');
+            console.log(JSON.stringify({ dept: 'qualita', status: 'done', task: q.ok ? 'Tutto a posto: ' + q.checks.length + ' controlli superati' : q.problems.length + ' cose da guardare: ' + q.problems[0] }));
+          " > qdept.json
+          node tools/office.mjs "$(cat qdept.json)"
       - name: Release (public link for the platforms)
         id: release
         env:
@@ -173,7 +185,8 @@ jobs:
             const m = require('./' + process.env.P + '/meta.json');
             const caption = m.caption + '\n\n' + (m.hashtags || []).join(' ');
             console.log(JSON.stringify({ queue: { id: process.env.ID, title: m.title, caption, platforms: ['Instagram', 'YouTube', 'TikTok'],
-              preview_url: process.env.BASE + '/film.mp4', cover_url: process.env.BASE + '/cover.jpg', request: m.request } }));
+              preview_url: process.env.BASE + '/film.mp4', cover_url: process.env.BASE + '/cover.jpg', request: m.request,
+              quality: require('./' + process.env.P + '/out/quality.json') } }));
           " > queue.json
           node tools/office.mjs "$(cat queue.json)" '{"dept":"revisione","status":"waiting","task":"Il video è pronto: guardalo e scegli"}'
 

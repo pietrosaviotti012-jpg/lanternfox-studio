@@ -96,7 +96,7 @@ Per forzarne un'altra: `"voice": {"preset": "cupo"}` in `script.json`.
 Li fa GitHub Actions: un commit su `productions/<id>/` con il file `READY` avvia `render.yml`, che esegue `tools/build.sh` (eventi → carillon → fotogrammi → mix → −14 LUFS → poster e foglio dei provini) e manda gli eventi all'ufficio.
 
 ## 9. Controllo qualità (`qualita`)
-Skill: `reel-analyzer`. Sul film finito: il foglio dei provini (`out/sheet.jpg`) e 6 fotogrammi chiave. Si controllano:
+È automatico: `tools/quality.py` gira su GitHub dopo il montaggio e il risultato appare in Approva accanto al video. Non ferma mai la catena: misura volume, scene buie, gancio, durata e parole capibili. Non sa giudicare sottotitoli sopra il soggetto o qualità della storia: quello resta all'utente. In origine si controllavano:
 - l'aggancio entro 2 secondi;
 - nessun fotogramma nero o vuoto;
 - i sottotitoli leggibili e mai sopra il soggetto;
@@ -110,7 +110,7 @@ Evento `queue` con `preview_url` (il film sulla release di GitHub), `cover_url` 
 ## 11-13. Pubblicazione, community, statistiche
 - Pubblicazione: due uscite al giorno, alle 16 e alle 22 UTC (17 e 23 in Italia d'inverno). Una sola storia per uscita, la più vecchia fra quelle approvate (manuale `PUBBLICAZIONE.md`).
 - Community: `COMMUNITY.md`.
-- Statistiche: la Fase 7.
+- Statistiche: ogni sera, nel giro della Community delle 19:00 UTC. Il Soggetto le legge prima di scegliere il formato (`GET {OFFICE_URL}/stats`, `videos`): un formato che va meglio degli altri torna più spesso. Con pochi video i numeri contano poco: non cambiare rotta per un solo risultato.
 
 ## Chi fa partire la catena
 La routine **"Lantern Fox · Produzione"** gira due volte al giorno, alle 5 e alle 11 UTC. Ogni giro produce un video. I passi sono:

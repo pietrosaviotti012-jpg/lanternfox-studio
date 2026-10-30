@@ -835,7 +835,7 @@ function reviewCard(q) {
     : publishedBlock(q);
   const no = q.n ? `<span class="vno">Video ${q.n} del ${new Date(q.day + "T12:00:00").toLocaleDateString("it-IT", { day: "numeric", month: "short" })}</span>` : "";
   return `<article class="review"><div>${media}</div><div>${no}<h4>${esc(q.title)}</h4><ul class="chips">${plats}</ul>
-    <p class="cap">${esc(q.caption || "")}</p>${actions}</div></article>`;
+    <p class="cap">${esc(q.caption || "")}</p>${qualityBlock(q)}${actions}</div></article>`;
 }
 
 // —— publishing times: the slots (UTC hours), the Italian day, and when each approved video goes out ——
@@ -859,6 +859,14 @@ function todayCount(exceptId) {
 }
 
 // After "Pubblica": when it goes out and where it already is; TikTok arrives in the drafts and the user taps Publish
+// what the Controllo qualità found on this film
+function qualityBlock(q) {
+  const k = q.quality;
+  if (!k) return "";
+  return k.ok ? `<p class="note" style="margin:0 0 10px;color:var(--ok)">Controllo qualità: tutto a posto (${k.checks.length} controlli)</p>`
+    : `<div class="alert" style="margin:0 0 10px"><b>Controllo qualità: da guardare</b>${k.problems.map((p) => `<span class="note" style="display:block">${esc(p)}</span>`).join("")}</div>`;
+}
+
 function publishedBlock(q) {
   const pub = q.published || {};
   // the slot it waits for (one story per slot), or the time the user chose
@@ -999,7 +1007,10 @@ function renderStats() {
     <div class="num"><b>${n(f.tiktok)}</b><span>TikTok</span></div></div>
     <h3>Ultimi 7 giorni</h3><div class="nums"><div class="num"><b>${n(s.views_7d)}</b><span>visualizzazioni</span></div>
     <div class="num" style="grid-column: span 2"><b style="font-size:1.1rem">${esc(s.best ? s.best.title : "–")}</b><span>la storia più vista${s.best ? ` (${n(s.best.views)})` : ""}</span></div></div>
-    <p class="note" style="margin-top:12px">Aggiornate alle ${fmtTime(s.updated_at)}.</p>`;
+    ${(s.videos || []).length ? `<h3>Video per video</h3><ul class="ideas">${[...s.videos].reverse().map((v) => `<li><span>${esc(v.title)}</span>
+      <span class="note">YouTube: ${v.youtube ? `${n(v.youtube.views)} viste, ${n(v.youtube.likes)} like, ${n(v.youtube.comments)} commenti` : "–"}</span>
+      <span class="note">Instagram: ${v.instagram ? `${v.instagram.views != null ? n(v.instagram.views) + " viste, " : ""}${n(v.instagram.likes)} like, ${n(v.instagram.comments)} commenti${v.instagram.shares != null ? `, ${n(v.instagram.shares)} condivisioni` : ""}${v.instagram.avg_watch_s != null ? `, guardato in media ${v.instagram.avg_watch_s.toFixed(0)} s` : ""}` : "–"}</span></li>`).join("")}</ul>` : ""}
+    <p class="note" style="margin-top:12px">Aggiornate alle ${fmtTime(s.updated_at)}. Le visualizzazioni contano solo YouTube${(s.videos || []).some((v) => v.instagram?.views != null) ? " e Instagram" : ": Instagram non le fornisce ancora"}.</p>`;
 }
 
 // scheda del reparto

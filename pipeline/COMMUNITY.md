@@ -83,6 +83,21 @@ requests.post(OFFICE_URL + "/community/log", headers=H, timeout=30, json={"items
 ```
 Segnala ogni commento trattato, anche quelli saltati (`skipped`), così il giro dopo non li ripesca. Se non c'era niente, manda `{"items": []}`: l'Ufficio scrive comunque nel diario che il giro è stato fatto.
 
+## Il giro delle 19:00 UTC: le statistiche
+Solo nel giro delle 19:00 UTC, dopo il resoconto, porta i numeri di Instagram all'Ufficio, che aggiunge quelli di YouTube (reparto Statistiche):
+```python
+media, _ = run_composio_tool("INSTAGRAM_GET_IG_USER_MEDIA", {"ig_user_id": "me", "limit": 50, "fields": "id,permalink,like_count,comments_count"}, account="instagram_sain-curr")
+for m in media["data"]["data"]:   # viste, persone raggiunte, condivisioni, salvataggi e tempo medio di visione
+    r, err = run_composio_tool("INSTAGRAM_GET_IG_MEDIA_INSIGHTS", {"ig_media_id": m["id"], "metric": ["views", "reach", "saved", "shares", "ig_reels_avg_watch_time"]}, account="instagram_sain-curr")
+    for x in (r or {}).get("data", {}).get("data", []):
+        v = x["values"][0]["value"]
+        if x["name"] == "ig_reels_avg_watch_time": m["avg_watch_s"] = v / 1000
+        else: m[x["name"]] = v
+info, _ = run_composio_tool("INSTAGRAM_GET_USER_INFO", {"ig_user_id": "me", "fields": "followers_count"}, account="instagram_sain-curr")
+requests.post(OFFICE_URL + "/stats/collect", headers=H, timeout=60, json={"instagram": {"followers": info["data"]["followers_count"], "media": media["data"]["data"]}})
+```
+Se Instagram non risponde, chiama comunque `/stats/collect` con `{}`: YouTube si aggiorna lo stesso.
+
 ## Regole
 - Non modificare file del repository e non fare commit.
 - Nessun messaggio privato a chi non ha scritto STORY.

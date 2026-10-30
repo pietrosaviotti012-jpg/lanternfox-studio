@@ -697,6 +697,50 @@ export default {
       }
       return json({ today: new Date(Date.now() + 3600e3).toISOString().slice(0, 10), notes: notes.map(({ date, text, at }) => ({ date, text, at })) });
     }
+    // Statistiche (Abaco): the Community's evening round brings Instagram's numbers, the Office adds YouTube's and matches them to our videos
+    if (url.pathname === "/stats/collect" && request.method === "POST") {
+      if (!(await publishOk(request, env))) return json({ error: "non autorizzato" }, 401);
+      const state = await loadState(env), now = new Date().toISOString(), { instagram } = await request.json().catch(() => ({}));
+      const token = await youtubeToken(env), yt = {}, ids = {};
+      for (const q of state.queue) { const m = /shorts\/([\w-]+)/.exec(q.published?.youtube?.url || ""); if (m) ids[m[1]] = q.id; }
+      let ytFollowers = null, ytError = token ? "" : "YouTube non collegato";
+      if (token) {
+        const get = (path) => fetch(`https://www.googleapis.com/youtube/v3/${path}`, { headers: { Authorization: `Bearer ${token}` } }).then((r) => r.json());
+        const ch = await get("channels?part=statistics&mine=true").catch(() => ({}));
+        ytFollowers = Number(ch.items?.[0]?.statistics?.subscriberCount ?? NaN);
+        if (Object.keys(ids).length) {
+          const v = await get(`videos?part=statistics&id=${Object.keys(ids).slice(0, 50).join(",")}`).catch(() => ({}));
+          if (v.error) ytError = clip(v.error.message, 120);
+          for (const i of v.items || []) yt[ids[i.id]] = { views: +i.statistics.viewCount || 0, likes: +i.statistics.likeCount || 0, comments: +i.statistics.commentCount || 0 };
+        }
+      }
+      const ig = {};
+      for (const m of instagram?.media || []) {
+        const q = state.queue.find((x) => x.published?.instagram?.url && m.permalink && x.published.instagram.url.split("?")[0] === m.permalink.split("?")[0]);
+        if (q) ig[q.id] = { likes: +m.like_count || 0, comments: +m.comments_count || 0, ...(m.views != null ? { views: +m.views } : {}),
+          ...(m.reach != null ? { reach: +m.reach } : {}), ...(m.shares != null ? { shares: +m.shares } : {}), ...(m.saved != null ? { saved: +m.saved } : {}),
+          ...(m.avg_watch_s != null ? { avg_watch_s: +m.avg_watch_s } : {}) };
+      }
+      const old = Object.fromEntries((state.stats?.videos || []).map((v) => [v.id, v]));
+      const videos = state.queue.filter((q) => q.published?.youtube?.url || q.published?.instagram?.url).map((q) => ({ id: q.id, title: q.title,
+        youtube: yt[q.id] || old[q.id]?.youtube || null, instagram: ig[q.id] || old[q.id]?.instagram || null }));
+      const total = (v) => (v.youtube?.views || 0) + (v.instagram?.views || 0), week = Date.now() - 7 * 864e5;
+      const recent = videos.filter((v) => { const p = state.queue.find((q) => q.id === v.id).published; return Object.values(p).some((x) => x?.at && Date.parse(x.at) > week); });
+      const best = [...videos].sort((a, b) => total(b) - total(a))[0];
+      const stats = { ...(state.stats || {}), videos, updated_at: now, views_7d: recent.reduce((n, v) => n + total(v), 0),
+        best: best ? { title: best.title, views: total(best) } : null,
+        followers: { ...(state.stats?.followers || {}), ...(Number.isFinite(ytFollowers) ? { youtube: ytFollowers } : {}), ...(instagram?.followers != null ? { instagram: +instagram.followers } : {}) } };
+      state.stats = stats;
+      state.departments.statistiche = { status: ytError ? "error" : "done", task: ytError ? `YouTube: ${ytError}` : `Contati ${videos.length} video: ${stats.views_7d} visualizzazioni in 7 giorni`, output: "", updated_at: now };
+      state.log.push({ at: now, dept: "statistiche", status: ytError ? "error" : "done", text: state.departments.statistiche.task });
+      await saveState(env, state);
+      return json({ ok: !ytError, stats });
+    }
+    // the numbers for the routines: which videos and formats are working (Soggetto, Ricerca)
+    if (url.pathname === "/stats" && request.method === "GET") {
+      if (!(await publishOk(request, env))) return json({ error: "non autorizzato" }, 401);
+      return json((await loadState(env)).stats || {});
+    }
     if (url.pathname === "/publish/youtube" && request.method === "POST") {
       if (!(await publishOk(request, env))) return json({ error: "non autorizzato" }, 401);
       const { id } = await request.json().catch(() => ({}));
