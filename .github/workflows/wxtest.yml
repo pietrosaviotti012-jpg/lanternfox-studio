@@ -16,7 +16,7 @@ jobs:
           echo /tmp/ffmpeg-master-latest-linux64-gpl/bin >> "$GITHUB_PATH"
       - run: |
           python -m venv /tmp/wx
-          time /tmp/wx/bin/pip install -q --extra-index-url https://download.pytorch.org/whl/cpu whisperx
+          time /tmp/wx/bin/pip install -q --extra-index-url https://download.pytorch.org/whl/cpu whisperx "av<19"
           /tmp/wx/bin/pip list 2>/dev/null | grep -iE "^(whisperx|torch|ctranslate2) "
       - run: |
           mkdir -p /tmp/p/vo; cp voices/pov.wav /tmp/p/vo/L01.wav; cp voices/cupo.wav /tmp/p/vo/L02.wav
