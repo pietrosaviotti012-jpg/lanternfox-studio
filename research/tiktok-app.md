@@ -9,5 +9,10 @@
 | Upload-Post | sì | sì | 24 $ al mese: il piano gratis non include TikTok | fuori budget |
 | Blotato | sì, dice di aver passato l'audit | sì | a pagamento | fuori budget |
 | Composio con la nostra app | no | no | gratis | solo post privati |
+| **Zernio** | sì, secondo la documentazione (video pubblici con `PUBLIC_TO_EVERYONE`) | sì, API completa | gratis per i primi 2 account, post illimitati | l'audit non è dichiarato: va provato. I termini non indicano un'età minima |
+| Higgsfield | sì, già collegato | no: ogni post va confermato a mano nel suo modulo, e il video deve stare sui suoi server | da controllare | non automatico |
+| TikTok Studio (sito) | sì, programma fino a 10 giorni prima | no, solo a mano da computer | gratis | ufficiale; alcune guide dicono che serve un account Business |
 
-Buffer è il più adatto, ma l'account dovrebbe intestarlo un adulto. I termini provati sono quelli del 2023; ne esiste una versione del 2025. Non è stato provato nessun servizio.
+**Da scartare:** i programmi che usano i cookie e simulano il browser (per esempio tiktok-uploader). I termini di TikTok vietano gli script automatici, e il rischio è perdere il profilo. Zapier e Make non hanno un'azione per caricare video su TikTok.
+
+Zernio è la prima cosa da provare. Tra gli altri, Buffer è il più adatto, ma l'account dovrebbe intestarlo un adulto. I termini provati sono quelli del 2023; ne esiste una versione del 2025. Non è stato provato nessun servizio.
