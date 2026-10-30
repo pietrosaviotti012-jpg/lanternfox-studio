@@ -3,11 +3,11 @@
  "series": "On My Way",
  "format": "your-call",
  "captions": "pop",
+ "motion": false,
  "hud": {
   "tag": "ON MY WAY",
   "part": "PART 1"
  },
- "fx": "dust",
  "lead": 0.4,
  "tail": 3.4,
  "lines": [
@@ -35,7 +35,7 @@
   },
   {
    "id": "L02",
-   "text": "Except your mom is sitting on your couch. Right now.",
+   "text": "But your mom is already home. She's on your couch.",
    "em": [
     "couch"
    ],
@@ -54,24 +54,24 @@
    "em": [
     "tea"
    ],
-   "gap": 0.6,
+   "gap": 0.4,
    "act": {
-    "intensity": 0.35,
-    "pace": 0.34,
+    "intensity": 0.4,
+    "pace": 0.32,
     "speed": 0.95,
-    "gain_db": -2
+    "gain_db": -1.5
    }
   },
   {
    "id": "L04",
-   "text": "So you text back: Mom, you're already here?",
+   "text": "So you text her: Mom, you're already here?",
    "em": [
     "already"
    ],
    "gap": 0.4,
    "act": {
     "intensity": 0.45,
-    "pace": 0.34,
+    "pace": 0.32,
     "speed": 0.95,
     "gain_db": -1
    },
@@ -92,16 +92,17 @@
   },
   {
    "id": "L05",
-   "text": "Three dots. Then her answer: she's still in the car.",
+   "text": "No, sweetheart. I'm still in the car.",
+   "speaker": "donna-calda",
+   "vfx": "phone",
    "em": [
     "car"
    ],
    "gap": 0.6,
    "act": {
-    "intensity": 0.5,
+    "intensity": 0.45,
     "pace": 0.32,
-    "speed": 0.95,
-    "gain_db": -0.5
+    "speed": 0.95
    },
    "card": {
     "app": "Messages",
@@ -113,16 +114,16 @@
   },
   {
    "id": "L06",
-   "text": "On the couch, your mom is watching TV. Smiling.",
+   "text": "On the couch, mom is watching TV. Smiling.",
    "em": [
     "smiling"
    ],
-   "gap": 0.9,
+   "gap": 0.6,
    "act": {
     "intensity": 0.4,
     "pace": 0.32,
     "speed": 0.95,
-    "gain_db": -2
+    "gain_db": -1.5
    }
   },
   {
@@ -133,8 +134,8 @@
    ],
    "hit": true,
    "tint": true,
-   "hold": 2.2,
-   "gap": 1.2,
+   "hold": 2.0,
+   "gap": 1.0,
    "act": {
     "intensity": 0.7,
     "pace": 0.3,
@@ -144,7 +145,9 @@
   },
   {
    "id": "L08",
-   "text": "Your phone buzzes again. She can't find the house.",
+   "text": "Honey, I can't find the house.",
+   "speaker": "donna-calda",
+   "vfx": "phone",
    "em": [
     "find"
    ],
@@ -152,21 +155,20 @@
    "gap": 0.5,
    "act": {
     "intensity": 0.5,
-    "pace": 0.34,
-    "speed": 0.95,
-    "gain_db": -1
+    "pace": 0.32,
+    "speed": 0.95
    },
    "card": {
     "app": "Messages",
     "kind": "info",
     "title": "Mom",
     "body": "Is the porch light on? I can't find the house.",
-    "hold": 3.6
+    "hold": 3.4
    }
   },
   {
    "id": "L09",
-   "text": "You look outside. The porch light is on. The street is empty.",
+   "text": "You check the window. Porch light on. Street empty.",
    "em": [
     "empty"
    ],
@@ -175,17 +177,17 @@
     "intensity": 0.4,
     "pace": 0.32,
     "speed": 0.95,
-    "gain_db": -2
+    "gain_db": -1.5
    }
   },
   {
    "id": "L10",
-   "text": "Almost empty. A fox sits under the streetlamp, holding a lantern.",
+   "text": "Except for a fox with a lantern, staring at your door.",
    "em": [
     "fox",
-    "lantern"
+    "door"
    ],
-   "gap": 0.4,
+   "gap": 0.7,
    "act": {
     "intensity": 0.45,
     "pace": 0.32,
@@ -195,51 +197,47 @@
   },
   {
    "id": "L11",
-   "text": "It's staring at your front door.",
-   "em": [
-    "door"
-   ],
-   "gap": 1.1,
-   "act": {
-    "intensity": 0.5,
-    "pace": 0.3,
-    "speed": 0.95,
-    "gain_db": -2.5
-   }
-  },
-  {
-   "id": "L12",
-   "text": "Behind you, the couch creaks. Slowly.",
+   "text": "Behind you, the couch creaks. She's standing up.",
    "em": [
     "creaks"
    ],
    "clock": "NIGHT 1 · 11:59 PM",
-   "gap": 0.7,
+   "gap": 0.6,
    "act": {
-    "intensity": 0.65,
+    "intensity": 0.6,
     "pace": 0.3,
     "speed": 0.95,
-    "gain_db": -1
-   },
-   "tint": true
+    "gain_db": -0.5
+   }
   },
   {
-   "id": "L13",
-   "text": "The dead TV turns on by itself. It's asking you something.",
+   "id": "L12",
+   "text": "The dead TV turns on by itself.",
    "em": [
     "itself"
    ],
    "tint": true,
-   "gap": 1.2,
+   "gap": 0.8,
    "act": {
     "intensity": 0.55,
     "pace": 0.3,
     "speed": 0.95,
-    "gain_db": -3
-   },
-   "tv": {
-    "title": "NO SIGNAL",
-    "text": "Who are you texting, sweetheart?"
+    "gain_db": -2
+   }
+  },
+  {
+   "id": "L13",
+   "text": "Who are you texting, sweetheart?",
+   "speaker": "sussurro",
+   "quote": true,
+   "em": [
+    "sweetheart"
+   ],
+   "gap": 0.8,
+   "act": {
+    "intensity": 0.5,
+    "pace": 0.32,
+    "speed": 0.95
    }
   },
   {
@@ -259,7 +257,7 @@
   },
   {
    "id": "L15",
-   "text": "One of them is your mom. Text the car, or trust the couch?",
+   "text": "One of them is your mom. The car, or the couch?",
    "em": [
     "car",
     "couch"
@@ -268,7 +266,8 @@
    "act": {
     "intensity": 0.6,
     "pace": 0.34,
-    "speed": 0.95
+    "speed": 0.95,
+    "gain_db": 1
    }
   },
   {
@@ -282,7 +281,8 @@
    "act": {
     "intensity": 0.55,
     "pace": 0.34,
-    "speed": 0.97
+    "speed": 0.97,
+    "gain_db": 2
    }
   }
  ],
@@ -314,7 +314,7 @@
    "mood": "rise"
   },
   {
-   "at": "S12",
+   "at": "S11",
    "mood": "storm"
   }
  ]
