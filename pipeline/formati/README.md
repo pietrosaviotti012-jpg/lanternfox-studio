@@ -12,6 +12,7 @@ Le schede nascono dai video studiati dalla Ricerca (`research/analisi/`). Quando
 | What if | `what-if.md` | — | domanda impossibile, conseguenze passo per passo |
 | Misteri e leggende vere | `misteri.md` | — | fatto preciso, la leggenda dichiarata |
 | I soldi che scottano | `soldi.md` | *You just stole $10 million* (940 mila like) | cifra enorme nel gancio, contatore del sospetto, fatti veri su schede crema, HIDE/SPEND |
+| Non fare rumore | `silenzio.md` | *Dead Quiet · Day 1* (149 mila like), *14 Floors Up* (741 mila like) | misuratore NOISE in alto, regole legate a oggetti che fanno rumore, dilemma morale finale, regole numerate di puntata in puntata |
 
 ## Cosa hanno in comune i video che funzionano (tutti e quattro i modelli)
 - **Un'immagine nuova ogni 1,5 secondi**, anche quando la scena non cambia: il telefono passa a un'altra schermata, un numero sale, un oggetto entra.

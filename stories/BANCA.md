@@ -69,6 +69,12 @@ La Ricerca aggiunge ogni giorno 3-5 voci nuove (dalle mode del momento, da Reddi
 - ⭐ **From: Me** (dal 2026-10-30, sera, formato telefono): alle 3:07 ricevi un messaggio dal tuo numero: "Don't open the door for me." Poi le regole, poi qualcuno bussa con la tua voce. PHONE or DOOR.
 - **The Last Ferry** (dal 2026-10-30, sera, formato conto alla rovescia): "If the flood starts while you're driving the last ferry, you're the safest person in town. Unless you forget one thing." Checklist con le spunte, finale a indovinello "What did he forget?".
 - **Myth or Rule** (dal 2026-10-30, sera, formato regole): nel blackout, cinque cose che tutti credono e una che ti salva; ogni falso mito col timbro "✗ MYTH". Solo fatti veri di sicurezza.
+- ⭐ **Floor 31** (dal 2026-10-31, sera, a puntate): "You live on floor 31. Tonight the lights go out one floor at a time, from the bottom up." Numero del piano dipinto sul muro come contatore, regole numerate che continuano di puntata in puntata. Finale morale: la vicina del 29 bussa con il figlio. OPEN or STAY QUIET.
+- ⭐ **Sixty Seconds** (dal 2026-10-31, sera, formato conto alla rovescia, tempo reale): "The dam just broke. The water reaches your street in 60 seconds. This video is 60 seconds long." Cartello del timer ogni 15 s. Finale: "You have time to go back for one thing. What is it?"
+
+## Non fare rumore (formato `silenzio.md`, dal 2026-10-31)
+- ⭐ **Hush Harbor**: "It's 3:12 am on the night ferry. The engines cut out, and the captain whispers into the radio: from now on, nobody makes a sound." Misuratore NOISE in alto, tre regole su tre oggetti (telefono, scarpe sul ponte di metallo, il parapetto). Finale: il carillon di una bambina comincia a suonare. STOP IT or THROW IT.
+- **Library Hours**: addormentato in biblioteca, alle 2:14 si accende il cartello "QUIET PLEASE. IT IS LISTENING." Finale: qualcuno sta per starnutire. HELP or HIDE.
 
 ## I soldi che scottano (formato `soldi.md`, dal 2026-10-30)
 - ⭐ **The Wrong Transfer**: "At 2:14 AM, your bank app says you have $4,800,000. Yesterday you had $212." Fatti veri su schede crema (un bonifico sbagliato si può riprendere, spenderlo è reato). Contatore SUSPICION. TELL THE BANK or WAIT.

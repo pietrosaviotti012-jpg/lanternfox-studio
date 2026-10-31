@@ -29,9 +29,10 @@ Follow Leon's fight for survival and stay tuned for the next part! 🔥
 #scary
 #scarystories
 
-## Cosa vede la Ricerca (da scrivere guardando hook.jpg e sheet.jpg)
-- Gancio:
-- Grafica e personaggi:
-- Voce e suono:
-- Ritmo e scene:
-- Cosa copiare (e in quale formato):
+## Cosa vede la Ricerca (Claude, 2026-10-31, sera)
+- Gancio: "It's 2 a.m. You're lying in bed, mindlessly scrolling through your phone": normalità totale per 5 secondi, poi la sirena. Primo fotogramma: casa di campagna con le finestre accese sotto un cielo blu notte; titolo fisso in alto "Nuclear Apocalypse · Part 1" (bianco + arancio) per tutto il video. Il gancio è debole nel testo ma forte nel titolo: la promessa sta nella scritta in alto.
+- Grafica e personaggi: illustrazione digitale calda e dettagliata (stile cartone 2D con luci d'interno arancio), il ragazzo con il cappellino rosso e la felpa nera, occhi a puntino arrabbiati; padre con occhiali e barba, madre, fratellino. Il telefono in mano a tutto schermo con l'allerta rossa "NUCLEAR IMPACT IMMINENT · 60 SECONDS" e la stanza che si tinge di rosso. Il **conto alla rovescia come cartello nero a tutto schermo** con cifre rosse da sveglia digitale (00:60 → 00:40 → 00:20 → 00:10 → 00:01): taglia la scena ogni 20 secondi. Primi piani d'azione con linee di velocità (il ragazzo che corre di profilo), la torcia del padre, il cassetto che si apre con mappa e maschera antigas.
+- Voce e suono: voce narrante veloce (162 parole al minuto), 10 cambi: i "40/20/10 seconds remaining" sono più brillanti (voce del telefono o annuncio), sussurrata su "Your blood runs cold". Sirena antiaerea sotto i primi 10 secondi.
+- Ritmo e scene: 7 tagli, quasi tutti sui cartelli del timer: il video è diviso in blocchi da 20 s, e ogni blocco è una lista di azioni ("grab the essentials", padre col fucile, radio e torcia, cibo e acqua). Il tempo della storia coincide con il tempo del video (60 secondi veri).
+- Finale: il salto nel seminterrato "just in time" all'ultimo secondo, poi stop: nessuna scelta, solo "stay tuned for the next part" in didascalia. 102 mila like ma solo 433 commenti: senza domanda finale i commenti crollano (1 ogni 235 like, contro 1 ogni 35 di *14 Floors Up*).
+- Cosa copiare (e in quale formato): **Conto alla rovescia**: il tempo reale (60 secondi della storia = 60 secondi del video) e il cartello nero del timer che taglia la scena ogni 20 s. Da non copiare: il finale senza scelta. Da noi il timer vero va unito a una domanda ("what's the one thing you go back for?").
