@@ -7,6 +7,7 @@
 // Redo (2026-10-31): every figure stands on its ground (no feet above a ground line, also while walking off), close-ups framed
 // on the face with the floor under them; sounds of the story (window, steps, a breath at the tree line, lanterns catching,
 // a morning bell, a door) instead of thunder and floor creaks in the forest.
+// Redo 2 (2026-10-31): every sound effect at half its level (-6 dB), so the narrator sits clearly on top.
 // The threat is never shown: only the footsteps, a long shadow that is not yours, the dark beyond the trees.
 // Subjects sit between 15 % and 52 % of the frame height (the series tag is above, the pop captions below).
 // Starts are anchored to narration lines (C), effects to the line timings (E.cue / E.cueEnd / E.word).
@@ -59,7 +60,7 @@ export function SHOTS(C, DUR) {
   return [
     // 1 · The vote, and the window: you from behind at your bedroom window, the fox's lantern in the yard below, sitting on
     //     the grass, waiting. The vote card (GO 1 · STAY 0) drops on frame 0. A slow push to the glass; the window creaks open.
-    { id: 'S1', start: 0, sfx: [{ t: 0, type: 'wind', d: end('L01') + .6, v: .35 }, { t: end('L01') - .05, type: 'door-creak', v: .55 }, { t: end('L01') + .3, type: 'whoosh', v: .4 }],
+    { id: 'S1', start: 0, sfx: [{ t: 0, type: 'wind', d: end('L01') + .6, v: .17 }, { t: end('L01') - .05, type: 'door-creak', v: .28 }, { t: end('L01') + .3, type: 'whoosh', v: .2 }],
       build: E => layered(E, {
         light: [0, .07, -.12], lightR: .1, lightCol: T.light, key: .55, amb: .3, sky: { stops: NIGHT, stars: 90 }, on: false,
         layers: [
@@ -80,7 +81,7 @@ export function SHOTS(C, DUR) {
     // 2 · Footsteps that match yours: you cross the yard towards the trees, the fox ahead; from the bottom of the frame a long
     //     shadow that is not yours stretches up the grass and keeps pace. Two sets of steps, a beat apart; a breath behind you.
     { id: 'S2', start: at('L02') - .2, in: { type: 'dissolve', dur: .35 },
-      sfx: [{ t: 0, type: 'steps', d: 3, v: .6, pan: .2 }, { t: .14, type: 'steps', d: 3, v: .75, pan: -.3 }, { t: end('L02') - at('L02') + .25, type: 'breath', v: .45, pan: -.4 }],
+      sfx: [{ t: 0, type: 'steps', d: 3, v: .3, pan: .2 }, { t: .14, type: 'steps', d: 3, v: .38, pan: -.3 }, { t: end('L02') - at('L02') + .25, type: 'breath', v: .23, pan: -.4 }],
       build: E => layered(E, {
         light: [.02, .1, -.12], lightR: .1, lightCol: T.light, key: .5, amb: .3, sky: { stops: NIGHT, stars: 80 }, on: false,
         layers: [
@@ -100,7 +101,7 @@ export function SHOTS(C, DUR) {
 
     // 3 · Into the old forest: the fox slips between the first trunks, its light swinging, and gets smaller as it goes in; the
     //     forest floor rises to meet it, so its paws stay on the leaves. The camera follows in, past the trees.
-    { id: 'S3', start: at('L03') - .3, in: { type: 'dissolve', dur: .5 }, sfx: [{ t: .3, type: 'whoosh', v: .35 }, { t: .2, type: 'steps', d: 2.4, v: .35, pan: .1 }],
+    { id: 'S3', start: at('L03') - .3, in: { type: 'dissolve', dur: .5 }, sfx: [{ t: .3, type: 'whoosh', v: .17 }, { t: .2, type: 'steps', d: 2.4, v: .17, pan: .1 }],
       build: E => layered(E, {
         light: [.0, .08, -.1], lightR: .07, lightCol: '#ffc878', key: .45, amb: .26, sky: { stops: WOOD, stars: 40 }, on: false,
         layers: [
@@ -119,7 +120,7 @@ export function SHOTS(C, DUR) {
 
     // 4 · Hundreds of lanterns: a crane up the trunks; a few lanterns burn, then on "hundreds" the whole canopy lights at once,
     //     with a soft rush of flames and a chime.
-    { id: 'S4', start: at('L04') - .25, sfx: [{ t: .05, type: 'whoosh', v: .45 }, { t: .25, type: 'chimes', v: .4 }, { t: .3, type: 'fire', d: 1.8, v: .35 }],
+    { id: 'S4', start: at('L04') - .25, sfx: [{ t: .05, type: 'whoosh', v: .23 }, { t: .25, type: 'chimes', v: .2 }, { t: .3, type: 'fire', d: 1.8, v: .17 }],
       build: E => {
         const on = E.word('L04', 0) - .05, far = lanternSpots(7, 70, [-.22, .22], [.08, .27], .006), near = lanternSpots(13, 16, [-.15, .15], [.1, .25], .011);
         return layered(E, {
@@ -139,7 +140,7 @@ export function SHOTS(C, DUR) {
 
     // 5 · Under each one a neighbor, eyes shut, smiling: a slow truck along the row, each smile catching its lantern. The forest
     //     floor reaches above every pair of feet.
-    { id: 'S5', start: at('L05') - .3, in: { type: 'dissolve', dur: .6 }, sfx: [{ t: .3, type: 'breath', v: .25 }],
+    { id: 'S5', start: at('L05') - .3, in: { type: 'dissolve', dur: .6 }, sfx: [{ t: .3, type: 'breath', v: .12 }],
       build: E => {
         const P = [[-.13, .06], [-.065, .07], [0, .062], [.065, .072], [.13, .058]];
         return layered(E, {
@@ -158,11 +159,11 @@ export function SHOTS(C, DUR) {
         });
       } },
 
-    // 6 · One lantern is dark: a close-up of an unlit paper lantern on its branch, a paper tag hanging from it: YOU.
+    // 6 · One dark lantern has your name: a close-up of an unlit paper lantern on its branch, a paper tag hanging from it: YOU.
     //     The burning lanterns blur behind it. A hard cut and a slow push; the tag rustles as it turns.
-    { id: 'S6', start: at('L06') - .15, sfx: [{ t: .15 + C.L06.dur * .8, type: 'page', v: .5 }],
+    { id: 'S6', start: at('L06') - .15, sfx: [{ t: .15 + C.L06.dur * .8, type: 'page', v: .25 }],
       build: E => {
-        const tag = E.word('L06', 7);
+        const tag = E.word('L06', 5);   // 'name'
         return layered(E, {
           light: [.0, .12, -.12], lightR: .1, lightCol: '#ffc878', key: .55, amb: .32, sky: { stops: WOOD }, on: false,
           layers: [
@@ -181,7 +182,7 @@ export function SHOTS(C, DUR) {
 
     // 7 · The fox lights it: the fox sits up under the branch, lifts its lantern, and your lantern catches with a small flame.
     //     The fox tilts but its paws stay on the floor.
-    { id: 'S7', start: at('L07') - .25, in: { type: 'dissolve', dur: .4 }, sfx: [{ t: 0, type: 'whoosh', v: .35 }, { t: .25 + C.L07.dur * .6, type: 'fire', d: 2, v: .6 }],
+    { id: 'S7', start: at('L07') - .25, in: { type: 'dissolve', dur: .4 }, sfx: [{ t: 0, type: 'whoosh', v: .17 }, { t: .25 + C.L07.dur * .6, type: 'fire', d: 2, v: .3 }],
       build: E => {
         const lit = E.cue('L07') + C.L07.dur * .6;
         return layered(E, {
@@ -205,7 +206,7 @@ export function SHOTS(C, DUR) {
     //     dark field and your town, unlit. Steps, then nothing; in the long silence something breathes out there and the grass
     //     at the edge bends towards us.
     { id: 'S8', start: at('L08') - .3, in: { type: 'dissolve', dur: .5 },
-      sfx: [{ t: .1, type: 'steps', d: 2, v: .7, pan: .1 }, { t: end('L08') - at('L08') + .35, type: 'creature', v: .3 }, { t: end('L08') - at('L08') + .5, type: 'wind', d: 1.6, v: .45 }],
+      sfx: [{ t: .1, type: 'steps', d: 2, v: .35, pan: .1 }, { t: end('L08') - at('L08') + .35, type: 'creature', v: .15 }, { t: end('L08') - at('L08') + .5, type: 'wind', d: 1.6, v: .23 }],
       build: E => {
         const bend = E.cueEnd('L08') + .3;
         return layered(E, {
@@ -226,7 +227,7 @@ export function SHOTS(C, DUR) {
 
     // 9 · The whisper (Nicole): a close-up of the nearest neighbor under her lantern, eyes shut, a calm smile; her face high in
     //     the frame, the leaves of the forest floor round her feet. Only her lantern crackles.
-    { id: 'S9', start: at('L09') - .3, in: { type: 'dissolve', dur: .5 }, sfx: [{ t: 0, type: 'fire', d: end('L09') - at('L09') + .9, v: .2 }],
+    { id: 'S9', start: at('L09') - .3, in: { type: 'dissolve', dur: .5 }, sfx: [{ t: 0, type: 'fire', d: end('L09') - at('L09') + .9, v: .1 }],
       build: E => layered(E, {
         light: [.04, .19, -.06], lightR: .08, lightCol: '#ffc878', key: .7, amb: .45, ambCol: '#a89ac8', sky: { stops: WOOD }, on: false,
         layers: [
@@ -242,7 +243,7 @@ export function SHOTS(C, DUR) {
 
     // 10 · They're hiding: a pull back and up over the whole clearing, rows of neighbors under rows of lanterns, a low rumble
     //      from beyond the trees. Hit on "hiding". The floor rises above the back row's feet.
-    { id: 'S10', start: at('L10') - .15, sfx: [{ t: .05, type: 'rumble', d: 2.6, v: .4 }, { t: .1, type: 'whoosh', v: .45 }],
+    { id: 'S10', start: at('L10') - .15, sfx: [{ t: .05, type: 'rumble', d: 2.6, v: .2 }, { t: .1, type: 'whoosh', v: .23 }],
       build: E => {
         const back = [-.16, -.1, -.04, .02, .08, .14].map((cx, i) => [cx + .01 * (i % 2), .1 + .004 * (i % 3)]);
         const front = [-.13, -.065, 0, .065, .13].map((cx, i) => [cx, .055 + .004 * (i % 2)]);
@@ -266,7 +267,7 @@ export function SHOTS(C, DUR) {
     // 11 · You shut your eyes and wait: you, close, under your own lantern, now burning. Scared, then on "shut" the eyes close.
     //      In the long silence, one slow step passes behind you, and you hold your breath.
     { id: 'S11', start: at('L11') - .3, in: { type: 'dissolve', dur: .6 },
-      sfx: [{ t: .2, type: 'breath', v: .35 }, { t: end('L11') - at('L11') + .45, type: 'steps', d: 1.2, v: .3, pan: -.6 }],
+      sfx: [{ t: .2, type: 'breath', v: .17 }, { t: end('L11') - at('L11') + .45, type: 'steps', d: 1.2, v: .15, pan: -.6 }],
       build: E => {
         const shut = E.word('L11', 2);
         return layered(E, {
@@ -288,7 +289,7 @@ export function SHOTS(C, DUR) {
     // 12 · 6:12 am: dawn through the trees (your-call/alba), the lanterns going out one by one, the neighbors walking home up the
     //      field (their feet stay under its top line as they go). A far bell, a dog, steps on the path.
     { id: 'S12', start: at('L12') - .4, in: { type: 'dissolve', dur: .8 },
-      sfx: [{ t: .5, type: 'bell', v: .35 }, { t: .8, type: 'steps', d: 3, v: .4, pan: -.3 }, { t: 2.2, type: 'dog', v: .2, pan: .5 }],
+      sfx: [{ t: .5, type: 'bell', v: .17 }, { t: .8, type: 'steps', d: 3, v: .2, pan: -.3 }, { t: 2.2, type: 'dog', v: .1, pan: .5 }],
       build: E => {
         const W = [[-.08, .05], [-.02, .055], [.04, .048], [.1, .056]];
         return layered(E, {
@@ -312,7 +313,7 @@ export function SHOTS(C, DUR) {
     // 13 · Except the fox: morning in the empty forest, the fox sitting alone between the trunks, its lantern still burning but
     //      weaker and weaker. A slow push in on "fading"; a raven far off.
     { id: 'S13', start: at('L13') - .3, in: { type: 'dissolve', dur: .7 },
-      sfx: [{ t: .3, type: 'raven', v: .25, pan: .4 }, { t: 0, type: 'fire', d: end('L13') - at('L13') + 1, v: .2 }],
+      sfx: [{ t: .3, type: 'raven', v: .12, pan: .4 }, { t: 0, type: 'fire', d: end('L13') - at('L13') + 1, v: .1 }],
       build: E => layered(E, {
         light: [.02, .1, -.08], lightR: .1, lightCol: '#ffc878', key: .8, amb: .55, ambCol: '#c8a8b8', sky: { stops: D.sky }, on: false,
         layers: [
@@ -329,7 +330,7 @@ export function SHOTS(C, DUR) {
     // 14 · The same neighbor (Nicole), at her front door in the morning light, eyes open now, not smiling: "Don't go back."
     //      She stands on her doorstep; after the line she steps back and the door creaks shut.
     { id: 'S14', start: at('L14') - .3, in: { type: 'dissolve', dur: .5 },
-      sfx: [{ t: end('L14') - at('L14') + .35, type: 'door-creak', v: .5 }],
+      sfx: [{ t: end('L14') - at('L14') + .35, type: 'door-creak', v: .25 }],
       build: E => layered(E, {
         light: [.06, .2, -.05], lightR: .2, lightCol: D.light, key: .85, amb: .6, ambCol: '#d8b8c0', sky: { stops: D.sky }, on: false,
         layers: [
@@ -346,7 +347,7 @@ export function SHOTS(C, DUR) {
     //      on the grass, its lantern a weak dot (GO); on the right your house, one window lit (STAY). A slow crane up; the
     //      choice card rises over it, then the PART 3 card. The wind picks up; far in the trees, something breathes.
     { id: 'S15', start: at('L15') - .3, in: { type: 'dissolve', dur: .6 },
-      sfx: [{ t: 0, type: 'wind', d: DUR - at('L15') + .5, v: .35 }, { t: end('L16') - at('L15') + .5, type: 'creature', v: .3, pan: -.5 }],
+      sfx: [{ t: 0, type: 'wind', d: DUR - at('L15') + .5, v: .17 }, { t: end('L16') - at('L15') + .5, type: 'creature', v: .15, pan: -.5 }],
       build: E => layered(E, {
         light: [-.08, .09, -.11], lightR: .06, lightCol: '#ffc878', key: .55, amb: .4, ambCol: '#b07a8a', sky: { stops: DUSK }, on: false,
         layers: [

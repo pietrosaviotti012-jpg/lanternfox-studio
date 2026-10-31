@@ -19,11 +19,11 @@
  "lines": [
   {
    "id": "L01",
-   "text": "One of you said GO. So at 2:23 am, you follow the fox.",
+   "text": "One of you said GO. At 2:23 am, you follow the fox.",
    "em": [
     "GO"
    ],
-   "say": "One of you said GO. So at two twenty-three a.m., you follow the fox.",
+   "say": "One of you said go. At two twenty-three a.m., you follow the fox.",
    "clock": "DAY 1 · 02:23 AM",
    "card": {
     "app": "Lantern Night",
@@ -98,7 +98,7 @@
   },
   {
    "id": "L06",
-   "text": "One lantern is dark. It has your name.",
+   "text": "One dark lantern has your name.",
    "em": [
     "name"
    ],
@@ -109,7 +109,8 @@
     "intensity": 0.6,
     "pace": 0.32,
     "speed": 0.95
-   }
+   },
+   "say": "One dark lantern... has your name."
   },
   {
    "id": "L07",
@@ -257,7 +258,8 @@
     "pace": 0.32,
     "speed": 0.99,
     "gain_db": 2
-   }
+   },
+   "say": "Your call. Comment go, or stay."
   }
  ],
  "choice": {
