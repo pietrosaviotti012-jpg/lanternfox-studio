@@ -15,6 +15,7 @@
  "fx": "embers",
  "lead": 0.4,
  "tail": 3.4,
+ "bed": "forest",
  "lines": [
   {
    "id": "L01",
@@ -40,20 +41,6 @@
   },
   {
    "id": "L02",
-   "text": "Out the window. You don't turn around.",
-   "em": [
-    "turn"
-   ],
-   "gap": 0.35,
-   "act": {
-    "intensity": 0.45,
-    "pace": 0.32,
-    "speed": 0.95,
-    "gain_db": -1
-   }
-  },
-  {
-   "id": "L03",
    "text": "But the footsteps behind you match yours.",
    "em": [
     "match"
@@ -64,11 +51,11 @@
     "intensity": 0.65,
     "pace": 0.32,
     "speed": 0.95,
-    "gain_db": 0.5
+    "gain_db": 1
    }
   },
   {
-   "id": "L04",
+   "id": "L03",
    "text": "The fox leads you into the old forest.",
    "em": [
     "forest"
@@ -78,12 +65,11 @@
    "act": {
     "intensity": 0.45,
     "pace": 0.32,
-    "speed": 0.95,
-    "gain_db": -1
+    "speed": 0.95
    }
   },
   {
-   "id": "L05",
+   "id": "L04",
    "text": "Hundreds of lanterns hang in the trees.",
    "em": [
     "hundreds"
@@ -92,11 +78,12 @@
    "act": {
     "intensity": 0.5,
     "pace": 0.32,
-    "speed": 0.95
+    "speed": 0.95,
+    "gain_db": 0.5
    }
   },
   {
-   "id": "L06",
+   "id": "L05",
    "text": "Under each one, a neighbor. Eyes shut. Smiling.",
    "em": [
     "smiling"
@@ -106,11 +93,11 @@
     "intensity": 0.45,
     "pace": 0.32,
     "speed": 0.95,
-    "gain_db": -1.5
+    "gain_db": -0.5
    }
   },
   {
-   "id": "L07",
+   "id": "L06",
    "text": "One lantern is dark. It has your name.",
    "em": [
     "name"
@@ -121,12 +108,11 @@
    "act": {
     "intensity": 0.6,
     "pace": 0.32,
-    "speed": 0.95,
-    "gain_db": -0.5
+    "speed": 0.95
    }
   },
   {
-   "id": "L08",
+   "id": "L07",
    "text": "The fox lights it.",
    "em": [
     "lights"
@@ -136,40 +122,40 @@
     "intensity": 0.4,
     "pace": 0.32,
     "speed": 0.95,
-    "gain_db": -2
-   }
-  },
-  {
-   "id": "L09",
-   "text": "Behind you, the footsteps stop at the trees.",
-   "em": [
-    "stop"
-   ],
-   "gap": 1.1,
-   "act": {
-    "intensity": 0.6,
-    "pace": 0.32,
-    "speed": 0.95,
     "gain_db": -1
    }
   },
   {
-   "id": "L10",
+   "id": "L08",
+   "text": "Behind you, the footsteps stop at the trees.",
+   "em": [
+    "stop"
+   ],
+   "gap": 1.0,
+   "act": {
+    "intensity": 0.6,
+    "pace": 0.32,
+    "speed": 0.95
+   }
+  },
+  {
+   "id": "L09",
    "text": "Close your eyes. It can't see you.",
    "em": [
     "see"
    ],
    "speaker": "sussurro",
    "quote": true,
-   "gap": 0.7,
+   "gap": 0.6,
    "act": {
     "intensity": 0.45,
     "pace": 0.32,
-    "speed": 0.95
+    "speed": 0.95,
+    "gain_db": 2
    }
   },
   {
-   "id": "L11",
+   "id": "L10",
    "text": "Your neighbors aren't lost. They're hiding.",
    "em": [
     "hiding"
@@ -180,106 +166,145 @@
     "intensity": 0.7,
     "pace": 0.32,
     "speed": 0.95,
-    "gain_db": 1
+    "gain_db": 1.5
    }
   },
   {
-   "id": "L12",
+   "id": "L11",
    "text": "So you shut your eyes. And you wait.",
    "em": [
     "wait"
    ],
-   "gap": 1.2,
+   "gap": 1.1,
    "act": {
     "intensity": 0.35,
-    "pace": 0.32,
-    "speed": 0.95,
-    "gain_db": -3
-   }
-  },
-  {
-   "id": "L13",
-   "text": "At 6:12 am, the sun comes up. Everyone walks home.",
-   "em": [
-    "sun"
-   ],
-   "say": "At six twelve a.m., the sun comes up. Everyone walks home.",
-   "clock": "DAY 2 · 06:12 AM",
-   "gap": 0.4,
-   "act": {
-    "intensity": 0.45,
-    "pace": 0.32,
-    "speed": 0.92
-   }
-  },
-  {
-   "id": "L14",
-   "text": "Everyone except the fox.",
-   "em": [
-    "fox"
-   ],
-   "gap": 0.9,
-   "act": {
-    "intensity": 0.55,
     "pace": 0.32,
     "speed": 0.95,
     "gain_db": -1
    }
   },
   {
-   "id": "L15",
-   "text": "Its lantern still burns in the forest. Alone.",
+   "id": "L12",
+   "text": "At 6:12 am, the sun is up. You all walk home.",
    "em": [
-    "alone"
+    "home"
    ],
-   "gap": 0.5,
+   "say": "At six twelve a.m., the sun is up. You all walk home.",
+   "clock": "DAY 2 · 06:12 AM",
+   "gap": 0.4,
    "act": {
     "intensity": 0.45,
     "pace": 0.32,
+    "speed": 0.95
+   }
+  },
+  {
+   "id": "L13",
+   "text": "Except the fox. Its lantern is fading.",
+   "em": [
+    "fading"
+   ],
+   "gap": 0.7,
+   "act": {
+    "intensity": 0.55,
+    "pace": 0.32,
     "speed": 0.95,
-    "gain_db": -1.5
+    "gain_db": 0.5
+   }
+  },
+  {
+   "id": "L14",
+   "text": "Don't go back. It hunts after dark.",
+   "em": [
+    "dark"
+   ],
+   "speaker": "sussurro",
+   "quote": true,
+   "gap": 0.6,
+   "act": {
+    "intensity": 0.5,
+    "pace": 0.32,
+    "speed": 0.95,
+    "gain_db": 2
+   }
+  },
+  {
+   "id": "L15",
+   "text": "Go back for the fox before dark, or stay home?",
+   "em": [
+    "fox",
+    "home"
+   ],
+   "clock": "DAY 2 · 05:41 PM",
+   "gap": 0.45,
+   "act": {
+    "intensity": 0.6,
+    "pace": 0.32,
+    "speed": 0.97,
+    "gain_db": 1.5
    }
   },
   {
    "id": "L16",
-   "text": "So who is the fox still hiding from?",
+   "text": "Your call. Comment GO or STAY.",
    "em": [
-    "hiding"
+    "GO",
+    "STAY"
    ],
    "gap": 0.2,
    "act": {
-    "intensity": 0.6,
+    "intensity": 0.55,
     "pace": 0.32,
-    "speed": 0.98,
+    "speed": 0.99,
     "gain_db": 2
    }
   }
  ],
+ "choice": {
+  "question": "Go back for the fox?",
+  "a": {
+   "word": "GO",
+   "sub": "into the dark, no lantern"
+  },
+  "b": {
+   "word": "STAY",
+   "sub": "and its light goes out"
+  },
+  "note": "THE MAJORITY WRITES PART 3"
+ },
+ "next": {
+  "title": "PART 3",
+  "sub": "Follow for part 3"
+ },
  "bpm": 60,
  "seed": 32,
  "music": [
   {
    "at": "S1",
-   "mood": "storm"
-  },
-  {
-   "at": "S5",
-   "mood": "hush"
-  },
-  {
-   "at": "S9",
    "mood": "rise"
   },
   {
-   "at": "S10",
+   "at": "S4",
    "mood": "hush"
   },
   {
-   "at": "S13",
+   "at": "S8",
+   "mood": "rise"
+  },
+  {
+   "at": "S9",
+   "mood": "hush"
+  },
+  {
+   "at": "S12",
    "mood": "warm"
   },
   {
    "at": "S14",
+   "mood": "hush"
+  },
+  {
+   "at": "S15",
    "mood": "end"
   }
  ]

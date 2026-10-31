@@ -5,7 +5,7 @@
   "format": "your-call",
   "series": "Lantern Night",
   "episode": 2,
-  "idea": "One of you said GO: at 2:23 am you climb out the window and follow the fox, footsteps matching yours behind you; in the old forest hundreds of lanterns hang in the trees over your neighbors, eyes shut, smiling; one dark lantern has your name, the fox lights it, the footsteps stop at the tree line and a whisper explains: close your eyes and it can't see you. They're hiding. At sunrise everyone walks home, except the fox, whose lantern still burns alone in the forest.",
+  "idea": "One of you said GO: at 2:23 am you follow the fox into the old forest, footsteps matching yours behind you; hundreds of lanterns hang over your neighbors, eyes shut, smiling; one dark lantern has your name and the fox lights it; the footsteps stop at the tree line and a neighbor whispers: close your eyes, it can't see you. They're hiding. At sunrise everyone walks home except the fox, whose lantern is fading; the neighbor warns you not to go back, it hunts after dark. At 5:41 pm: go back for the fox, or stay home? Comment GO or STAY: the majority writes Part 3.",
   "hook": "One of you said GO. So at 2:23 am, you follow the fox.",
   "votes": {
     "GO": 1,
@@ -17,7 +17,7 @@
     "text": "One lantern has *your* name",
     "t": 20
   },
-  "caption": "Part 2. One of you said GO. 🦊🏮\nSo you followed the fox into the old forest, with footsteps behind you matching yours.\n\nHundreds of lanterns. Your neighbors underneath, eyes shut, smiling. And one lantern with your name on it.\n\nEveryone came home at sunrise. Except the fox.\nWho is it still hiding from? Tell us in the comments 👇",
+  "caption": "Part 2. One of you said GO. 🦊🏮\nSo you followed the fox into the old forest, with footsteps behind you matching yours.\n\nHundreds of lanterns. Your neighbors underneath, eyes shut, smiling. And one lantern with your name on it.\n\nAt sunrise you all walked home. Except the fox. Its lantern is fading, and sunset is at 5:41.\nGo back for the fox, or stay home? Your call: comment GO or STAY 👇 The majority writes Part 3.",
   "hashtags": [
     "#yourcall",
     "#pov",
@@ -28,11 +28,20 @@
     "#papercut",
     "#lanternfoxtales"
   ],
-  "first_comment": "Who is the fox still hiding from? 🦊🏮 Your theories below 👇",
+  "first_comment": "Sunset is at 5:41 🦊🏮 Do you go back for the fox? Comment GO or STAY. Part 3 follows the majority 👇",
   "ai_label": true,
   "platforms": [
     "instagram",
     "youtube",
     "tiktok"
-  ]
+  ],
+  "part3": {
+    "title": "Lantern Night · Part 3",
+    "planned": "2026-11-02",
+    "choice": [
+      "GO",
+      "STAY"
+    ],
+    "ending": "Part 3 closes the series. The thing in the dark only finds eyes that are open and looking; one night a year the fox, keeper of the lanterns, keeps the whole town hidden, and it can never shut its own eyes, because someone has to hold the light. GO: at dusk you walk back in with no lantern, eyes shut, following its fading glow; you take the stick from the fox and hold the light yourself until dawn, so for the first time the fox can close its eyes and sleep; the footsteps pass you by; at sunrise you both walk home, and the fox's lantern now hangs at your window: next Lantern Night, you hold it together. STAY: you stay home, but at 2:07 am you light the lantern with your name and put it in your window; the fox's light goes out in the forest, then a small glow comes across the field towards yours, and the fox climbs onto your windowsill, safe; the footsteps stop at your door and turn away. Both endings end warm, with a last question to comment (not a new choice)."
+  }
 }
