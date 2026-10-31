@@ -1,0 +1,47 @@
+[
+ {
+  "t": 21.8,
+  "text": "Not you.",
+  "change": [
+   "louder",
+   "darker (deep, muffled, another voice?)"
+  ]
+ },
+ {
+  "t": 68.8,
+  "text": "You think you're safe.",
+  "change": [
+   "brighter (phone, radio, another voice?)"
+  ]
+ },
+ {
+  "t": 78.8,
+  "text": "Room 214, we know you're in there.",
+  "change": [
+   "louder",
+   "darker (deep, muffled, another voice?)"
+  ]
+ },
+ {
+  "t": 89.8,
+  "text": "It's me, Maya.",
+  "change": [
+   "quieter (whisper?)"
+  ]
+ },
+ {
+  "t": 91.8,
+  "text": "I got out, please.",
+  "change": [
+   "quieter (whisper?)",
+   "brighter (phone, radio, another voice?)"
+  ]
+ },
+ {
+  "t": 96.5,
+  "text": "Her shadow sits in the gap under the door.",
+  "change": [
+   "darker (deep, muffled, another voice?)"
+  ]
+ }
+]

@@ -1,0 +1,25 @@
+[
+ {
+  "t": 11.0,
+  "text": "Tower 9 Ranger Station, stay inside, lights off, pick up in 7 days.",
+  "change": [
+   "brighter (phone, radio, another voice?)"
+  ]
+ },
+ {
+  "t": 48.0,
+  "text": "Tower 9, Dale is right here with us.",
+  "change": [
+   "louder",
+   "brighter (phone, radio, another voice?)"
+  ]
+ },
+ {
+  "t": 51.0,
+  "text": "I can see your light.",
+  "change": [
+   "quieter (whisper?)",
+   "brighter (phone, radio, another voice?)"
+  ]
+ }
+]

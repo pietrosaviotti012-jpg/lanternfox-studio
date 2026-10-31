@@ -1,0 +1,38 @@
+# Transcript (en)
+
+- `  0.0` **[HOOK]** If the outbreak starts at your school, don't go to the gym.
+- `  3.4` One rule keeps you alive today, and your whole class will ignore it.
+- `  7.5` Third period, chemistry, every phone buzzes at once.
+- ` 11.7` Then the PA.
+- ` 13.1` All students report to the gym.
+- ` 15.0` Teachers will lock the doors behind you.
+- ` 17.2` 30 kids bolt for the hallway, including Maya, your best friend.
+- ` 21.8` Not you.
+- ` 22.9` This morning, you walked past the nurse's office, right next to the gym.
+- ` 27.0` Three kids were on the cots, shaking, and the nurse was gone.
+- ` 31.4` So you stay.
+- ` 33.0` You grab what nobody thinks about.
+- ` 35.1` The teacher's key lanyard and a roll of black paper from the supply shelf.
+- ` 39.4` You lock the door, tape paper over the window, and kill the lights.
+- ` 43.6` Down the hall, the gym doors slam shut.
+- ` 46.4` Then the shouting starts, muffled through the walls.
+- ` 49.7` A teacher yells, everybody stay calm.
+- ` 52.8` Someone pounds on a door.
+- ` 54.6` Then the pounding turns into screaming, and one by one, it stops.
+- ` 60.0` You crawl behind the teacher's desk and stop breathing.
+- ` 63.6` At 2.14, the hallway goes silent.
+- ` 66.6` Your phone says 4%.
+- ` 68.8` You think you're safe.
+- ` 70.0` Concrete walls, a steel door.
+- ` 72.6` No one knows you're here.
+- ` 74.2` Then the PA clicks on, a calm voice, almost kind.
+- ` 78.8` Room 214, we know you're in there.
+- ` 81.8` Come to the gym.
+- ` 83.2` No one could know that unless someone told them.
+- ` 86.9` Then three soft taps on your door.
+- ` 89.8` It's me, Maya.
+- ` 91.8` I got out, please.
+- ` 93.8` She whispers the joke only you two know.
+- ` 96.5` Her shadow sits in the gap under the door.
+- `102.5` Part two, do you unlock the door, yes or no?
+- `106.4` Part two starts with your answer.
