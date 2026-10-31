@@ -1,0 +1,286 @@
+{
+ "title": "Lantern Night · Part 2",
+ "series": "Lantern Night",
+ "format": "your-call",
+ "theme": "your-call/notte",
+ "voice": {
+  "engine": "chatterbox",
+  "preset": "cupo"
+ },
+ "captions": "pop",
+ "hud": {
+  "tag": "LANTERN NIGHT",
+  "part": "PART 2"
+ },
+ "fx": "embers",
+ "lead": 0.4,
+ "tail": 3.4,
+ "lines": [
+  {
+   "id": "L01",
+   "text": "One of you said GO. So at 2:23 am, you follow the fox.",
+   "em": [
+    "GO"
+   ],
+   "say": "One of you said GO. So at two twenty-three a.m., you follow the fox.",
+   "clock": "DAY 1 · 02:23 AM",
+   "card": {
+    "app": "Lantern Night",
+    "kind": "info",
+    "title": "Part 1 · your votes",
+    "body": "GO · 1    STAY · 0",
+    "hold": 3.4
+   },
+   "gap": 0.5,
+   "act": {
+    "intensity": 0.5,
+    "pace": 0.32,
+    "speed": 0.95
+   }
+  },
+  {
+   "id": "L02",
+   "text": "Out the window. You don't turn around.",
+   "em": [
+    "turn"
+   ],
+   "gap": 0.35,
+   "act": {
+    "intensity": 0.45,
+    "pace": 0.32,
+    "speed": 0.95,
+    "gain_db": -1
+   }
+  },
+  {
+   "id": "L03",
+   "text": "But the footsteps behind you match yours.",
+   "em": [
+    "match"
+   ],
+   "hit": true,
+   "gap": 0.6,
+   "act": {
+    "intensity": 0.65,
+    "pace": 0.32,
+    "speed": 0.95,
+    "gain_db": 0.5
+   }
+  },
+  {
+   "id": "L04",
+   "text": "The fox leads you into the old forest.",
+   "em": [
+    "forest"
+   ],
+   "clock": "DAY 1 · 02:31 AM",
+   "gap": 0.4,
+   "act": {
+    "intensity": 0.45,
+    "pace": 0.32,
+    "speed": 0.95,
+    "gain_db": -1
+   }
+  },
+  {
+   "id": "L05",
+   "text": "Hundreds of lanterns hang in the trees.",
+   "em": [
+    "hundreds"
+   ],
+   "gap": 0.45,
+   "act": {
+    "intensity": 0.5,
+    "pace": 0.32,
+    "speed": 0.95
+   }
+  },
+  {
+   "id": "L06",
+   "text": "Under each one, a neighbor. Eyes shut. Smiling.",
+   "em": [
+    "smiling"
+   ],
+   "gap": 0.7,
+   "act": {
+    "intensity": 0.45,
+    "pace": 0.32,
+    "speed": 0.95,
+    "gain_db": -1.5
+   }
+  },
+  {
+   "id": "L07",
+   "text": "One lantern is dark. It has your name.",
+   "em": [
+    "name"
+   ],
+   "tint": true,
+   "clock": "DAY 1 · 02:34 AM",
+   "gap": 0.9,
+   "act": {
+    "intensity": 0.6,
+    "pace": 0.32,
+    "speed": 0.95,
+    "gain_db": -0.5
+   }
+  },
+  {
+   "id": "L08",
+   "text": "The fox lights it.",
+   "em": [
+    "lights"
+   ],
+   "gap": 0.4,
+   "act": {
+    "intensity": 0.4,
+    "pace": 0.32,
+    "speed": 0.95,
+    "gain_db": -2
+   }
+  },
+  {
+   "id": "L09",
+   "text": "Behind you, the footsteps stop at the trees.",
+   "em": [
+    "stop"
+   ],
+   "gap": 1.1,
+   "act": {
+    "intensity": 0.6,
+    "pace": 0.32,
+    "speed": 0.95,
+    "gain_db": -1
+   }
+  },
+  {
+   "id": "L10",
+   "text": "Close your eyes. It can't see you.",
+   "em": [
+    "see"
+   ],
+   "speaker": "sussurro",
+   "quote": true,
+   "gap": 0.7,
+   "act": {
+    "intensity": 0.45,
+    "pace": 0.32,
+    "speed": 0.95
+   }
+  },
+  {
+   "id": "L11",
+   "text": "Your neighbors aren't lost. They're hiding.",
+   "em": [
+    "hiding"
+   ],
+   "hit": true,
+   "gap": 0.6,
+   "act": {
+    "intensity": 0.7,
+    "pace": 0.32,
+    "speed": 0.95,
+    "gain_db": 1
+   }
+  },
+  {
+   "id": "L12",
+   "text": "So you shut your eyes. And you wait.",
+   "em": [
+    "wait"
+   ],
+   "gap": 1.2,
+   "act": {
+    "intensity": 0.35,
+    "pace": 0.32,
+    "speed": 0.95,
+    "gain_db": -3
+   }
+  },
+  {
+   "id": "L13",
+   "text": "At 6:12 am, the sun comes up. Everyone walks home.",
+   "em": [
+    "sun"
+   ],
+   "say": "At six twelve a.m., the sun comes up. Everyone walks home.",
+   "clock": "DAY 2 · 06:12 AM",
+   "gap": 0.4,
+   "act": {
+    "intensity": 0.45,
+    "pace": 0.32,
+    "speed": 0.92
+   }
+  },
+  {
+   "id": "L14",
+   "text": "Everyone except the fox.",
+   "em": [
+    "fox"
+   ],
+   "gap": 0.9,
+   "act": {
+    "intensity": 0.55,
+    "pace": 0.32,
+    "speed": 0.95,
+    "gain_db": -1
+   }
+  },
+  {
+   "id": "L15",
+   "text": "Its lantern still burns in the forest. Alone.",
+   "em": [
+    "alone"
+   ],
+   "gap": 0.5,
+   "act": {
+    "intensity": 0.45,
+    "pace": 0.32,
+    "speed": 0.95,
+    "gain_db": -1.5
+   }
+  },
+  {
+   "id": "L16",
+   "text": "So who is the fox still hiding from?",
+   "em": [
+    "hiding"
+   ],
+   "gap": 0.2,
+   "act": {
+    "intensity": 0.6,
+    "pace": 0.32,
+    "speed": 0.98,
+    "gain_db": 2
+   }
+  }
+ ],
+ "bpm": 60,
+ "seed": 32,
+ "music": [
+  {
+   "at": "S1",
+   "mood": "storm"
+  },
+  {
+   "at": "S5",
+   "mood": "hush"
+  },
+  {
+   "at": "S9",
+   "mood": "rise"
+  },
+  {
+   "at": "S10",
+   "mood": "hush"
+  },
+  {
+   "at": "S13",
+   "mood": "warm"
+  },
+  {
+   "at": "S14",
+   "mood": "end"
+  }
+ ]
+}

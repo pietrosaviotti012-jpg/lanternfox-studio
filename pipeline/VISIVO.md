@@ -74,3 +74,4 @@ Figure, mostri, animali e la volpe in ogni video: `pipeline/FIGURE.md`.
 - **Margini:** testi e schede restano dentro il 10% dai bordi; una camera o un movimento non li taglia mai. Le schede di testo stanno ferme e in piano, senza zoom.
 - **Sottotitoli liberi:** i sottotitoli pop stanno nel 55-70% dell'altezza; schede e titoli non ci finiscono sotto. Sulle righe lette da una scheda spegni i sottotitoli (`"sub": false`).
 - **Le persone si leggono:** volto chiaro (`skin` di base), mai tinto dal buio.
+- 2026-10-31, dalle guide sulle serie di Shorts: la Parte 2 riprende per prima cosa l'ultima immagine della Parte 1 (qui la porta che si apre alle spalle) e la scelta vinta scritta grande, poi uno sbalzo di colore nel finale (da `notte` ad `alba`) come premio. Il motore lo sa fare (tema per inquadratura, `clock`, cartello di testo nella scena). Non ancora: un cartello "VOTES" con il conteggio che sale.

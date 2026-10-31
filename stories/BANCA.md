@@ -24,6 +24,7 @@ La Ricerca aggiunge ogni giorno 3-5 voci nuove (dalle mode del momento, da Reddi
 - **Le luci di Marfa (Texas, dal 1880 circa)**: luci che fluttuano sul deserto; dire che la spiegazione più probabile sono i fari delle auto. (dal 2026-10-29)
 - **L'isola Hy-Brasil (leggenda)**: un'isola rotonda segnata sulle carte nautiche per secoli a ovest dell'Irlanda, visibile un giorno ogni sette anni. Dire che è leggenda e che sparì dalle carte nell'Ottocento. (dal 2026-10-29)
 - **La nave Octavius (leggenda, 1775)**: una baleniera trovata alla deriva con l'equipaggio congelato e il diario di bordo fermo a 13 anni prima. Raccontarla come leggenda: le fonti sono tarde. (dal 2026-10-29)
+- **Le luci di Hessdalen (Norvegia, dal 1981)**: luci che restano sospese nella valle anche per un'ora; dal 1998 un osservatorio automatico le filma. Fatto documentato, spiegazione ancora aperta. (dal 2026-10-31)
 - **La grande bufala della Luna (1835)**: un giornale di New York racconta per sei giorni che un telescopio ha visto uomini-pipistrello sulla Luna, e la città ci crede. Fatto vero e documentato (The Sun, agosto 1835). (dal 2026-10-30, sera)
 
 ## What if
@@ -42,10 +43,11 @@ La Ricerca aggiunge ogni giorno 3-5 voci nuove (dalle mode del momento, da Reddi
 - What if you could see Wi-Fi? (Una nebbia che si muove per casa, le stanze più luminose, il router come un falò. Chiusa: "Would you still sleep next to it?") (dal 2026-10-30)
 - What if the Moon moved away 3.8 cm every second instead of every year? (dal 2026-10-30, sera: seguito naturale della Luna, collana "il cielo")
 - What if the Sun were the size of the Moon in the sky? (I fatti veri sulla distanza, la luce che cambia colore.) (dal 2026-10-30, sera)
+- What if Earth had rings like Saturn? (Un arco che taglia il cielo di giorno, l'ombra degli anelli d'inverno, notti mai buie. Fatti veri.) (dal 2026-10-31)
 - What if sound stopped for one minute? ("You don't hear the crash. You see it." Chiusa: "Would you notice first, or would your dog?") (dal 2026-10-29, sera)
 
 ## Your Call (seconda persona, scelta finale)
-- ⭐ **Lantern Night** (serie): la parte 2 segue GO o STAY. → `productions/2026-10-28-lantern-night-1`
+- ⭐ **Lantern Night** (serie): la parte 2 segue GO o STAY. → `productions/2026-10-28-lantern-night-1`, Parte 2 (GO) → `productions/2026-10-31-lantern-night-2`
 - ⭐ **The Last Train**: "It's 11:58 pm. The last train arrives. It's completely empty, except for one seat with your name on it." TAKE IT or WAIT.
 - ⭐ **Room 0**: in hotel, il tuo ascensore ha un pulsante in più, "0". PRESS or LEAVE.
 - **The Snow Rule**: nel tuo paese, durante la neve, nessuno apre la porta. Stanotte qualcuno bussa con la voce di tua madre. OPEN or STAY.
@@ -59,6 +61,7 @@ La Ricerca aggiunge ogni giorno 3-5 voci nuove (dalle mode del momento, da Reddi
 - ⭐ **The Last Lighthouse** (dal 2026-10-29, sera, formato conto alla rovescia): "The storm will last nine days. You have lamp oil for six." Barra: DAY 1/9 · OIL 6 · FOOD · WATER. Qualcosa sbatte alla porta della cisterna. LIGHT IT or SAVE IT.
 - **The Spare Key** (dal 2026-10-30): all'1:10 senti una chiave nella tua porta. Vivi da solo, la chiave ce l'hai tu. Poi si ferma, e una voce dice "wrong house, sorry": è la tua voce. OPEN or CALL.
 - **The Porch Light** (dal 2026-10-30): la regola di casa è lasciare la luce del portico accesa per chi torna tardi. Stanotte qualcuno la spegne da fuori. TURN IT ON or LEAVE IT.
+- ⭐ **The Last Knock** (dal 2026-10-31, Halloween): alle 23:48 la ciotola delle caramelle è vuota, poi un ultimo colpo alla porta. Un bambino con la maschera da volpe chiede una lanterna, non dolci; nella brina dietro di lui non ci sono impronte. OPEN or LIGHTS OFF.
 - **Rule 3** (dal 2026-10-29, sera, formato regole): la sirena del paese suona due volte l'anno. Stanotte ha suonato tre volte. La regola 3 dice cosa fare, ma nessuno la ricorda.
 
 - ⭐ **From: Me** (dal 2026-10-30, sera, formato telefono): alle 3:07 ricevi un messaggio dal tuo numero: "Don't open the door for me." Poi le regole, poi qualcuno bussa con la tua voce. PHONE or DOOR.
