@@ -864,3 +864,76 @@ export function paperMoon(x, o, g) {
     x.fillStyle = sea; for (const [u, v, rr] of [[-.3, .25, .28], [.2, .35, .2], [.28, -.12, .26], [-.15, -.38, .18], [-.45, -.05, .14]]) { x.beginPath(); x.arc(cx + u * r, cy + v * r, rr * r, 0, TAU); x.fill(); } }
   if (g) { g.fillStyle = '#fff'; g.beginPath(); g.arc(cx, cy, r, 0, TAU); g.fill(); }
 }
+
+// —— Added for "The Mary Celeste": a two-masted brigantine, a ship's wheel, a barrel, a rowing boat, a log slate ——
+
+// A brigantine, side view, bow to the right. cx = midships, by = waterline, s = length. o.sails: 'full' | 'half' (the lower
+// square sails furled, as she was found) | 'none'. o.boat: the lifeboat hangs in the stern davits (false = empty davits,
+// two ropes dangling). o.lit: portholes and the stern lamp burn in g. o.sail = sail colour (a lighter paper than the hull).
+export function brigantine(x, o, g) {
+  const { cx, by, s, col = '#0a1110', sail = '#c9bfa4', sails = 'half', boat = false, lit = false, flip = false } = o, f = flip ? -1 : 1;
+  const X = u => cx + u * s * f, Y = v => by + v * s;
+  const fm = .17, mm = -.13;   // foremast, mainmast
+  if (x) {
+    x.fillStyle = col;
+    x.beginPath(); x.moveTo(X(-.46), Y(.115)); x.quadraticCurveTo(X(0), Y(.095), X(.44), Y(.14));
+    x.quadraticCurveTo(X(.43), Y(.03), X(.36), Y(-.035)); x.lineTo(X(-.4), Y(-.035)); x.lineTo(X(-.47), Y(.04)); x.closePath(); x.fill();
+    x.fillRect(Math.min(X(-.46), X(.44)), Y(.115), Math.abs(X(.44) - X(-.46)), s * .012);                       // rail
+    x.lineCap = 'round'; x.strokeStyle = col;
+    x.lineWidth = s * .012; x.beginPath(); x.moveTo(X(.42), Y(.13)); x.lineTo(X(.64), Y(.22)); x.stroke();      // bowsprit
+    x.lineWidth = s * .014; for (const [m, h] of [[fm, .78], [mm, .84]]) { x.beginPath(); x.moveTo(X(m), Y(.1)); x.lineTo(X(m), Y(h)); x.stroke(); }
+    x.lineWidth = s * .003; x.beginPath();                                                                      // stays
+    x.moveTo(X(fm), Y(.76)); x.lineTo(X(.64), Y(.22)); x.moveTo(X(mm), Y(.82)); x.lineTo(X(fm), Y(.7));
+    x.moveTo(X(mm), Y(.8)); x.lineTo(X(-.44), Y(.12)); x.moveTo(X(fm), Y(.74)); x.lineTo(X(.05), Y(.12)); x.stroke();
+    // the foremast yards and square sails: [yard height, half width]
+    const yards = [[.32, .12], [.46, .105], [.6, .085], [.72, .06]];
+    x.lineWidth = s * .007; for (const [h, w] of yards) { x.beginPath(); x.moveTo(X(fm - w), Y(h)); x.lineTo(X(fm + w), Y(h)); x.stroke(); }
+    x.fillStyle = sail;
+    yards.forEach(([h, w], i) => {
+      if (sails === 'none' || i === yards.length - 1) return;
+      const [h2, w2] = yards[i + 1], set = sails === 'full' || i >= 2;
+      if (set) { x.beginPath(); x.moveTo(X(fm - w2), Y(h2 - .006)); x.lineTo(X(fm + w2), Y(h2 - .006));
+        x.quadraticCurveTo(X(fm + w * 1.08), Y((h + h2) / 2), X(fm + w), Y(h + .004)); x.lineTo(X(fm - w), Y(h + .004));
+        x.quadraticCurveTo(X(fm - w * 1.02), Y((h + h2) / 2), X(fm - w2), Y(h2 - .006)); x.closePath(); x.fill(); }
+      else { x.fillRect(Math.min(X(fm - w), X(fm + w)), Y(h + .002), Math.abs(X(fm + w) - X(fm - w)), s * .014); }   // furled
+    });
+    if (sails !== 'none') {
+      x.beginPath(); x.moveTo(X(fm + .01), Y(.7)); x.lineTo(X(.6), Y(.23)); x.quadraticCurveTo(X(.4), Y(.24), X(fm + .03), Y(.16)); x.closePath(); x.fill();   // jib
+      x.beginPath(); x.moveTo(X(mm - .008), Y(.2)); x.lineTo(X(mm - .008), Y(.7)); x.lineTo(X(-.38), Y(.62));             // mainsail (gaff)
+      x.quadraticCurveTo(X(-.44), Y(.4), X(-.43), Y(.2)); x.closePath(); x.fill();
+    }
+    x.strokeStyle = col; x.lineWidth = s * .006; x.beginPath(); x.moveTo(X(mm), Y(.7)); x.lineTo(X(-.39), Y(.625)); x.moveTo(X(mm), Y(.19)); x.lineTo(X(-.45), Y(.19)); x.stroke();
+    // the stern davits: two curved arms over the rail
+    x.lineWidth = s * .008; for (const d of [-.42, -.32]) { x.beginPath(); x.moveTo(X(d), Y(.115)); x.quadraticCurveTo(X(d), Y(.2), X(d - .03), Y(.2)); x.stroke(); }
+    if (boat) { rowboat(x, { cx: X(-.385), by: Y(.135), s: s * .14, col, flip }); }
+    else { x.lineWidth = s * .003; for (const d of [-.45, -.35]) { x.beginPath(); x.moveTo(X(d), Y(.2)); x.quadraticCurveTo(X(d + .006), Y(.15), X(d + .002), Y(.11)); x.stroke(); } }
+  }
+  if (g && lit) { g.fillStyle = '#fff'; for (const u of [-.25, -.15, .0, .12, .25]) { g.beginPath(); g.arc(X(u), Y(.06), s * .009, 0, TAU); g.fill(); }
+    g.beginPath(); g.arc(X(-.46), Y(.15), s * .012, 0, TAU); g.fill(); }
+  return { fore: [X(fm), Y(.78)], main: [X(mm), Y(.84)], davits: [X(-.37), Y(.2)] };
+}
+
+// A small rowing boat (the ship's yawl), side view. cx, by = keel centre, s = length.
+export function rowboat(x, o) {
+  const { cx, by, s, col = '#0a1110' } = o;
+  x.fillStyle = col; x.beginPath(); x.moveTo(cx - s * .5, by + s * .2); x.quadraticCurveTo(cx, by + s * .14, cx + s * .52, by + s * .24);
+  x.quadraticCurveTo(cx + s * .36, by - s * .02, cx + s * .1, by); x.lineTo(cx - s * .36, by); x.quadraticCurveTo(cx - s * .48, by + s * .06, cx - s * .5, by + s * .2); x.fill();
+}
+
+// A ship's wheel: rim, hub and eight handled spokes. o.rot turns it (radians).
+export function shipWheel(x, o) {
+  const { cx, cy, r, rot = 0, col = '#2a1c10' } = o;
+  x.save(); x.translate(cx, cy); x.rotate(rot); x.strokeStyle = col; x.fillStyle = col; x.lineCap = 'round';
+  x.lineWidth = r * .14; x.beginPath(); x.arc(0, 0, r * .78, 0, TAU); x.stroke();
+  x.lineWidth = r * .07; for (let i = 0; i < 8; i++) { const a = i * TAU / 8; x.beginPath(); x.moveTo(0, 0); x.lineTo(Math.cos(a) * r * 1.18, Math.sin(a) * r * 1.18); x.stroke();
+    x.beginPath(); x.arc(Math.cos(a) * r * 1.2, Math.sin(a) * r * 1.2, r * .07, 0, TAU); x.fill(); }
+  x.beginPath(); x.arc(0, 0, r * .2, 0, TAU); x.fill(); x.restore();
+}
+
+// A cask on its end: bulged staves and two hoops. cx, by = bottom centre; w, h. o.band = hoop colour.
+export function barrel(x, o) {
+  const { cx, by, w, h, col = '#3a2616', band = '#1a110a' } = o;
+  x.fillStyle = col; x.beginPath(); x.moveTo(cx - w * .42, by); x.quadraticCurveTo(cx - w * .56, by + h / 2, cx - w * .42, by + h);
+  x.lineTo(cx + w * .42, by + h); x.quadraticCurveTo(cx + w * .56, by + h / 2, cx + w * .42, by); x.closePath(); x.fill();
+  x.fillStyle = band; for (const v of [.18, .78]) x.fillRect(cx - w * .5, by + h * v, w, h * .06);
+}

@@ -10,7 +10,8 @@ La Ricerca aggiunge ogni giorno 3-5 voci nuove (dalle mode del momento, da Reddi
 - **Formato Reddit:** storie originali in prima o seconda persona, con il ritmo delle storie virali di Reddit: regole strane, il vicino che…, il messaggio che non doveva arrivare, il colpo di scena nell'ultima riga. Mai il testo di un post vero.
 
 ## Misteri e leggende vere
-- ⭐ **La Mary Celeste (1872)**: "In 1872, a ship was found drifting in the Atlantic. The table was set. The crew was gone." (In realtà la tavola apparecchiata è una leggenda: dillo con eleganza.)
+- ⭐ **La Mary Celeste (1872)**: "In 1872, a ship was found drifting in the Atlantic. The table was set. The crew was gone." (In realtà la tavola apparecchiata è una leggenda: dillo con eleganza.) → `productions/2026-10-31-mary-celeste`
+- **La Carroll A. Deering (1921)**: una goletta incagliata sulle secche di Diamond Shoals, il pranzo in cambusa, nessuno a bordo; il gatto di bordo era l'unico vivo. Fatto documentato (indagine dell'FBI del 1921). (dal 2026-10-31, sera)
 - ⭐ **I guardiani del faro delle Isole Flannan (1900)**: tre uomini spariti, una tavola rovesciata e un orologio fermo. Si lega alla nostra serie del faro. → `productions/2026-10-29-flannan-keepers`
 - ⭐ **Roanoke e "CROATOAN" (1590)**: una colonia intera sparita, una sola parola incisa su un palo.
 - **La danza del 1518 a Strasburgo**: centinaia di persone ballano per giorni senza potersi fermare.
@@ -33,7 +34,7 @@ La Ricerca aggiunge ogni giorno 3-5 voci nuove (dalle mode del momento, da Reddi
 - ⭐ What if you could hear every thought in a room for one minute?
 - What if the Earth stopped spinning for one second?
 - What if you woke up and everyone had forgotten you?
-- What if the ocean drained overnight?
+- What if the ocean drained overnight? ("By sunrise, you could walk to America." I fatti veri: le fosse, i relitti, l'acqua che resta nei laghi salati.) (rilanciata il 2026-10-31)
 - What if animals could talk, for one day only?
 - ⭐ What if every clock in the world stopped at the same second? (Il primo a cadere è il GPS: si lega all'orologio fermo delle Flannan.) (dal 2026-10-29) → `productions/2026-10-29-clocks-stop`
 - What if the Sun went out for eight minutes? (Nessuno se ne accorge per 8 minuti e 20 secondi: la luce è in viaggio. Poi il freddo, piano.) (dal 2026-10-29)
@@ -62,6 +63,7 @@ La Ricerca aggiunge ogni giorno 3-5 voci nuove (dalle mode del momento, da Reddi
 - **The Spare Key** (dal 2026-10-30): all'1:10 senti una chiave nella tua porta. Vivi da solo, la chiave ce l'hai tu. Poi si ferma, e una voce dice "wrong house, sorry": è la tua voce. OPEN or CALL.
 - **The Porch Light** (dal 2026-10-30): la regola di casa è lasciare la luce del portico accesa per chi torna tardi. Stanotte qualcuno la spegne da fuori. TURN IT ON or LEAVE IT.
 - ⭐ **The Last Knock** (dal 2026-10-31, Halloween): alle 23:48 la ciotola delle caramelle è vuota, poi un ultimo colpo alla porta. Un bambino con la maschera da volpe chiede una lanterna, non dolci; nella brina dietro di lui non ci sono impronte. OPEN or LIGHTS OFF.
+- **The Ghost Ship** (dal 2026-10-31, sera): alle 4:10 il tuo traghetto notturno si ferma nella nebbia. Accanto c'è un veliero con tutte le lampade accese e nessuno sul ponte. Una scialuppa vuota batte contro il vostro scafo. BOARD or STAY. (Seguito ideale del mistero Mary Celeste.)
 - **Rule 3** (dal 2026-10-29, sera, formato regole): la sirena del paese suona due volte l'anno. Stanotte ha suonato tre volte. La regola 3 dice cosa fare, ma nessuno la ricorda.
 
 - ⭐ **From: Me** (dal 2026-10-30, sera, formato telefono): alle 3:07 ricevi un messaggio dal tuo numero: "Don't open the door for me." Poi le regole, poi qualcuno bussa con la tua voce. PHONE or DOOR.

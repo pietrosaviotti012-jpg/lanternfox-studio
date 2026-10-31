@@ -1,0 +1,293 @@
+{
+ "title": "The Mary Celeste",
+ "series": "True Mysteries",
+ "format": "mystery",
+ "theme": "misteri/notte",
+ "voice": {
+  "engine": "chatterbox",
+  "preset": "cupo"
+ },
+ "captions": "pop",
+ "hud": {
+  "tag": "TRUE MYSTERY",
+  "part": "CASE 2"
+ },
+ "fx": "dust",
+ "lead": 0.4,
+ "tail": 3.4,
+ "lines": [
+  {
+   "id": "L01",
+   "text": "In 1872, a ship was found sailing itself across the Atlantic.",
+   "em": [
+    "sailing",
+    "itself"
+   ],
+   "say": "In eighteen seventy-two, a ship was found sailing itself across the Atlantic.",
+   "clock": "1872 · NORTH ATLANTIC",
+   "gap": 0.3,
+   "act": {
+    "intensity": 0.55,
+    "pace": 0.32,
+    "speed": 0.97
+   }
+  },
+  {
+   "id": "L02",
+   "text": "Ten people had been aboard, including a two-year-old girl.",
+   "em": [
+    "two-year-old"
+   ],
+   "gap": 0.3,
+   "act": {
+    "intensity": 0.45,
+    "pace": 0.32,
+    "speed": 0.95,
+    "gain_db": -1
+   }
+  },
+  {
+   "id": "L03",
+   "text": "Every one of them was gone. And nothing on the ship was broken.",
+   "em": [
+    "gone",
+    "broken"
+   ],
+   "hit": true,
+   "gap": 0.8,
+   "act": {
+    "intensity": 0.68,
+    "pace": 0.32,
+    "speed": 0.95,
+    "gain_db": 0.5
+   }
+  },
+  {
+   "id": "L04",
+   "text": "December fourth. Another ship sees her off the Azores.",
+   "em": [
+    "Azores"
+   ],
+   "clock": "4 DEC 1872 · AZORES",
+   "gap": 0.3,
+   "act": {
+    "intensity": 0.45,
+    "pace": 0.32,
+    "speed": 0.97,
+    "gain_db": -1
+   }
+  },
+  {
+   "id": "L05",
+   "text": "Her sails are half set. Nobody answers their call.",
+   "em": [
+    "nobody"
+   ],
+   "gap": 0.4,
+   "act": {
+    "intensity": 0.5,
+    "pace": 0.32,
+    "speed": 0.95,
+    "gain_db": -1
+   }
+  },
+  {
+   "id": "L06",
+   "text": "Captain Morehouse sends two men across.",
+   "em": [
+    "two"
+   ],
+   "name": {
+    "name": "DAVID MOREHOUSE",
+    "role": "captain of the Dei Gratia"
+   },
+   "gap": 0.3,
+   "act": {
+    "intensity": 0.45,
+    "pace": 0.32,
+    "speed": 0.95,
+    "gain_db": -1.5
+   }
+  },
+  {
+   "id": "L07",
+   "text": "No one on deck. No one below.",
+   "em": [
+    "below"
+   ],
+   "gap": 0.6,
+   "act": {
+    "intensity": 0.5,
+    "pace": 0.32,
+    "speed": 0.94,
+    "gain_db": -2
+   }
+  },
+  {
+   "id": "L08",
+   "text": "Six months of food and water. Clothes still folded.",
+   "em": [
+    "six",
+    "folded"
+   ],
+   "gap": 0.3,
+   "act": {
+    "intensity": 0.45,
+    "pace": 0.32,
+    "speed": 0.95,
+    "gain_db": -1.5
+   }
+  },
+  {
+   "id": "L09",
+   "text": "The cargo, 1,701 barrels of alcohol, is almost untouched.",
+   "em": [
+    "1,701"
+   ],
+   "say": "The cargo, seventeen hundred and one barrels of alcohol, is almost untouched.",
+   "gap": 0.3,
+   "act": {
+    "intensity": 0.45,
+    "pace": 0.32,
+    "speed": 0.95,
+    "gain_db": -1
+   }
+  },
+  {
+   "id": "L10",
+   "text": "Only one thing is missing. The lifeboat.",
+   "em": [
+    "lifeboat"
+   ],
+   "hit": true,
+   "gap": 0.8,
+   "act": {
+    "intensity": 0.75,
+    "pace": 0.32,
+    "speed": 0.94,
+    "gain_db": 1.5
+   }
+  },
+  {
+   "id": "L11",
+   "text": "The last note on the log slate is nine days old.",
+   "em": [
+    "nine"
+   ],
+   "clock": "25 NOV 1872 · LAST ENTRY",
+   "gap": 0.5,
+   "act": {
+    "intensity": 0.5,
+    "pace": 0.32,
+    "speed": 0.95,
+    "gain_db": -1
+   }
+  },
+  {
+   "id": "L12",
+   "text": "And the warm tea on the table? Legend. It comes from a Conan Doyle story.",
+   "em": [
+    "legend"
+   ],
+   "gap": 0.5,
+   "act": {
+    "intensity": 0.45,
+    "pace": 0.32,
+    "speed": 0.96,
+    "gain_db": -1
+   }
+  },
+  {
+   "id": "L13",
+   "text": "The best guess is a scare. Fumes from the cargo, or a leak that wasn't there.",
+   "em": [
+    "scare",
+    "fumes"
+   ],
+   "gap": 0.3,
+   "act": {
+    "intensity": 0.55,
+    "pace": 0.32,
+    "speed": 0.95
+   }
+  },
+  {
+   "id": "L14",
+   "text": "Maybe they waited in the lifeboat, on a rope behind the ship.",
+   "em": [
+    "rope"
+   ],
+   "gap": 0.4,
+   "act": {
+    "intensity": 0.45,
+    "pace": 0.32,
+    "speed": 0.95,
+    "gain_db": -2
+   }
+  },
+  {
+   "id": "L15",
+   "text": "The ship sailed on. They were never seen again.",
+   "em": [
+    "never"
+   ],
+   "gap": 0.7,
+   "act": {
+    "intensity": 0.6,
+    "pace": 0.32,
+    "speed": 0.93,
+    "gain_db": -0.5
+   }
+  },
+  {
+   "id": "L16",
+   "text": "Fumes, a false alarm, or something else? Tell us below.",
+   "em": [
+    "fumes",
+    "else"
+   ],
+   "gap": 0.2,
+   "act": {
+    "intensity": 0.55,
+    "pace": 0.32,
+    "speed": 0.97
+   }
+  }
+ ],
+ "bpm": 60,
+ "seed": 33,
+ "music": [
+  {
+   "at": "S1",
+   "mood": "storm"
+  },
+  {
+   "at": "S4",
+   "mood": "hush"
+  },
+  {
+   "at": "S9",
+   "mood": "rise"
+  },
+  {
+   "at": "S10",
+   "mood": "storm"
+  },
+  {
+   "at": "S11",
+   "mood": "hush"
+  },
+  {
+   "at": "S13",
+   "mood": "rise"
+  },
+  {
+   "at": "S14",
+   "mood": "hush"
+  },
+  {
+   "at": "S15",
+   "mood": "end"
+  }
+ ]
+}
