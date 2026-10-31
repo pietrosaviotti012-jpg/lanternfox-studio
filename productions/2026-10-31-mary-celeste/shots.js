@@ -4,13 +4,16 @@
 // sails and the wheel turning by itself, the boarding party, the open hatch, the cabin, the hold of barrels, the EMPTY DAVITS
 // (the image of the video), the log slate, the legend of the warm tea set apart on a page, the fumes, the lifeboat on its rope,
 // and the fox's lantern on a headland of the Azores as the only light at the end.
+// Redo (2026-10-31): the brigantine always under full sail and sitting IN the sea (her sheet sits just behind the sea layer
+// in front of her, the waterline a little below its top, gentler bobbing); a clearer explanation (the sextant and papers
+// taken, nine leaking barrels, the lifeboat on a rope that broke) with a new S12 on the empty sextant case; every sound
+// effect at under half its level so the narrator sits on top; wider paper signs at the end.
 // Subjects sit between 15 % and 52 % of the frame height (the series tag is above, the pop captions below).
 // Starts are anchored to narration lines (C), effects to the line timings (E.cue / E.cueEnd / E.word).
 import { layered } from './engine/kit/shot.js';
 import { fox, neighbor, foreground, cliffRich, brigantine, rowboat, shipWheel, barrel, hangLantern } from './engine/kit/motifs.js';
 import { theme } from './engine/kit/themes.js';
 import { waves, waterTop } from './engine/art.js';
-import { table } from './engine/props.js';
 import { text } from './engine/paper.js';
 import { seg, ss, lerp } from './engine/lib.js';
 
@@ -30,7 +33,7 @@ const seaNear = (col, line, base, r = .009) => x => {
 // a ship on its own sheet: the sheet's origin is the waterline, so it can bob and roll around it
 const ship = (name, s, cx, by, z, o = {}) => ({ name, z, trans: o.trans ?? .25, glow: o.lit ? 2.2 : 0, glowCol: T.glow, w: s * 1.5, h: s * 1.1, x: cx, y: by, ay: -s * .45,
   draw: x => brigantine(x, { cx: 0, by: 0, s, ...o }), glowDraw: o.lit ? g => brigantine(null, { cx: 0, by: 0, s, ...o }, g) : undefined });
-const bob = (L, n, t, a = .003, r = .025, w = 1.3) => { const m = L[n]; m.position.y = m.userData.p0.y + a * Math.sin(t * w); m.rotation.z = r * Math.sin(t * w * .8 + .7); };
+const bob = (L, n, t, a = .0015, r = .02, w = 1.3) => { const m = L[n]; m.position.y = m.userData.p0.y + a * Math.sin(t * w); m.rotation.z = r * Math.sin(t * w * .8 + .7); };
 const fog = (col, y0, seed = 1) => x => { x.fillStyle = col; for (let i = 0; i < 9; i++) { const px = -.25 + ((i * .137 + seed * .21) % .5), py = y0 + ((i * .053 + seed * .07) % .08);
   x.beginPath(); x.ellipse(px, py, .08 + (i % 3) * .03, .012 + (i % 2) * .006, 0, 0, Math.PI * 2); x.fill(); } };
 // fade a small text/sign sheet in at t0 (it rises a little as it appears)
@@ -46,32 +49,32 @@ export function SHOTS(C, DUR) {
   return [
     // 1 · The hook, already lit: the brigantine sails alone under the moon, half her sails set, nobody at the wheel. The camera
     //     trucks alongside her; on "itself" a push towards the empty stern.
-    { id: 'S1', start: 0, sfx: [{ t: 0, type: 'waves', d: end('L01') + 1, v: .7 }, { t: 0, type: 'wind', d: end('L01') + 1, v: .45 }, { t: 1.2, type: 'door-creak', v: .35 }],
+    { id: 'S1', start: 0, sfx: [{ t: 0, type: 'waves', d: end('L01') + 1, v: .32 }, { t: 0, type: 'wind', d: end('L01') + 1, v: .20 }, { t: 1.2, type: 'door-creak', v: .16 }],
       build: E => {
         const it = E.word('L01', 8);
         return layered(E, {
           light: [.05, .17, -.13], lightR: .2, lightCol: T.light, key: .7, amb: .32, sky: { stops: NIGHT, stars: 120 }, on: false,
           layers: [
             moonL(.08, .19, .018),
-            { name: 'far', z: -.115, trans: .45, draw: seaNear('#4a6264', '#587274', .03, .006) },
-            ship('ship', .15, 0, .045, -.09, { sail: SAIL, sails: 'half' }),
-            { name: 'mid', z: -.07, trans: .3, draw: seaNear('#2a3c3e', '#36494b', .02, .011) },
+            { name: 'far', z: -.115, trans: .45, draw: seaNear('#4a6264', '#587274', .075, .006) },
+            ship('ship', .15, 0, .045, -.072, { sail: SAIL, sails: 'full' }),
+            { name: 'mid', z: -.07, trans: .3, draw: seaNear('#2a3c3e', '#36494b', .048, .011) },
             { name: 'near', z: -.04, trans: .1, draw: seaNear('#121c1c', '#1d2a2a', -.06, .015) },
           ],
           glows: { moon: [[0, 1]] },
           move: { far: [[0, [0, 0, 0]], [E.dur, [-.01, 0, 0]]], mid: [[0, [0, 0, 0]], [E.dur, [-.03, 0, 0]]], near: [[0, [0, 0, 0]], [E.dur, [-.06, 0, 0]]] },
           update: (t, L) => bob(L, 'ship', t),
           cam: [[0, [-.02, .08, .46, -.01, .085, -.07]], [it, [-.01, .085, .42, -.01, .09, -.07]], [E.dur, [-.03, .09, .38, -.03, .095, -.07]]],
-          focus: -.09, aper: 14,
+          focus: -.072, aper: 14,
         });
       } },
 
     // 2 · Ten people had been aboard: New York, a warm dusk. The ten stand along the rail; on "two-year-old" the camera finds
     //     Sophia, the smallest, holding a tiny lantern. Then on "gone" they stutter and vanish, one by one, and the deck is bare.
     { id: 'S2', start: at('L02') - .25, in: { type: 'dissolve', dur: .5 },
-      sfx: [{ t: 0, type: 'bell', v: .35 }, { t: .2, type: 'waves', d: 5, v: .4 }, { t: at('L03') - at('L02') + .25 + C.L03.dur * .3, type: 'whoosh', v: .6 }],
+      sfx: [{ t: 0, type: 'bell', v: .16 }, { t: .2, type: 'waves', d: 5, v: .18 }, { t: at('L03') - at('L02') + .25 + C.L03.dur * .3, type: 'whoosh', v: .27 }],
       build: E => {
-        const girl = E.word('L02', 7), gone = E.word('L03', 5);
+        const girl = E.word('L02', 7), gone = E.word('L03', 4);
         const person = ([cx, s, col], i) => ({ name: 'p' + i, z: -.075, trans: .05, w: s * .6, h: s * 1.1, x: cx, y: .062 + s * .5, shadow: false,
           draw: x => neighbor(x, { cx: 0, by: -s * .5, s, lantern: false, col }) });
         return layered(E, {
@@ -95,31 +98,31 @@ export function SHOTS(C, DUR) {
       } },
 
     // 3 · And nothing on the ship was broken: cut wide, grey day, the ship whole and sailing on, every line in place
-    { id: 'S3', start: at('L03') + C.L03.dur * .45, in: { type: 'cut' }, sfx: [{ t: .05, type: 'boom', v: .5 }, { t: 0, type: 'wind', d: 3, v: .4 }],
+    { id: 'S3', start: at('L03') + C.L03.dur * .45, in: { type: 'cut' }, sfx: [{ t: .05, type: 'boom', v: .23 }, { t: 0, type: 'wind', d: 3, v: .18 }],
       build: E => layered(E, {
         light: [.05, .15, -.13], lightR: .3, lightCol: A.light, key: .9, amb: .45, ambCol: '#8a98a0', sky: { stops: DAY }, on: false,
         layers: [
-          { name: 'far', z: -.115, trans: .45, draw: seaNear('#6f8284', '#7c8f90', .04, .006) },
-          ship('ship', .12, .0, .05, -.095, { col: A.near, sail: SAIL, sails: 'half' }),
-          { name: 'mid', z: -.07, trans: .3, draw: seaNear('#43585a', '#506567', .025, .011) },
+          { name: 'far', z: -.115, trans: .45, draw: seaNear('#6f8284', '#7c8f90', .085, .006) },
+          ship('ship', .12, .0, .05, -.072, { col: A.near, sail: SAIL, sails: 'full' }),
+          { name: 'mid', z: -.07, trans: .3, draw: seaNear('#43585a', '#506567', .053, .011) },
           { name: 'near', z: -.04, trans: .1, draw: seaNear('#263334', '#314041', -.06, .015) },
         ],
         move: { ship: [[0, [-.01, 0, 0]], [E.dur, [.02, 0, 0]]] },
         update: (t, L) => bob(L, 'ship', t, .002, .02, 1.1),
         cam: [[0, [0, .07, .4, 0, .075, -.07]], [E.dur, [0, .08, .56, 0, .08, -.07]]],
-        focus: -.095, aper: 12, grade: { sat: .7, lift: [.01, .012, .02] },
+        focus: -.072, aper: 12, grade: { sat: .7, lift: [.01, .012, .02] },
       }) },
 
     // 4 · December 4th: through the Dei Gratia's spyglass, a round window on the grey sea; the ship swims into the circle
-    { id: 'S4', start: at('L04') - .3, in: { type: 'dissolve', dur: .5 }, sfx: [{ t: 0, type: 'waves', d: 4, v: .55 }, { t: .4, type: 'bell', v: .5 }, { t: C.L04.dur * .5, type: 'click', v: .6 }],
+    { id: 'S4', start: at('L04') - .3, in: { type: 'dissolve', dur: .5 }, sfx: [{ t: 0, type: 'waves', d: 4, v: .25 }, { t: .4, type: 'bell', v: .23 }, { t: C.L04.dur * .5, type: 'click', v: .27 }],
       build: E => {
         const az = E.word('L04', 8);
         return layered(E, {
           light: [0, .1, -.13], lightR: .3, lightCol: A.light, key: .9, amb: .45, ambCol: '#8a98a0', sky: { stops: DAY }, on: false,
           layers: [
-            { name: 'far', z: -.115, trans: .45, draw: seaNear('#6f8284', '#7c8f90', .06, .006) },
-            ship('ship', .09, -.03, .066, -.105, { col: A.near, sail: SAIL, sails: 'half' }),
-            { name: 'mid', z: -.09, trans: .3, draw: seaNear('#43585a', '#506567', .05, .01) },
+            { name: 'far', z: -.115, trans: .45, draw: seaNear('#6f8284', '#7c8f90', .095, .006) },
+            ship('ship', .09, -.03, .066, -.092, { col: A.near, sail: SAIL, sails: 'full' }),
+            { name: 'mid', z: -.09, trans: .3, draw: seaNear('#43585a', '#506567', .069, .01) },
             { name: 'glass', z: -.05, trans: .03, draw: x => { x.fillStyle = '#0d1212'; x.fillRect(-.25, -.45, .5, .9);
               x.save(); x.globalCompositeOperation = 'destination-out'; x.beginPath(); x.arc(0, .085, .085, 0, Math.PI * 2); x.fill(); x.restore();
               x.strokeStyle = '#3a3226'; x.lineWidth = .006; x.beginPath(); x.arc(0, .085, .087, 0, Math.PI * 2); x.stroke();
@@ -128,17 +131,17 @@ export function SHOTS(C, DUR) {
           move: { ship: [[0, [-.06, 0, 0]], [az, [0, 0, 0]], [E.dur, [.01, 0, 0]]], glass: [[0, [.01, -.006, 0]], [E.dur, [-.006, .004, 0]]] },
           update: (t, L) => bob(L, 'ship', t, .002, .03, 1.2),
           cam: [[0, [0, .085, .4, 0, .085, -.07]], [E.dur, [0, .085, .34, 0, .085, -.07]]],
-          focus: -.1, aper: 12, grade: { sat: .68, lift: [.01, .012, .02] },
+          focus: -.092, aper: 12, grade: { sat: .68, lift: [.01, .012, .02] },
         });
       } },
 
-    // 5 · Her sails half set: low under the foremast, the set sails pull and slacken; on the quarterdeck the wheel turns by
+    // 5 · Her sails are up: low under the foremast, the set sails pull and slacken; on the quarterdeck the wheel turns by
     //     itself, a little left, a little right. Nobody answers.
-    { id: 'S5', start: at('L05') - .3, in: { type: 'cut' }, sfx: [{ t: 0, type: 'wind', d: 4, v: .6 }, { t: .5, type: 'door-creak', v: .45 }, { t: C.L05.dur * .55 + .3, type: 'whoosh', v: .3 }],
+    { id: 'S5', start: at('L05') - .3, in: { type: 'cut' }, sfx: [{ t: 0, type: 'wind', d: 4, v: .27 }, { t: .5, type: 'door-creak', v: .20 }, { t: C.L05.dur * .55 + .3, type: 'whoosh', v: .14 }],
       build: E => layered(E, {
         light: [-.04, .16, -.13], lightR: .3, lightCol: A.light, key: .9, amb: .45, ambCol: '#8a98a0', sky: { stops: DAY }, on: false,
         layers: [
-          { name: 'rig', z: -.11, trans: .3, draw: x => brigantine(x, { cx: .1, by: -.1, s: .42, col: '#2a3436', sail: SAILD, sails: 'half' }) },
+          { name: 'rig', z: -.11, trans: .3, draw: x => brigantine(x, { cx: .1, by: -.1, s: .42, col: '#2a3436', sail: SAILD, sails: 'full' }) },
           { name: 'sail', z: -.1, trans: .35, w: .2, h: .07, x: .17, y: .13, draw: x => { x.fillStyle = SAIL; x.beginPath(); x.moveTo(-.09, .03); x.lineTo(.09, .03); x.quadraticCurveTo(.1, 0, .085, -.03); x.lineTo(-.085, -.03); x.quadraticCurveTo(-.1, 0, -.09, .03); x.fill(); } },
           { name: 'deck', z: -.07, trans: .08, draw: x => { x.fillStyle = A.near; x.fillRect(-.25, -.45, .5, .47); x.fillRect(-.25, .02, .5, .006); x.fillRect(-.1, .02, .01, .03); } },
           { name: 'wheel', z: -.06, trans: .06, w: .08, h: .08, x: -.1, y: .065, draw: x => shipWheel(x, { cx: 0, cy: 0, r: .026, col: '#2a1c10' }) },
@@ -150,16 +153,17 @@ export function SHOTS(C, DUR) {
       }) },
 
     // 6 · Captain Morehouse sends two men across: a small boat rows from the Dei Gratia (left) to the silent ship (right)
-    { id: 'S6', start: at('L06') - .3, in: { type: 'dissolve', dur: .5 }, sfx: [{ t: .3, type: 'water', d: 3.2, v: .55 }, { t: 0, type: 'waves', d: 4, v: .45 }],
+    { id: 'S6', start: at('L06') - .3, in: { type: 'dissolve', dur: .5 }, sfx: [{ t: .3, type: 'water', d: 3.2, v: .25 }, { t: 0, type: 'waves', d: 4, v: .20 }],
       build: E => layered(E, {
         light: [0, .15, -.13], lightR: .3, lightCol: A.light, key: .9, amb: .45, ambCol: '#8a98a0', sky: { stops: DAY }, on: false,
         layers: [
-          { name: 'far', z: -.115, trans: .45, draw: seaNear('#6f8284', '#7c8f90', .05, .006) },
-          ship('dg', .1, -.14, .055, -.11, { col: '#3e4c4e', sail: '#aaa592', sails: 'full', boat: true }),
-          ship('mc', .11, .12, .05, -.1, { col: A.near, sail: SAIL, sails: 'half' }),
-          { name: 'mid', z: -.085, trans: .3, draw: seaNear('#43585a', '#506567', .035, .01) },
-          { name: 'boat', z: -.08, trans: .05, w: .05, h: .04, x: -.08, y: .03, shadow: false, draw: x => { rowboat(x, { cx: 0, by: -.006, s: .03, col: '#141c1e' });
-            neighbor(x, { cx: -.006, by: -.001, s: .014, lantern: false, col: '#141c1e' }); neighbor(x, { cx: .007, by: -.001, s: .014, lantern: false, col: '#141c1e' }); } },
+          { name: 'far', z: -.115, trans: .45, draw: seaNear('#6f8284', '#7c8f90', .088, .006) },
+          ship('dg', .1, -.14, .055, -.088, { col: '#3e4c4e', sail: '#aaa592', sails: 'full', boat: true }),
+          ship('mc', .11, .12, .055, -.087, { col: A.near, sail: SAIL, sails: 'full' }),
+          { name: 'mid', z: -.085, trans: .3, draw: seaNear('#43585a', '#506567', .058, .01) },
+          { name: 'boat', z: -.08, trans: .05, w: .05, h: .04, x: -.08, y: .036, shadow: false, draw: x => { rowboat(x, { cx: 0, by: -.006, s: .03, col: '#141c1e' });
+            neighbor(x, { cx: -.006, by: -.001, s: .014, lantern: false, col: '#141c1e' }); neighbor(x, { cx: .007, by: -.001, s: .014, lantern: false, col: '#141c1e' });
+            x.fillStyle = '#43585a'; waterTop(x, { x0: -.025, x1: .025, base: -.003, amp: .0012, len: .012 }); } },   // her keel in the water
           { name: 'near', z: -.05, trans: .1, draw: seaNear('#263334', '#314041', -.04, .015) },
         ],
         move: { boat: [[0, [0, 0, 0]], [E.dur, [.13, .005, 0]]] },
@@ -170,7 +174,7 @@ export function SHOTS(C, DUR) {
 
     // 7 · No one on deck. No one below: the empty deck, a coil of rope, the forehatch open; on "below" the camera drops into the
     //     square of dark under the hatch
-    { id: 'S7', start: at('L07') - .3, in: { type: 'cut' }, sfx: [{ t: .2, type: 'steps', n: 5, every: .38, v: .6 }, { t: C.L07.dur * .55 + .3, type: 'door-creak', v: .6 }],
+    { id: 'S7', start: at('L07') - .3, in: { type: 'cut' }, sfx: [{ t: .2, type: 'steps', n: 5, every: .38, v: .27 }, { t: C.L07.dur * .55 + .3, type: 'door-creak', v: .27 }],
       build: E => {
         const below = E.word('L07', 6) - .3;
         return layered(E, {
@@ -192,7 +196,7 @@ export function SHOTS(C, DUR) {
 
     // 8 · Six months of food and water, clothes still folded: the cabin by the light of a porthole — sacks and casks on the
     //     shelf, a water butt, a neat stack of shirts on the bunk. A slow pan from the stores to the bunk.
-    { id: 'S8', start: at('L08') - .3, in: { type: 'dissolve', dur: .5 }, sfx: [{ t: .2, type: 'room', d: 4, v: .4 }, { t: .3, type: 'water', d: 3, v: .25 }],
+    { id: 'S8', start: at('L08') - .3, in: { type: 'dissolve', dur: .5 }, sfx: [{ t: .2, type: 'room', d: 4, v: .18 }, { t: .3, type: 'water', d: 3, v: .11 }],
       build: E => layered(E, {
         light: [.06, .14, -.12], lightR: .14, lightCol: A.light, key: .65, amb: .32, ambCol: '#7a6a58', sky: { stops: HOLD }, on: false,
         layers: [
@@ -217,7 +221,7 @@ export function SHOTS(C, DUR) {
 
     // 9 · 1,701 barrels of alcohol: the hold, rows of casks going back into the dark, "1701 BBLS" chalked on a beam; a low
     //     truck along the rows by a hanging lantern
-    { id: 'S9', start: at('L09') - .3, in: { type: 'cut' }, sfx: [{ t: .2, type: 'door-creak', v: .4 }, { t: 0, type: 'room', d: 4, v: .35 }],
+    { id: 'S9', start: at('L09') - .3, in: { type: 'cut' }, sfx: [{ t: .2, type: 'door-creak', v: .18 }, { t: 0, type: 'room', d: 4, v: .16 }],
       build: E => {
         const n = E.word('L09', 2);
         const rows = (z, col, by, w, h, seed, name) => ({ name, z, trans: .06, draw: x => { for (let r = 0; r < 2; r++) for (let i = 0; i < 12; i++) barrel(x, { cx: -.25 + (i + (r ? .5 : 0)) * w * 1.02 + (seed % 3) * .004, by: by + r * h * .92, w, h, col: r ? col : '#2a1c10', band: '#120c06' }); } });
@@ -240,7 +244,7 @@ export function SHOTS(C, DUR) {
 
     // 10 · Only one thing is missing: the stern, grey sky, two empty davits with their ropes swinging. On "lifeboat" a pale
     //      outline of the boat flickers where it should hang, and is gone. (The image of the video.)
-    { id: 'S10', start: at('L10') - .3, in: { type: 'cut' }, sfx: [{ t: 0, type: 'wind', d: 4, v: .7 }, { t: .3 + C.L10.dur * .6, type: 'boom', v: .7 }, { t: .3 + C.L10.dur * .62, type: 'whoosh', v: .5 }],
+    { id: 'S10', start: at('L10') - .3, in: { type: 'cut' }, sfx: [{ t: 0, type: 'wind', d: 4, v: .32 }, { t: .3 + C.L10.dur * .6, type: 'boom', v: .32 }, { t: .3 + C.L10.dur * .62, type: 'whoosh', v: .23 }],
       build: E => {
         const lb = E.word('L10', 6) - .1;
         return layered(E, {
@@ -266,9 +270,9 @@ export function SHOTS(C, DUR) {
 
     // 11 · The last note on the log slate: the slate in chalk by lantern light — 25 Nov, 8 a.m., Santa Maria six miles off.
     //      A slow push; the lantern swings; on "nine" the date is underlined.
-    { id: 'S11', start: at('L11') - .3, in: { type: 'dissolve', dur: .6 }, sfx: [{ t: .3, type: 'clock', d: 3.5, v: .4 }, { t: .3 + C.L11.dur * .7, type: 'click', v: .5 }],
+    { id: 'S11', start: at('L11') - .3, in: { type: 'dissolve', dur: .6 }, sfx: [{ t: .3, type: 'clock', d: 3.5, v: .18 }, { t: .3 + C.L11.dur * .7, type: 'click', v: .23 }],
       build: E => {
-        const nine = E.word('L11', 8);
+        const nine = E.word('L11', 5);
         return layered(E, {
           light: [.08, .16, -.11], lightR: .11, lightCol: '#ffc878', key: .6, amb: .3, ambCol: '#6a5038', sky: { stops: HOLD }, on: false,
           layers: [
@@ -288,40 +292,46 @@ export function SHOTS(C, DUR) {
         });
       } },
 
-    // 12 · The legend, set apart: a cream page from the 1884 story, a table laid, a cup still steaming; a red LEGEND stamp
-    //      lands on "Legend"
-    { id: 'S12', start: at('L12') - .3, in: { type: 'dissolve', dur: .6 }, sfx: [{ t: .2, type: 'paper', v: .8 }, { t: .3 + C.L12.dur * .5, type: 'paper', v: 1.4 }],
+    // 12 · The sextant and the papers were gone too: the captain's desk by lantern light, an open sextant case on it, its red
+    //      velvet empty. A pale outline of the sextant flickers in the velvet and a ghost of the papers beside it; on "gone"
+    //      both stutter out. On "purpose" a slow push into the empty case: they took the tools to find land.
+    { id: 'S12', start: at('L12') - .3, in: { type: 'dissolve', dur: .6 }, sfx: [{ t: .25, type: 'click', v: .2 }, { t: .3 + C.L12.dur * .45, type: 'paper', v: .18 }],
       build: E => {
-        const stamp = E.word('L12', 7) - .05;
+        const gone = E.word('L12', 7) - .1, purp = E.word('L12', 12);
+        const ghost = (x, line) => { x.strokeStyle = line; x.lineWidth = .002; x.lineCap = 'round';
+          x.save(); x.translate(-.045, .012);   // the sextant: a 60° frame, its arc, the index arm and the little telescope
+          x.beginPath(); x.moveTo(0, .028); x.lineTo(.05 * Math.cos(Math.PI * 1.5 - .52), .028 + .05 * Math.sin(Math.PI * 1.5 - .52));
+          x.arc(0, .028, .05, Math.PI * 1.5 - .52, Math.PI * 1.5 + .52); x.closePath(); x.stroke();
+          x.beginPath(); x.moveTo(0, .028); x.lineTo(.012, -.02); x.stroke(); x.strokeRect(-.02, .004, .03, .007); x.restore();
+          x.strokeRect(.055, -.03, .06, .075); x.strokeRect(.06, -.025, .06, .075);   // the ship's papers
+          for (let k = 0; k < 5; k++) { x.beginPath(); x.moveTo(.068, .03 - k * .011); x.lineTo(.11, .03 - k * .011); x.stroke(); } };
         return layered(E, {
-          light: [0, .08, -.13], lightR: .3, lightCol: '#ffe2ae', key: .9, amb: .45, ambCol: '#a08a6a', keyCol: '#ffe8c8', sky: { stops: PAGE }, on: false,
+          light: [.08, .16, -.11], lightR: .11, lightCol: '#ffc878', key: .6, amb: .3, ambCol: '#6a5038', sky: { stops: HOLD }, on: false,
           layers: [
-            { name: 'head', z: -.12, trans: .1, w: .26, h: .06, x: 0, y: .2, shadow: false, draw: x => { text(x, 'J. HABAKUK JEPHSON\'S STATEMENT', 0, .008, .012, '"Cormorant"', { fill: '#5a3e24', weight: 700 }); text(x, 'a story by A. Conan Doyle · 1884', 0, -.012, .01, '"Cormorant"', { fill: '#7a5a38', weight: 500 }); } },
-            { name: 'room', z: -.1, trans: .1, draw: x => { x.fillStyle = '#6b4a2c'; x.fillRect(-.25, -.45, .5, .45); x.fillStyle = '#5a3d24'; for (let i = 0; i < 9; i++) x.fillRect(-.25 + i * .06, .0, .003, .16); } },
-            { name: 'table', z: -.08, trans: .05, draw: x => { x.fillStyle = '#2b1a0e'; table(x, 0, .06, .17, .07);
-              x.fillStyle = '#e6d3a8'; for (const px of [-.06, .05]) { x.beginPath(); x.ellipse(px, .066, .016, .004, 0, 0, Math.PI * 2); x.fill(); }
-              x.fillStyle = '#efe4c8'; x.fillRect(-.01, .064, .016, .014); x.strokeStyle = '#efe4c8'; x.lineWidth = .002; x.beginPath(); x.arc(.009, .071, .004, -1.4, 1.4); x.stroke(); } },
-            { name: 'steam', z: -.078, trans: .4, w: .04, h: .06, x: -.002, y: .1, shadow: false, recv: false, draw: x => { x.strokeStyle = 'rgba(255,248,230,.85)'; x.lineWidth = .0018; x.lineCap = 'round';
-              for (const d of [-.004, .004]) { x.beginPath(); x.moveTo(d, -.02); x.bezierCurveTo(d + .006, -.008, d - .006, .004, d + .003, .02); x.stroke(); } } },
-            { name: 'stamp', z: -.05, trans: .2, w: .16, h: .06, x: .03, y: .14, shadow: false, recv: false, finish: { rim: .5 },
-              draw: x => { x.strokeStyle = '#b3302a'; x.lineWidth = .003; x.strokeRect(-.065, -.02, .13, .04); text(x, 'LEGEND', 0, -.001, .026, '"Anton"', { fill: '#b3302a' }); } },
-            { name: 'fg', z: -.03, trans: .04, draw: x => { x.fillStyle = '#3a2614'; x.fillRect(-.25, -.45, .5, .38); x.fillStyle = '#2b1a0e'; x.fillRect(-.25, -.07, .5, .006); } },
+            { name: 'desk', z: -.1, trans: .05, draw: x => { x.fillStyle = '#3a2a1c'; x.fillRect(-.25, -.45, .5, .9); x.fillStyle = '#2e2116'; for (let i = 0; i < 9; i++) x.fillRect(-.25 + i * .06, -.45, .002, .9);
+              x.fillStyle = '#4a3624'; x.fillRect(.035, .045, .07, .085); } },   // a clean patch of wood where the papers lay
+            { name: 'case', z: -.09, trans: .04, draw: x => { x.fillStyle = '#2a1a0e'; x.fillRect(-.12, .148, .15, .05);   // lid, open
+              x.fillStyle = '#3a2414'; x.fillRect(-.12, .05, .15, .095); x.fillStyle = '#5a1e1e'; x.fillRect(-.112, .058, .134, .079);
+              x.fillStyle = '#4a1818'; x.beginPath(); x.moveTo(-.075, .12); x.lineTo(-.075 + .05 * Math.cos(Math.PI * 1.5 - .52) * .56, .12 - .05 * .86); x.lineTo(-.075 + .05 * Math.cos(Math.PI * 1.5 + .52) * .56, .12 - .05 * .86); x.closePath(); x.fill();
+              x.fillStyle = '#b08a4a'; x.fillRect(-.05, .143, .012, .006); } },
+            { name: 'ghost', z: -.085, trans: .5, glow: 1.6, glowCol: '#f2e2c0', w: .28, h: .14, x: -.03, y: .09, shadow: false, recv: false,
+              draw: x => { x.setLineDash([.006, .004]); ghost(x, '#efe6cf'); }, glowDraw: g => ghost(g, '#fff') },
+            { name: 'lamp', z: -.07, trans: .3, glow: 3, glowCol: '#ffc878', w: .04, h: .08, x: .1, y: .21, ay: .035, shadow: false,
+              draw: x => hangLantern(x, { cx: 0, cy: -.015, r: .01, string: .03 }), glowDraw: g => hangLantern(null, { cx: 0, cy: -.015, r: .01 }, g) },
           ],
-          update: (t, L) => {
-            const k = seg(t, stamp, stamp + .18), s = L.stamp;
-            s.visible = k > 0; s.scale.setScalar(1 + 1.2 * (1 - ss(k))); s.rotation.z = -.12;
-            L.steam.position.y = L.steam.userData.p0.y + .004 * Math.sin(t * 1.6); L.steam.material.color.setScalar(1 - .7 * ss(seg(t, stamp, stamp + .6)));
-          },
-          cam: [[0, [-.04, .08, .44, -.03, .08, -.07]], [stamp, [.02, .09, .46, .02, .09, -.07]], [E.dur, [.02, .1, .5, .02, .1, -.07]]],
-          focus: -.08, aper: 18, grade: { sat: .9, gain: [1.06, 1, .9] },
+          glows: { lamp: [[0, 1]], ghost: [[0, .9], [gone, .9], [gone + .6, 0]] }, flicker: ['lamp'],
+          update: (t, L, S) => { L.lamp.rotation.z = .1 * Math.sin(t * 1.2); S.U.uLight.value.set(.1 + .015 * Math.sin(t * 1.2), .18, -.07);
+            const k = seg(t, gone - .1, gone + .6); L.ghost.visible = k < 1 && (k === 0 || Math.sin(t * 60) > -.3); },
+          cam: [[0, [.0, .11, .4, .0, .1, -.07]], [gone, [-.02, .105, .36, -.02, .1, -.07]], [purp, [-.03, .1, .34, -.03, .1, -.07]], [E.dur, [-.04, .1, .27, -.045, .1, -.07]]],
+          focus: -.09, aper: 20, grade: { sat: .85 },
         });
       } },
 
-    // 13 · The best guess is a scare: back in the hold, the lantern swings, and pale fumes curl up from the casks; on "fumes"
+    // 13 · Nine barrels had leaked: back in the hold, the lantern swings, and pale fumes curl up from the casks; on "explode"
     //      the light turns red (allarme) and the camera jolts closer
-    { id: 'S13', start: at('L13') - .3, in: { type: 'cut' }, sfx: [{ t: .2, type: 'rumble', d: 3, v: .5 }, { t: .3 + C.L13.dur * .55, type: 'whoosh', v: .5 }, { t: .3 + C.L13.dur * .8, type: 'door-creak', v: .5 }],
+    { id: 'S13', start: at('L13') - .3, in: { type: 'cut' }, sfx: [{ t: .2, type: 'rumble', d: 3, v: .23 }, { t: .3 + C.L13.dur * .55, type: 'whoosh', v: .23 }, { t: .3 + C.L13.dur * .8, type: 'door-creak', v: .23 }],
       build: E => {
-        const fm = E.word('L13', 6) - .1;
+        const fm = E.word('L13', 7) - .1;   // 'explode'
         const fumes = (name, z, x0, seed) => ({ name, z, trans: .5, w: .5, h: .3, x: x0, y: .06, shadow: false, recv: false,
           draw: x => { x.strokeStyle = 'rgba(220,214,190,.55)'; x.lineWidth = .004; x.lineCap = 'round'; for (let i = 0; i < 7; i++) { const px = -.2 + i * .065 + seed * .01;
             x.beginPath(); x.moveTo(px, -.1); x.bezierCurveTo(px + .02, -.05, px - .025, .0, px + .01, .06); x.bezierCurveTo(px + .03, .09, px - .01, .12, px + .005, .14); x.stroke(); } } });
@@ -344,23 +354,23 @@ export function SHOTS(C, DUR) {
         });
       } },
 
-    // 14 · Maybe they waited in the lifeboat, on a rope behind the ship: night fog, the ship sails right, the little boat
-    //      trails behind on a long line, ten tiny figures in it. "The ship sailed on": the line parts, the ship slides away
+    // 14 · The lifeboat on a rope behind the ship: night fog, the ship sails right, the little boat
+    //      trails behind on a long line, ten tiny figures in it. On "broke" the line parts, the ship slides away
     //      into the fog, the boat drifts and fades. "Never seen again": only sea.
     { id: 'S14', start: at('L14') - .3, in: { type: 'dissolve', dur: .7 },
-      sfx: [{ t: 0, type: 'waves', d: end('L15') - at('L14') + 1, v: .55 }, { t: 0, type: 'wind', d: end('L15') - at('L14') + 1, v: .4 }, { t: at('L15') - at('L14') + .1, type: 'crack', v: .55 }, { t: at('L15') - at('L14') + 1.2, type: 'foghorn', v: .35 }],
+      sfx: [{ t: 0, type: 'waves', d: end('L15') - at('L14') + 1, v: .25 }, { t: 0, type: 'wind', d: end('L15') - at('L14') + 1, v: .18 }, { t: at('L15') - at('L14') + .3 + C.L15.dur * .22, type: 'crack', v: .25 }, { t: at('L15') - at('L14') + 1.2, type: 'foghorn', v: .16 }],
       build: E => {
-        const snap = E.cue('L15') - .1, nev = E.word('L15', 6);
+        const snap = E.word('L15', 3) - .05, nev = E.word('L15', 10);   // 'broke', 'never'
         return layered(E, {
           light: [.02, .17, -.13], lightR: .24, lightCol: T.light, key: .65, amb: .32, sky: { stops: NIGHT, stars: 40 }, on: false,
           layers: [
             moonL(-.07, .2, .016),
-            { name: 'far', z: -.115, trans: .45, draw: seaNear('#4a6264', '#587274', .03, .006) },
-            ship('ship', .1, .07, .045, -.1, { sail: SAIL, sails: 'half' }),
-            { name: 'line', z: -.095, trans: .2, w: .16, h: .02, x: -.03, y: .049, shadow: false, recv: false, draw: x => { x.strokeStyle = '#141c1e'; x.lineWidth = .0012; x.beginPath(); x.moveTo(-.07, .0); x.quadraticCurveTo(0, -.004, .07, .002); x.stroke(); } },
-            { name: 'boat', z: -.095, trans: .1, w: .05, h: .03, x: -.11, y: .048, shadow: false, draw: x => { rowboat(x, { cx: 0, by: -.006, s: .032, col: '#141c1e' });
+            { name: 'far', z: -.115, trans: .45, draw: seaNear('#4a6264', '#587274', .075, .006) },
+            ship('ship', .1, .07, .045, -.078, { sail: SAIL, sails: 'full' }),
+            { name: 'line', z: -.077, trans: .2, w: .16, h: .02, x: -.03, y: .05, shadow: false, recv: false, draw: x => { x.strokeStyle = '#141c1e'; x.lineWidth = .0012; x.beginPath(); x.moveTo(-.07, .0); x.quadraticCurveTo(0, -.004, .07, .002); x.stroke(); } },
+            { name: 'boat', z: -.077, trans: .1, w: .05, h: .03, x: -.11, y: .051, shadow: false, draw: x => { rowboat(x, { cx: 0, by: -.006, s: .032, col: '#141c1e' });
               x.fillStyle = '#141c1e'; for (let i = 0; i < 6; i++) { x.beginPath(); x.arc(-.011 + i * .0045, .0005 + (i % 2) * .001, .0016, 0, Math.PI * 2); x.fill(); } } },
-            { name: 'mid', z: -.075, trans: .3, draw: seaNear('#2a3c3e', '#36494b', .02, .011) },
+            { name: 'mid', z: -.075, trans: .3, draw: seaNear('#2a3c3e', '#36494b', .048, .011) },
             { name: 'fog', z: -.06, trans: .5, shadow: false, recv: false, draw: fog('rgba(170,186,184,.22)', .03, 2) },
             { name: 'near', z: -.04, trans: .1, draw: seaNear('#121c1c', '#1d2a2a', -.06, .015) },
           ],
@@ -370,27 +380,27 @@ export function SHOTS(C, DUR) {
           update: (t, L) => { bob(L, 'ship', t, .002, .02); bob(L, 'boat', t, .002, .08, 1.7); L.line.visible = t < snap;
             const k = ss(seg(t, nev - .3, nev + .9)); L.boat.material.color.setScalar(1 - k); L.boat.visible = k < .99; },
           cam: [[0, [-.03, .07, .4, -.03, .07, -.07]], [snap, [-.02, .07, .42, -.02, .07, -.07]], [E.dur, [-.06, .08, .52, -.06, .075, -.07]]],
-          focus: -.095, aper: 14, grade: { sat: .75 },
+          focus: -.078, aper: 14, grade: { sat: .75 },
         });
       } },
 
     // 15 · Your theory: night on a headland of Santa Maria, the fox with its lantern, the only light, watching the ship sail
-    //      off half-rigged on the horizon. FUMES, FALSE ALARM and SOMETHING ELSE? are cut paper, then the title.
-    { id: 'S15', start: at('L16') - .3, in: { type: 'dissolve', dur: .7 }, sfx: [{ t: 0, type: 'waves', d: DUR - at('L16') + .5, v: .5 }, { t: .3, type: 'chime', v: .5 }, { t: .5, type: 'paper' }, { t: 1.4, type: 'paper' }, { t: 2.3, type: 'paper' }],
+    //      off half-rigged on the horizon. FUMES, BROKEN ROPE and SOMETHING ELSE? are cut paper, on wide signs, then the title.
+    { id: 'S15', start: at('L16') - .3, in: { type: 'dissolve', dur: .7 }, sfx: [{ t: 0, type: 'waves', d: DUR - at('L16') + .5, v: .23 }, { t: .3, type: 'chime', v: .23 }, { t: .5, type: 'paper', v: .14 }, { t: 1.4, type: 'paper', v: .14 }, { t: 2.3, type: 'paper', v: .14 }],
       build: E => {
-        const a = E.word('L16', 0), b = E.word('L16', 2), c = E.word('L16', 4) - .2, titleAt = E.cueEnd('L16') + .7;
-        const sign = (name, s, cx, cy, w, fill) => ({ name, z: -.05, trans: .25, w: w + .01, h: .034, x: cx, y: cy, shadow: false, recv: false, finish: { rim: .6 },
-          draw: x => { x.fillStyle = '#f1dbac'; x.fillRect(-w / 2, -.014, w, .028); text(x, s, 0, -.0005, .015, '"Anton"', { fill }); } });
+        const a = E.word('L16', 0), b = E.word('L16', 2), c = E.word('L16', 5) - .2, titleAt = E.cueEnd('L16') + .7;
+        const sign = (name, s, cx, cy, w, fill) => ({ name, z: -.05, trans: .25, w: w + .01, h: .04, x: cx, y: cy, shadow: false, recv: false, finish: { rim: .6 },
+          draw: x => { x.fillStyle = '#f1dbac'; x.fillRect(-w / 2, -.017, w, .034); text(x, s, 0, -.0005, .015, '"Anton"', { fill }); } });
         return layered(E, {
           light: [-.06, .07, -.12], lightR: .12, lightCol: '#ffc878', key: .5, amb: .26, sky: { stops: NIGHT, stars: 170 }, on: false,
           layers: [
             moonL(.1, .21, .014),
-            ship('ship', .05, .1, .085, -.12, { sail: SAIL, sails: 'half', trans: .4 }),
+            ship('ship', .05, .1, .077, -.112, { sail: SAIL, sails: 'full', trans: .4 }),
             { name: 'far', z: -.11, trans: .4, draw: seaNear('#4a6264', '#587274', .08, .007) },
             { name: 'head', z: -.075, trans: .15, draw: x => { x.fillStyle = T.mid; cliffRich(x, { x0: -.26, x1: .04, base: -.06, top: .05, side: -1, strata: '#2a3c3e' }); } },
             { name: 'fox', z: -.068, trans: .2, glow: 3.2, w: .14, h: .14, x: -.07, y: .1, ay: -.05,
               draw: x => fox(x, { cx: 0, by: -.05, s: .07, lantern: true }), glowDraw: g => fox(null, { cx: 0, by: -.05, s: .07, lantern: true }, g) },
-            sign('A', 'FUMES', -.06, .2, .05, '#2a3c3e'), sign('B', 'FALSE ALARM', .05, .2, .08, '#2a3c3e'), sign('C', 'SOMETHING ELSE?', 0, .163, .1, '#e8743b'),
+            sign('A', 'FUMES', -.075, .2, .07, '#2a3c3e'), sign('B', 'BROKEN ROPE', .045, .2, .13, '#2a3c3e'), sign('C', 'SOMETHING ELSE?', 0, .158, .17, '#e8743b'),
             { name: 'title', z: -.045, trans: .3, w: .18, h: .04, x: 0, y: .245, shadow: false, recv: false, finish: { rim: .6 },
               draw: x => text(x, 'Lantern Fox Tales', 0, 0, .013, '"Cormorant"', { fill: '#f1dbac', weight: 600 }) },
             { name: 'fg', z: -.025, trans: .03, draw: x => { x.fillStyle = '#070b0b'; foreground(x, { base: -.12, seed: 13, reedsAt: [-.2, -.05], reedsN: 18, stones: 5 }); } },

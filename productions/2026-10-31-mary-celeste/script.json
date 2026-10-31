@@ -29,7 +29,8 @@
    "act": {
     "intensity": 0.55,
     "pace": 0.32,
-    "speed": 0.97
+    "speed": 0.97,
+    "gain_db": 1.5
    }
   },
   {
@@ -43,23 +44,23 @@
     "intensity": 0.45,
     "pace": 0.32,
     "speed": 0.95,
-    "gain_db": -1
+    "gain_db": 0.5
    }
   },
   {
    "id": "L03",
-   "text": "Every one of them was gone. And nothing on the ship was broken.",
+   "text": "All of them were gone. And nothing on the ship was broken.",
    "em": [
     "gone",
     "broken"
    ],
    "hit": true,
-   "gap": 0.8,
+   "gap": 0.7,
    "act": {
-    "intensity": 0.68,
+    "intensity": 0.65,
     "pace": 0.32,
     "speed": 0.95,
-    "gain_db": 0.5
+    "gain_db": 2.0
    }
   },
   {
@@ -74,12 +75,12 @@
     "intensity": 0.45,
     "pace": 0.32,
     "speed": 0.97,
-    "gain_db": -1
+    "gain_db": 0.5
    }
   },
   {
    "id": "L05",
-   "text": "Her sails are half set. Nobody answers their call.",
+   "text": "Her sails are up. Nobody answers.",
    "em": [
     "nobody"
    ],
@@ -88,7 +89,7 @@
     "intensity": 0.5,
     "pace": 0.32,
     "speed": 0.95,
-    "gain_db": -1
+    "gain_db": 0.5
    }
   },
   {
@@ -106,7 +107,7 @@
     "intensity": 0.45,
     "pace": 0.32,
     "speed": 0.95,
-    "gain_db": -1.5
+    "gain_db": 0.5
    }
   },
   {
@@ -119,8 +120,8 @@
    "act": {
     "intensity": 0.5,
     "pace": 0.32,
-    "speed": 0.94,
-    "gain_db": -2
+    "speed": 0.95,
+    "gain_db": 0.5
    }
   },
   {
@@ -135,22 +136,22 @@
     "intensity": 0.45,
     "pace": 0.32,
     "speed": 0.95,
-    "gain_db": -1.5
+    "gain_db": 0.5
    }
   },
   {
    "id": "L09",
-   "text": "The cargo, 1,701 barrels of alcohol, is almost untouched.",
+   "text": "1,701 barrels of alcohol, almost untouched.",
    "em": [
     "1,701"
    ],
-   "say": "The cargo, seventeen hundred and one barrels of alcohol, is almost untouched.",
+   "say": "Seventeen hundred and one barrels of alcohol, almost untouched.",
    "gap": 0.3,
    "act": {
     "intensity": 0.45,
     "pace": 0.32,
     "speed": 0.95,
-    "gain_db": -1
+    "gain_db": 0.5
    }
   },
   {
@@ -160,17 +161,17 @@
     "lifeboat"
    ],
    "hit": true,
-   "gap": 0.8,
+   "gap": 0.7,
    "act": {
-    "intensity": 0.75,
+    "intensity": 0.65,
     "pace": 0.32,
-    "speed": 0.94,
-    "gain_db": 1.5
+    "speed": 0.95,
+    "gain_db": 2
    }
   },
   {
    "id": "L11",
-   "text": "The last note on the log slate is nine days old.",
+   "text": "The last log entry is nine days old.",
    "em": [
     "nine"
    ],
@@ -180,41 +181,44 @@
     "intensity": 0.5,
     "pace": 0.32,
     "speed": 0.95,
-    "gain_db": -1
+    "gain_db": 0.5
    }
   },
   {
    "id": "L12",
-   "text": "And the warm tea on the table? Legend. It comes from a Conan Doyle story.",
+   "text": "The sextant and the ship's papers were gone too. They left on purpose.",
    "em": [
-    "legend"
+    "sextant",
+    "purpose"
    ],
    "gap": 0.5,
    "act": {
     "intensity": 0.45,
     "pace": 0.32,
     "speed": 0.96,
-    "gain_db": -1
+    "gain_db": 0.5
    }
   },
   {
    "id": "L13",
-   "text": "The best guess is a scare. Fumes from the cargo, or a leak that wasn't there.",
+   "text": "Nine barrels had leaked. Alcohol fumes can explode.",
    "em": [
-    "scare",
-    "fumes"
+    "fumes",
+    "explode"
    ],
-   "gap": 0.3,
+   "gap": 0.4,
    "act": {
-    "intensity": 0.55,
+    "intensity": 0.6,
     "pace": 0.32,
-    "speed": 0.95
+    "speed": 0.95,
+    "gain_db": 1.5
    }
   },
   {
    "id": "L14",
-   "text": "Maybe they waited in the lifeboat, on a rope behind the ship.",
+   "text": "So the captain may have moved everyone to the lifeboat, on a rope.",
    "em": [
+    "lifeboat",
     "rope"
    ],
    "gap": 0.4,
@@ -222,26 +226,27 @@
     "intensity": 0.45,
     "pace": 0.32,
     "speed": 0.95,
-    "gain_db": -2
+    "gain_db": 0.5
    }
   },
   {
    "id": "L15",
-   "text": "The ship sailed on. They were never seen again.",
+   "text": "If the rope broke, the ship sailed on. They were never seen again.",
    "em": [
+    "broke",
     "never"
    ],
    "gap": 0.7,
    "act": {
     "intensity": 0.6,
     "pace": 0.32,
-    "speed": 0.93,
-    "gain_db": -0.5
+    "speed": 0.95,
+    "gain_db": 1.0
    }
   },
   {
    "id": "L16",
-   "text": "Fumes, a false alarm, or something else? Tell us below.",
+   "text": "Fumes, a broken rope, or something else? Tell us below.",
    "em": [
     "fumes",
     "else"
@@ -250,7 +255,8 @@
    "act": {
     "intensity": 0.55,
     "pace": 0.32,
-    "speed": 0.97
+    "speed": 0.97,
+    "gain_db": 2
    }
   }
  ],
