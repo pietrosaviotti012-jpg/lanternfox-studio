@@ -61,7 +61,7 @@ async function publishOk(request, env) {
   const auth = request.headers.get("Authorization") || "";
   return (Boolean(env.PUBLISH_KEY) && (await same(auth, `Bearer ${env.PUBLISH_KEY}`))) || bearerOk(request, env);
 }
-const PLATFORMS = ["instagram", "youtube"];   // sent by the routine; TikTok by hand until the TikTok app passes review (then add "tiktok")
+const PLATFORMS = ["instagram", "youtube"];   // sent by the routine; TikTok is sent by the Office through Zernio (tiktokPost)
 const sent = (p) => p?.url || p?.draft;
 // a video goes out once per platform, even when "Pubblica adesso" and the scheduled run meet:
 //   - "Pubblica adesso" reserves the video for 2 hours (item.now_at): the scheduled run does not see it in its queue;
@@ -77,7 +77,7 @@ function claim(item, platform, now) {
 }
 // who works when (UTC; the routines and GitHub's clock can start a few minutes late). Keep it in step with the routines.
 const SCHEDULE = [
-  { utc: "05:00", dept: "ricerca", who: "Produzione", what: "Video 1 di oggi: ricerca, storia, copione, regia, poi il render (circa 50 min)", slot: 1 },
+  { utc: "05:00", dept: "ricerca", who: "Produzione", what: "Video 1 di oggi: ricerca, storia, copione, regia, poi la lavorazione (circa 50 min)", slot: 1 },
   { utc: "07:00", dept: "community", who: "Community", what: "Risponde ai commenti" },
   { utc: "11:00", dept: "ricerca", who: "Produzione", what: "Video 2 di oggi (circa 50 min)", slot: 2 },
   { utc: "13:00", dept: "community", who: "Community", what: "Risponde ai commenti" },
@@ -399,16 +399,16 @@ async function restart(env, state, kind, target, now) {
   const which = RESTART[target], name = target[0].toUpperCase() + target.slice(1), video = state.video?.id || state.chain?.failed?.id;
   let ok, how;
   if (which === "RENDER") {
-    if (!video) return { ok: false, how: `${name}: non so quale video rifare` };
+    if (!video) return { ok: false, how: `Reparto ${name}: non so quale video rifare` };
     op({ kind: "rerender", target: video, dept: target }); ok = true;
-    how = `${name}: il guardiano rifà il render di "${video}" ${env.GH_DISPATCH_TOKEN ? "tra un minuto" : "entro un quarto d'ora"} (le righe di voce già buone restano)`;
+    how = `Reparto ${name}: il guardiano di GitHub rifà la lavorazione di "${video}" ${env.GH_DISPATCH_TOKEN ? "tra un minuto" : "entro un quarto d'ora"} (le righe di voce già buone restano)`;
   } else if (which === "PRODUCE") {
     const text = `Ripartenza dall'ufficio dal reparto ${name}. ${video ? `Se productions/ contiene già il video "${video}", non ricominciare da capo: riprendilo da ${name} (tieni quello che i reparti prima hanno già fatto), rifai da lì in poi e fai partire il render.` : "Produci il video di questo turno."}`;
     ok = fired(env.ROUTINE_PRODUCE_TOKEN ? await fireRoutine(env, "PRODUCE", text) : await fireRoutine(env, "REDO", `idea: ${text}\nrequest: restart-${now.slice(0, 16)}`));
-    how = ok ? `${name} è ripartito: la Produzione riprende ${video ? `"${video}" da lì` : "il video del turno"}` : `Non riesco a far ripartire ${name}`;
+    how = ok ? `Il reparto ${name} è ripartito: la Produzione riprende ${video ? `"${video}" da lì` : "il video del turno"}` : `Non riesco a far ripartire il reparto ${name}`;
   } else {
     ok = fired(await fireRoutine(env, which, `Ripartenza dall'ufficio: il reparto ${name} si era fermato, rifai il giro di adesso.`));
-    how = ok ? `${name} è ripartito` : env[`ROUTINE_${which}_TOKEN`] ? `Non riesco a far ripartire ${name}` : `${name} riparte da solo al prossimo giro: manca la sua chiave`;
+    how = ok ? `Il reparto ${name} è ripartito` : env[`ROUTINE_${which}_TOKEN`] ? `Non riesco a far ripartire il reparto ${name}` : `Il reparto ${name} riparte da solo al prossimo giro: manca la sua chiave`;
   }
   if (ok) state.departments[target] = { ...(state.departments[target] || {}), status: "working", task: "Ripartito dall'ufficio", updated_at: now };
   return { ok, how };
@@ -499,7 +499,7 @@ async function guardRound(env, state, now) {
   const stuck = Object.keys(RESTART).filter((id) => deps[id]?.status === "working" && deps[id].updated_at && t - Date.parse(deps[id].updated_at) > 2 * 3600e3);
   let renderDone = false;
   for (const id of [...broken, ...stuck]) {
-    seen.push(`${label(id)} ${broken.includes(id) ? "fermo" : "bloccato da oltre due ore"}`);
+    seen.push(`reparto ${label(id)} ${broken.includes(id) ? "fermo" : "bloccato da oltre due ore"}`);
     if (RENDER_DEPTS.includes(id)) { if (renderDone) continue; renderDone = true; }
     const r = await restart(env, state, "dept", id, now);
     done.push(r.how);
@@ -533,34 +533,33 @@ async function wakeWatchman(env) {
   return r.status;
 }
 
-// One public TikTok post through Zernio, to see if its app may do what ours may not: the first video that goes out after this moment, once only.
-// The result comes back on the next round of the watch, and the user decides whether to keep it.
-const ZERNIO = "https://zernio.com/api/v1", ZERNIO_TIKTOK = "6ae4e55fdfe8162fad8b43f0", TIKTOK_TRIAL_FROM = "2026-10-31T15:50:00Z";
-async function tiktokTrial(env, state, item) {
-  const t = state.tiktok_trial ||= {}, now = new Date().toISOString();
-  if (t.video || !env.ZERNIO_API_KEY || Date.now() < Date.parse(TIKTOK_TRIAL_FROM)) return;
-  t.video = item.id; t.at = now;
+// TikTok goes through Zernio, whose app TikTok allows to publish: when a video first goes out, the Office sends it too, once.
+// The answer comes back on a round of the watch; a refused video waits for "Riprova su TikTok" in Approva.
+const ZERNIO = "https://zernio.com/api/v1", ZERNIO_TIKTOK = "6ae4e55fdfe8162fad8b43f0";
+async function tiktokPost(env, state, item) {
+  if (!env.ZERNIO_API_KEY) return;
   const r = await fetch(`${ZERNIO}/posts`, { method: "POST", headers: { Authorization: `Bearer ${env.ZERNIO_API_KEY}`, "Content-Type": "application/json" }, body: JSON.stringify({
     content: clip(item.caption, 2200), mediaItems: [{ type: "video", url: item.preview_url }], platforms: [{ platform: "tiktok", accountId: ZERNIO_TIKTOK }], publishNow: true,
     tiktokSettings: { draft: false, privacy_level: "PUBLIC_TO_EVERYONE", allow_comment: true, allow_duet: false, allow_stitch: false, videoMadeWithAi: true, content_preview_confirmed: true, express_consent_given: true } }) }).catch((e) => ({ ok: false, json: async () => ({ error: e.message }) }));
   const j = await r.json().catch(() => ({})), post = j.post || j;
-  if (r.ok && (post._id || post.id)) t.post_id = post._id || post.id;
-  else await tiktokTrialEnd(env, state, item, "", clip(j.error || j.message || "Zernio non ha accettato il video", 200));
+  if (r.ok && (post._id || post.id)) item.tiktok_post = { id: post._id || post.id, at: new Date().toISOString() };
+  else await tiktokEnd(env, state, item, "", clip(j.error || j.message || "Zernio non ha accettato il video", 200));
 }
-async function tiktokTrialCheck(env, state) {
-  const t = state.tiktok_trial;
-  if (!t?.post_id || t.result) return;
-  const j = await fetch(`${ZERNIO}/posts/${t.post_id}`, { headers: { Authorization: `Bearer ${env.ZERNIO_API_KEY}` } }).then((r) => r.json()).catch(() => ({}));
-  const post = j.post || j, p = post.platforms?.[0] || {}, item = state.queue.find((q) => q.id === t.video);
-  if (post.status === "published" || p.status === "published") await tiktokTrialEnd(env, state, item, p.platformPostUrl || "https://www.tiktok.com/@lanternfoxtales", "");
-  else if (/fail|error/i.test(`${post.status} ${p.status}`)) await tiktokTrialEnd(env, state, item, "", clip(p.errorMessage || p.error || post.error || "TikTok ha rifiutato il video", 200));
+async function tiktokCheck(env, state) {
+  for (const q of state.queue.filter((x) => x.tiktok_post)) {
+    const j = await fetch(`${ZERNIO}/posts/${q.tiktok_post.id}`, { headers: { Authorization: `Bearer ${env.ZERNIO_API_KEY}` } }).then((r) => r.json()).catch(() => ({}));
+    const post = j.post || j, p = post.platforms?.[0] || {};
+    if (post.status === "published" || p.status === "published") await tiktokEnd(env, state, q, p.platformPostUrl || "https://www.tiktok.com/@lanternfoxtales", "");
+    else if (/fail|error/i.test(`${post.status} ${p.status}`)) await tiktokEnd(env, state, q, "", clip(p.errorMessage || p.error || post.error || "TikTok ha rifiutato il video", 200));
+    else if (Date.now() - Date.parse(q.tiktok_post.at) > 3600e3) await tiktokEnd(env, state, q, "", "nessuna risposta da Zernio dopo un'ora");
+  }
 }
-async function tiktokTrialEnd(env, state, item, url, error) {
-  const now = new Date().toISOString(), title = item?.title || "il video";
-  state.tiktok_trial.result = error ? "refused" : "published"; state.tiktok_trial.detail = error || url;
-  if (item && !error) item.published = { ...(item.published || {}), tiktok: { url: clip(url, 400), at: now } };
-  state.log.push({ at: now, dept: "pubblicazione", status: error ? "error" : "done", text: error ? `Prova TikTok con Zernio non riuscita: ${error}` : `Prova TikTok riuscita: "${title}" è uscito con Zernio` });
-  await pushAll(env, error ? { title: "Prova TikTok non riuscita", body: error, url: "/" } : { title: "Uscito su TikTok con Zernio", body: title, url });
+async function tiktokEnd(env, state, item, url, error) {
+  const now = new Date().toISOString();
+  delete item.tiktok_post;
+  item.published = { ...(item.published || {}), tiktok: error ? { error, at: now } : { url: clip(url, 400), at: now } };
+  state.log.push({ at: now, dept: "pubblicazione", status: error ? "error" : "done", text: error ? `TikTok: non pubblicato (${error})` : `Uscito su TikTok: "${item.title}"` });
+  await pushAll(env, error ? { title: "TikTok: pubblicazione non riuscita", body: error, url: "/#approva", urgent: true } : { title: "Uscito su TikTok", body: item.title, url });
 }
 
 async function publishNow(env, state, item, why) {
@@ -577,7 +576,7 @@ async function publishNow(env, state, item, why) {
 async function watch(env) {
   const state = await loadState(env), now = new Date().toISOString(), t = Date.now(), before = JSON.stringify(state);
   tidy(state, now);
-  await tiktokTrialCheck(env, state);
+  await tiktokCheck(env, state);
   for (const q of state.queue) if (q.status === "approved" && q.publish_exact && t >= Date.parse(q.publish_after)
     && !(q.now_at && t - Date.parse(q.now_at) < RESERVE_MS) && PLATFORMS.some((p) => !sent(q.published?.[p]))) await publishNow(env, state, q, "All'orario che hai scelto esce");
   const done = state.auto_guard?.day === romeDay(t) ? state.auto_guard.depts : [];
@@ -814,7 +813,7 @@ export default {
         const text = Object.entries(counts).map(([k, v]) => `${k} ${v}`).join(" · ");
         item.part_votes = { counts, winner: clip(body.winner, 30), by: body.by === "fox" ? "fox" : "comments", at: now };
         const part2 = item.title.replace(/Part 1\s*$/i, "Part 2"), row = state.calendar.find((c) => c.title === part2);
-        const note = body.by === "fox" ? `Nessuna maggioranza (${text || "nessun voto"}): sceglie la volpe, ${item.part_votes.winner}` : `Scelta del pubblico: ${item.part_votes.winner} (${text})`;
+        const note = body.by === "fox" ? `Nessuna maggioranza (${text || "nessun voto"}): la volpe sceglie ${item.part_votes.winner}` : `Scelta del pubblico: ${item.part_votes.winner} (${text})`;
         if (row) row.note = note;
         state.log.push({ at: now, dept: "soggetto", status: "done", text: `${part2}: ${note}` });
         await saveState(env, state);
@@ -857,7 +856,7 @@ export default {
         best: best ? { title: best.title, views: total(best) } : null,
         followers: { ...(state.stats?.followers || {}), ...(Number.isFinite(ytFollowers) ? { youtube: ytFollowers } : {}), ...(instagram?.followers != null ? { instagram: +instagram.followers } : {}) } };
       state.stats = stats;
-      state.departments.statistiche = { status: ytError ? "error" : "done", task: ytError ? `YouTube: ${ytError}` : `Contati ${videos.length} video: ${stats.views_7d} visualizzazioni in 7 giorni`, output: "", updated_at: now };
+      state.departments.statistiche = { status: ytError ? "error" : "done", task: ytError ? `YouTube: ${ytError}` : `Contati ${videos.length} video: ${stats.views_7d.toLocaleString("it-IT")} visualizzazioni in 7 giorni`, output: "", updated_at: now };
       state.log.push({ at: now, dept: "statistiche", status: ytError ? "error" : "done", text: state.departments.statistiche.task });
       await saveState(env, state);
       return json({ ok: !ytError, stats });
@@ -909,7 +908,7 @@ export default {
       state.log.push({ at: now, dept: "pubblicazione", status: error ? "error" : "done", text: error ? `${name}: non pubblicato (${clip(error, 120)})` : draft ? `${name}: "${item.title}" è nelle bozze, da pubblicare dall'app` : `Uscito su ${name}: "${item.title}"` });
       const done = PLATFORMS.every((p) => sent(item.published[p]));
       planParts(state);
-      if (!error && !draft && link) await tiktokTrial(env, state, item);
+      if (!error && !draft && link && !item.published.tiktok && !item.tiktok_post) await tiktokPost(env, state, item);
       if (done) {
         item.status = "published";
         const date = now.slice(0, 10);
@@ -1119,7 +1118,7 @@ export default {
       if (when) item.publish_after = when; else delete item.publish_after;
       item.publish_exact = Boolean(when && exact);
       calendarPut(state, { date: outDate(env, item), title: item.title, status: "approved" });
-      state.log.push({ at: new Date().toISOString(), dept: "pubblicazione", status: "done", text: `"${item.title}": hai cambiato l'orario di uscita (${outDate(env, item)})` });
+      state.log.push({ at: new Date().toISOString(), dept: "pubblicazione", status: "done", text: `"${item.title}": hai cambiato l'orario di uscita (${new Date(outDate(env, item) + "T12:00:00Z").toLocaleDateString("it-IT", { day: "numeric", month: "long" })})` });
       await saveState(env, state);
       return json({ ok: true });
     }
@@ -1176,12 +1175,12 @@ export default {
       let item;
       if ((request.headers.get("Content-Type") || "").startsWith("video/")) {
         const buf = await request.arrayBuffer();
-        if (buf.byteLength > 24e6) return json({ error: "il video è più grande di 24 MB: manda il link" }, 413);
+        if (buf.byteLength > 24e6) return json({ error: "Il video è più grande di 24 MB: manda il link" }, 413);
         await env.DATA.put("ex:" + id, buf, { expirationTtl: 14 * 86400 });
         item = { id, file: true, note: clip(url.searchParams.get("note"), 300), name: clip(url.searchParams.get("name"), 80) };
       } else {
         const { url: link, note } = await request.json().catch(() => ({}));
-        if (!/^https:\/\/(www\.)?(instagram\.com|tiktok\.com|vm\.tiktok\.com|youtube\.com|youtu\.be)\//.test(link || "")) return json({ error: "serve un link di Instagram, TikTok o YouTube" }, 400);
+        if (!/^https:\/\/(www\.)?(instagram\.com|tiktok\.com|vm\.tiktok\.com|youtube\.com|youtu\.be)\//.test(link || "")) return json({ error: "Serve un link di Instagram, TikTok o YouTube" }, 400);
         item = { id, url: clip(link, 300), note: clip(note, 300) };
       }
       const state = await loadState(env);
@@ -1207,7 +1206,7 @@ export default {
     }
     if (url.pathname === "/idea" && request.method === "POST") {
       const text = clip(String((await request.json()).text || "").trim(), 600);
-      if (text.length < 8) return json({ error: "scrivi un'idea un po' più lunga" }, 400);
+      if (text.length < 8) return json({ error: "Scrivi un'idea un po' più lunga" }, 400);
       const state = await loadState(env);
       const now = new Date().toISOString();
       const idea = { id: "idea-" + now.replace(/\D/g, "").slice(0, 14), text, at: now, status: "sent" };
@@ -1221,6 +1220,16 @@ export default {
       return json({ ok, idea }, ok ? 200 : 502);
     }
     // "Pubblica adesso": an approved video goes out now instead of waiting for the evening slot
+    // "Riprova su TikTok" in Approva, after a refusal
+    if (url.pathname === "/publish/tiktok" && request.method === "POST") {
+      const { id } = await request.json().catch(() => ({}));
+      const state = await loadState(env), item = state.queue.find((q) => q.id === id);
+      if (!item?.published?.tiktok?.error) return json({ error: "niente da riprovare" }, 404);
+      delete item.published.tiktok;
+      await tiktokPost(env, state, item);
+      await saveState(env, state);
+      return json({ ok: Boolean(item.tiktok_post) }, item.tiktok_post ? 200 : 502);
+    }
     if (url.pathname === "/publish/now" && request.method === "POST") {
       const { id } = await request.json();
       const state = await loadState(env);

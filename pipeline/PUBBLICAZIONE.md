@@ -6,9 +6,9 @@ l'utente ha approvato nell'Ufficio con "Pubblica".
 **Una sola storia per giro**, così le due del giorno escono a ore diverse:
 - se il prompt ha un blocco routine-fire-payload "Pubblica adesso: <id>", pubblica quella;
 - altrimenti la prima della coda, cioè la più vecchia fra le approvate;
-- fa eccezione una storia già uscita su una piattaforma e non sull'altra: finiscila prima di cominciarne una nuova. TikTok per ora lo pubblica l'utente a mano: l'app TikTok non è verificata
-(errore `unaudited_client_can_only_post_to_private_accounts`, e le bozze restano ferme in `PROCESSING_UPLOAD`).
-Il passo 3b vale solo quando la coda elenca `tiktok` in `platforms`.
+- fa eccezione una storia già uscita su una piattaforma e non sull'altra: finiscila prima di cominciarne una nuova.
+
+**TikTok non lo tocchi:** quando segnali la prima piattaforma, l'Ufficio manda il video a TikTok da solo, con Zernio.
 
 I valori `OFFICE_URL` e `PUBLISH_KEY` sono nel prompt della routine. La chiave può solo leggere la coda e segnare i video come pubblicati. Non scriverle mai in file, commit o messaggi.
 
@@ -58,15 +58,6 @@ y = requests.post(OFFICE_URL + "/publish/youtube", headers=H, json={"id": ID}, t
 ```
 Poi segnala come sempre al passo 4 (con `y["url"]` oppure con `y["error"]`).
 
-## 3b. TikTok, nelle bozze (connettore Composio, account `tiktok_upgive-apse` = Lantern Fox Tales)
-Nel `COMPOSIO_REMOTE_WORKBENCH`, riusando il file già caricato per YouTube (`up["s3key"]`; se manca, scaricalo allo stesso modo):
-```python
-res, err = run_composio_tool("TIKTOK_UPLOAD_VIDEO", {
-  "file_to_upload": {"name": "film.mp4", "mimetype": "video/mp4", "s3key": up["s3key"]},
-  "publish": False, "is_aigc": True}, account="tiktok_upgive-apse")
-```
-Se `res["data"]["upload_completed"]` è vero, il video è nelle bozze: segnala `{"id": ID, "platform": "tiktok", "draft": true}`.
-Lo stato su TikTok resta `PROCESSING_UPLOAD` finché l'utente non apre la bozza: è normale, non aspettare e non ricaricarlo.
 
 ## 4. Segnala all'Ufficio, una piattaforma per volta (sempre dal banco di lavoro)
 ```python

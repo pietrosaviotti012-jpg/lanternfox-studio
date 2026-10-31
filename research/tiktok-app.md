@@ -16,3 +16,5 @@
 **Da scartare:** i programmi che usano i cookie e simulano il browser (per esempio tiktok-uploader). I termini di TikTok vietano gli script automatici, e il rischio è perdere il profilo. Zapier e Make non hanno un'azione per caricare video su TikTok.
 
 Zernio è la prima cosa da provare. Tra gli altri, Buffer è il più adatto, ma l'account dovrebbe intestarlo un adulto. I termini provati sono quelli del 2023; ne esiste una versione del 2025. Non è stato provato nessun servizio.
+
+**Esito (2026-10-31):** il post pubblico con Zernio è riuscito (What If the Moon Disappeared Tonight?). Da ora ogni video esce su TikTok da solo, inviato dall'Ufficio. Le bozze non portano la didascalia e non provano niente sull'audit.

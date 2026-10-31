@@ -7,7 +7,7 @@
 const INSIDE = {
   ricerca: "Sulla bacheca ci sono le storie più viste della settimana, collegate con lo spago rosso. Orlo le passa una a una con la lente.",
   soggetto: "Nello schedario ci sono le idee per le storie. Tito ne pesca una dal cassetto e la posa sulla scrivania.",
-  copione: "Lino batte a macchina: il foglio si riempie riga dopo riga, con l'aggancio in cima.",
+  copione: "Lino batte a macchina: il foglio si riempie riga dopo riga, con il gancio in cima.",
   regia: "Sul pannello dello storyboard le scene si accendono una dopo l'altra, nell'ordine del film.",
   animazione: "Sul tavolo luminoso Pip fa scorrere gli strati di carta: è così che si muove la scena.",
   voce: "Davanti al microfono Cantù legge il copione; l'onda della voce si alza e si abbassa con le parole.",
@@ -236,7 +236,7 @@ const BUILD = {
     I.box(0.66, 0.42, 0.05, 0x23262e, -0.35, 1.08, -0.78, g);
     const scr = I.sheet(0.6, 0.36, 256, () => {}, g); scr.position.set(-0.35, 1.08, -0.75);
     const list = I.sheet(0.55, 0.7, 192, () => {}, g); list.position.set(0.55, 1.15, -1.1);
-    const CHECKS = ["Aggancio in 2 s", "Voce chiara", "Sottotitoli a tempo", "Volume giusto"];
+    const CHECKS = ["Gancio in 2 s", "Voce chiara", "Sottotitoli a tempo", "Volume giusto"];
     let lastN = -1, frame = 0;
     const drawList = (n) => list.userData.redraw((x, W, H) => {
       x.fillStyle = "#fbf3e2"; x.fillRect(0, 0, W, H); x.fillStyle = "#1a1d2a"; x.font = "700 17px Georgia, serif"; x.fillText("Controlli", 14, 28);

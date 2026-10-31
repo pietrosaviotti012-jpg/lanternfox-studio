@@ -8,6 +8,7 @@ P = sys.argv[1]
 film = os.path.join(P, "out", "film.mp4")
 script = json.load(open(os.path.join(P, "script.json"), encoding="utf8"))
 checks = []
+it = lambda v: f"{v:.1f}".replace(".", ",")   # the Office speaks Italian: decimal comma
 def add(name, ok, detail):
     checks.append({"name": name, "ok": bool(ok), "detail": detail})
 
@@ -22,7 +23,7 @@ add("Durata", 30 <= dur <= 100, f"{dur:.0f} secondi (va bene tra 30 e 100)")
 # loudness: −14 LUFS ± 1
 m = re.findall(r"I:\s+(-?[\d.]+) LUFS", ff("-af", "ebur128", "-vn"))
 if m:
-    add("Volume", abs(float(m[-1]) + 14) <= 1, f"{float(m[-1]):.1f} LUFS (obiettivo −14 ± 1)")
+    add("Volume", abs(float(m[-1]) + 14) <= 1, f"{it(float(m[-1]))} LUFS (obiettivo −14 ± 1)")
 
 # brightness twice a second: YAVG is 16 on pure black. The last seconds (end card) can be dark.
 out = subprocess.run(["ffmpeg", "-hide_banner", "-i", film, "-vf", "fps=2,scale=108:-1,signalstats,metadata=print:file=-", "-an", "-f", "null", "-"], capture_output=True, text=True).stdout
@@ -35,12 +36,12 @@ for i, v in enumerate(y + [255]):
         if run >= 4 and start / 2 < dur - 5:   # two seconds or more
             dark.append((start / 2, run / 2))
         run = 0
-add("Scene buie", not dark, "nessuna scena quasi nera" if not dark else "; ".join(f"quasi nero per {d:.1f} s da {s:.0f} s" for s, d in dark[:4]))
+add("Scene buie", not dark, "nessuna scena quasi nera" if not dark else "; ".join(f"quasi nero per {it(d)} secondi dal secondo {s:.0f}" for s, d in dark[:4]))
 
 # the hook: something on screen and the voice under way within two seconds
 lead = float(script.get("lead", 1.4))
 first = y[:4]
-add("Gancio", lead <= 2 and (not first or max(first) >= 22), f"la voce parte a {lead:.1f} s" + ("" if not first or max(first) >= 22 else ", ma i primi 2 secondi sono neri"))
+add("Gancio", lead <= 2 and (not first or max(first) >= 22), f"la voce parte dopo {it(lead)} secondi" + ("" if not first or max(first) >= 22 else ", ma i primi 2 secondi sono neri"))
 
 # the words: Whisper on the final mix must find the lines over music and effects
 try:

@@ -177,7 +177,7 @@ jobs:
           python tools/quality.py "$P" || echo '{"ok":false,"problems":["Il controllo non è riuscito"],"checks":[]}' > "$P/out/quality.json"
           node -e "
             const q = require('./' + process.env.P + '/out/quality.json');
-            console.log(JSON.stringify({ dept: 'qualita', status: 'done', task: q.ok ? 'Tutto a posto: ' + q.checks.length + ' controlli superati' : q.problems.length + ' cose da guardare: ' + q.problems[0] }));
+            console.log(JSON.stringify({ dept: 'qualita', status: 'done', task: q.ok ? 'Tutto a posto: ' + q.checks.length + ' controlli superati' : (q.problems.length === 1 ? '1 cosa' : q.problems.length + ' cose') + ' da guardare: ' + q.problems[0] }));
           " > qdept.json
           node tools/office.mjs "$(cat qdept.json)"
       - name: Release (public link for the platforms)
@@ -228,5 +228,5 @@ jobs:
             node tools/office.mjs "{\"chain\":{\"id\":\"$ID\",\"ok\":true,\"url\":\"$RUN_URL\"}}"
           elif [ "$1 $2 $3" != "cancelled cancelled cancelled" ] && ! echo "$RESULTS" | grep -q cancelled; then
             STEP=voce; [ "$1" = success ] && STEP=animazione; [ "$2" = success ] && STEP=montaggio
-            node tools/office.mjs "{\"chain\":{\"id\":\"${ID:-?}\",\"ok\":false,\"step\":\"$STEP\",\"url\":\"$RUN_URL\"}}" "{\"dept\":\"$STEP\",\"status\":\"error\",\"task\":\"Il render di ${ID:-un video} si è fermato qui: puoi farlo ripartire dall'ufficio\"}"
+            node tools/office.mjs "{\"chain\":{\"id\":\"${ID:-?}\",\"ok\":false,\"step\":\"$STEP\",\"url\":\"$RUN_URL\"}}" "{\"dept\":\"$STEP\",\"status\":\"error\",\"task\":\"La lavorazione di ${ID:-un video} si è fermata qui: puoi farla ripartire dall'ufficio\"}"
           fi

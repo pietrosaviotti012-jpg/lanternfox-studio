@@ -629,13 +629,13 @@ const PHASES = [
   { title: "L'idea", depts: ["ricerca", "soggetto"],
     text: "Si sceglie la storia: da quello che sta funzionando adesso, oppure dall'idea che scrivi tu nella sezione Idea." },
   { title: "La scrittura", depts: ["copione", "regia"],
-    text: "Claude scrive l'aggancio dei primi secondi e le righe con il tono di ogni frase, poi disegna le scene di carta." },
+    text: "Claude scrive il gancio dei primi secondi e le righe con il tono di ogni frase, poi disegna le scene di carta." },
   { title: "La produzione in cloud", depts: ["voce", "animazione", "musica", "montaggio", "qualita"],
-    text: "Il narratore registra riga per riga, sei macchine disegnano i fotogrammi, arrivano carillon e suoni, poi il montaggio e il controllo. Circa 25 minuti." },
+    text: "Il narratore registra riga per riga, sei macchine disegnano i fotogrammi, arrivano musica e suoni, poi il montaggio e il controllo. Circa 25 minuti." },
   { title: "Decidi tu", depts: ["revisione"],
     text: "Guardi il video in Approva: Pubblica, oppure Rifai con una nota su cosa cambiare." },
   { title: "L'uscita", depts: ["pubblicazione", "community", "statistiche"],
-    text: "Alle 23:00, o subito con Pubblica adesso, esce su Instagram e YouTube (TikTok a mano); poi risposte ai commenti e numeri della sera." },
+    text: "All'orario scelto, o subito con Pubblica adesso, esce su Instagram, YouTube e TikTok; poi risposte ai commenti e numeri della sera." },
 ];
 
 // how long each house usually works on one video (minutes, from the real runs): the bar and the "verso le…" come from here
@@ -778,7 +778,7 @@ function attachFilms(queue) {
     if (demo) { v.src = url; continue; }
     if (films.has(url)) { v.src = films.get(url); continue; }
     bar.hidden = false;
-    filmBlob(url, (k) => { bar.querySelector("i").style.width = Math.round(k * 100) + "%"; bar.querySelector("b").textContent = `Scarico il video… ${Math.round(k * 100)}%`; })
+    filmBlob(url, (k) => { bar.querySelector("i").style.width = Math.round(k * 100) + "%"; bar.querySelector("b").textContent = `Carico il video… ${Math.round(k * 100)}%`; })
       .then((blob) => { const o = URL.createObjectURL(blob); films.set(url, o); bar.hidden = true;
         for (const w of document.querySelectorAll("#queue video[data-film]")) if (w.dataset.film === url) w.src = o; })
       .catch(() => { bar.hidden = true; v.preload = "metadata"; v.src = url; });   // no cache: plays streaming, as before
@@ -789,34 +789,6 @@ function attachFilms(queue) {
   }).catch(() => {});
 }
 
-// "Scarica": on a phone the share sheet with the file ("Salva video" puts it in the gallery); elsewhere a normal download
-const dlButton = (q) => q.preview_url ? `<button class="btn" data-dl="${esc(q.id)}" aria-label="Scarica il video">Scarica</button>` : "";
-async function saveFilm(q, b) {
-  if (!q) return;
-  const name = (q.title || q.id).replace(/[^\w\- ]+/g, "").trim().replace(/\s+/g, "-") + ".mp4";
-  if (demo) { toast("Nella prova non c'è un file da scaricare"); return; }
-  try {
-    // iPhone opens the share sheet only right after a tap: if the file is not ready yet, the first tap prepares it
-    // and the second one saves it
-    const file = saveFilm.ready?.[q.id];
-    if (file && navigator.canShare?.({ files: [file] })) { await navigator.share({ files: [file], title: q.title }); b.textContent = "Scarica"; return; }
-    b.disabled = true; b.textContent = "Preparo…";
-    const url = filmUrl(q, "film.mp4");
-    const blob = films.has(url) ? await (await fetch(films.get(url))).blob() : await filmBlob(url, (k) => { b.textContent = `Scarico ${Math.round(k * 100)}%`; });
-    const f = new File([blob], name, { type: "video/mp4" });
-    b.disabled = false;
-    if (navigator.canShare?.({ files: [f] })) {
-      (saveFilm.ready ||= {})[q.id] = f;
-      b.textContent = "Salva sul telefono";
-      try { await navigator.share({ files: [f], title: q.title }); b.textContent = "Scarica"; }
-      catch (err) { if (err?.name !== "AbortError") toast("Pronto: tocca di nuovo per salvarlo"); }
-      return;
-    }
-    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name;
-    document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 30000);
-    b.textContent = "Scarica";
-  } catch (err) { b.disabled = false; b.textContent = "Scarica"; if (err?.name !== "AbortError") toast("Non riesco a scaricarlo: riprova"); }
-}
 
 function reviewCard(q) {
   // the film comes through the Office (/media/…) so it plays on iPhone too, and is downloaded whole
@@ -831,7 +803,7 @@ function reviewCard(q) {
     ? `<label for="note-${esc(q.id)}" class="note">Se va rifatto, cosa cambiare</label>
        <textarea id="note-${esc(q.id)}" placeholder="Per esempio: la voce più lenta nel finale"></textarea>
        <p class="note" style="margin:0 0 8px">Se approvi esce ${esc(whenText(nextSlot(Date.now())))}. Potrai cambiare l'orario subito dopo.</p>
-       <div class="row"><button class="btn primary" data-approve="${esc(q.id)}">Pubblica</button><button class="btn" data-redo="${esc(q.id)}">Rifai</button>${dlButton(q)}</div>`
+       <div class="row"><button class="btn primary" data-approve="${esc(q.id)}">Pubblica</button><button class="btn" data-redo="${esc(q.id)}">Rifai</button></div>`
     : q.status === "redo" ? `<p class="decided">Da rifare (chiesto alle ${fmtTime(q.decided_at)})${q.note ? `: ${esc(q.note)}` : ""}</p><p class="note" style="margin:0">La Regia sistema il copione e le scene, poi la nuova versione arriva qui in circa mezz'ora.</p>`
     : publishedBlock(q);
   const no = q.n ? `<span class="vno">Video ${q.n} del ${new Date(q.day + "T12:00:00").toLocaleDateString("it-IT", { day: "numeric", month: "short" })}</span>` : "";
@@ -861,7 +833,7 @@ function todayCount(exceptId) {
   return out + waiting;
 }
 
-// After "Pubblica": when it goes out and where it already is; TikTok arrives in the drafts and the user taps Publish
+// After "Pubblica": when it goes out and where it already is
 // what the Controllo qualità found on this film
 function qualityBlock(q) {
   const k = q.quality;
@@ -875,28 +847,25 @@ function publishedBlock(q) {
   // the slot it waits for (one story per slot), or the time the user chose
   const at = outAt(q), local = whenText(at), later = Date.parse(q.publish_after || 0) > Date.now();
   const row = (key, name) => pub[key]?.url ? `<li><a href="${esc(pub[key].url)}" target="_blank" rel="noopener">${name}: uscito ↗</a></li>`
-    : pub[key]?.draft ? `<li>${name}: nelle bozze</li>`
-    : pub[key]?.error ? `<li>${name}: non riuscito, riprovo al prossimo giro</li>` : `<li>${name}: esce ${local}</li>`;
+    : pub[key]?.error ? `<li>${name}: non riuscito${key === "tiktok" ? "" : ", riprovo al prossimo giro"}</li>`
+    : key === "tiktok" && q.tiktok_post ? `<li>${name}: in uscita</li>` : `<li>${name}: esce ${local}</li>`;
   const edit = q.status === "approved" ? `<details class="edit"><summary>Modifica titolo e didascalia</summary>
     <label class="note" for="t-${esc(q.id)}">Titolo</label><input id="t-${esc(q.id)}" class="field" style="min-height:0" maxlength="120" value="${esc(q.title)}">
     <label class="note" for="c-${esc(q.id)}">Didascalia (con gli hashtag)</label><textarea id="c-${esc(q.id)}" class="field" maxlength="2200">${esc(q.caption || "")}</textarea>
     <div class="row"><button class="btn primary" data-edit="${esc(q.id)}">Salva le modifiche</button></div></details>` : "";
   const now = edit + `<div class="row">${q.status === "approved" ? `<button class="btn primary" data-now="${esc(q.id)}">Pubblica adesso</button>
-` : ""}${dlButton(q)}</div>`;
+` : ""}</div>`;
   // the time it goes out, written big, and how to change it: the next slots with one tap, or any time
   const slots = []; for (let s = nextSlot(Date.now()), k = 0; k < 4; k++, s = nextSlot(s.getTime() + 6 * 60e3)) slots.push(s);
-  const out = q.status === "approved" ? `<div class="outbox"><span class="note">Andrà online</span><b>${esc(whenLong(at))}</b><span class="note">${inMin(at)}, su Instagram e YouTube</span>
+  const out = q.status === "approved" ? `<div class="outbox"><span class="note">Andrà online</span><b>${esc(whenLong(at))}</b><span class="note">${inMin(at)}, su Instagram, YouTube e TikTok</span>
     <details class="edit"><summary>Cambia orario</summary><div class="row">${slots.map((s) => `<button class="btn${Math.abs(s - at) < 60e3 ? " primary" : ""}" data-when="${esc(q.id)}" data-after="${s.toISOString()}">${esc(whenText(s))}</button>`).join("")}</div>
     <label class="note" for="w-${esc(q.id)}">Oppure scegli giorno e ora (fino a 8 giorni)</label><input id="w-${esc(q.id)}" class="field" style="min-height:0" type="datetime-local" value="${inputTime(at)}" min="${inputTime(new Date())}" max="${inputTime(new Date(Date.now() + 7.9 * 864e5))}">
     <div class="row"><button class="btn primary" data-whenat="${esc(q.id)}">Salva questo orario</button></div>
     <p class="note" style="margin:8px 0 0">Un orario scelto da te parte entro 10 minuti da quell'ora.</p></details></div>` : "";
   return `<p class="decided">${q.status === "published" ? "Pubblicato" : "Approvato"} alle ${fmtTime(q.decided_at)}</p>
-    ${out}<ul class="chips">${row("instagram", "Instagram")}${row("youtube", "YouTube")}${pub.tiktok ? row("tiktok", "TikTok") : ""}</ul>${now}
-    ${pub.tiktok?.url ? "" : pub.tiktok?.draft ? `<p class="note" style="margin:0 0 8px">Su TikTok il video è nelle bozze: apri l'app, tocca la notifica, incolla la didascalia e premi Pubblica.</p>
-    <div class="row"><button class="btn" data-copy="${esc(q.id)}">Copia didascalia</button></div>`
-    : `<p class="note" style="margin:0 0 8px">TikTok per ora si pubblica a mano: apri il video, salvalo e caricalo dall'app con la didascalia.</p>
-    <div class="row"><a class="btn" href="${filmUrl(q, "film.mp4")}" target="_blank" rel="noopener" style="text-decoration:none">Apri il video</a>
-    <button class="btn" data-copy="${esc(q.id)}">Copia didascalia</button></div>`}`;
+    ${out}<ul class="chips">${row("instagram", "Instagram")}${row("youtube", "YouTube")}${pub.tiktok || q.tiktok_post || q.status === "approved" ? row("tiktok", "TikTok") : ""}</ul>${now}
+    ${pub.tiktok?.error ? `<p class="note" style="margin:0 0 8px">TikTok non ha accettato il video: ${esc(pub.tiktok.error)}</p>
+    <div class="row"><button class="btn" data-tiktok="${esc(q.id)}">Riprova su TikTok</button></div>` : ""}`;
 }
 
 function renderDays() {
@@ -927,8 +896,8 @@ function workLinks(id) {
   const gh = `https://github.com/${L.repo}`, a = (href, text) => `<a class="btn" href="${esc(href)}" target="_blank" rel="noopener" style="text-decoration:none">${text}</a>`;
   if (w === "RENDER") {
     const f = state.chain?.failed;
-    return a(f?.url && f.id === (state.video?.id || f.id) ? f.url : `${gh}/actions/workflows/render.yml`, "Il render su GitHub")
-      + a(`${gh}/actions/workflows/office.yml`, "Il guardiano");
+    return a(f?.url && f.id === (state.video?.id || f.id) ? f.url : `${gh}/actions/workflows/render.yml`, "La lavorazione su GitHub")
+      + a(`${gh}/actions/workflows/office.yml`, "Il guardiano di GitHub");
   }
   const r = L.routines?.[w];
   return (r ? a(`https://claude.ai/code/routines/${r}`, "Il lavoro di Claude") : "")
@@ -938,7 +907,7 @@ function workLinks(id) {
 // "Fai ripartire" for one house that stopped: only that house (and what comes after it) runs again
 // (Ricerca and Community without their key: they start again by themselves at their next round)
 const restartBtn = (id, primary) => id === "revisione" ? "" : state?.can_restart?.[id] === false
-  ? `<span class="note">${esc(BY_ID[id].name)} riparte da sola al prossimo giro</span>`
+  ? `<span class="note">Il reparto ${esc(BY_ID[id].name)} riparte da solo al prossimo giro</span>`
   : `<button class="btn${primary ? " primary" : ""}" data-op="dept" data-target="${id}">Fai ripartire ${esc(BY_ID[id].name)}</button>`;
 
 // —— control of the chain: what stopped, the day's shifts, the next video out, the Research's day, GitHub ——
@@ -951,18 +920,18 @@ function renderControl() {
   const fail = state.chain?.failed;
   const broken = DEPTS.filter((d) => (deps[d.id] || {}).status === "error");
   let alert = "";
-  if (fail) alert += `<div class="alert"><b>⚠ Il render di "${esc(fail.id)}" si è fermato (${esc(fail.step)})</b>
+  if (fail) alert += `<div class="alert"><b>⚠ La lavorazione di "${esc(fail.id)}" si è fermata (${esc(fail.step)})</b>
     <span class="note">Alle ${fmtTime(fail.at)}. <a href="${esc(fail.url)}" target="_blank" rel="noopener" style="color:var(--lamp)">Vedi su GitHub</a></span>
     <div class="row">${["voce", "animazione", "musica", "montaggio", "qualita"].map((id) => (deps[id] || {}).status === "error" ? restartBtn(id, true) : "").join("")
-      || `<button class="btn primary" data-op="rerender" data-target="${esc(fail.id)}">Fai ripartire il render</button>`}</div></div>`;
+      || `<button class="btn primary" data-op="rerender" data-target="${esc(fail.id)}">Fai ripartire la lavorazione</button>`}</div></div>`;
   for (const d of broken) {
     if (fail && ["voce", "animazione", "musica", "montaggio"].includes(d.id)) continue;
     const btn = restartBtn(d.id, true);
-    alert += `<div class="alert"><b>⚠ ${esc(d.name)} si è fermato</b><span class="note">${esc(deps[d.id].task || "")}</span>
+    alert += `<div class="alert"><b>⚠ Il reparto ${esc(d.name)} si è fermato</b><span class="note">${esc(deps[d.id].task || "")}</span>
       ${btn ? `<div class="row">${btn}</div>` : ""}</div>`;
   }
   const opsRunning = (state.ops || []).filter((o) => o.status === "waiting" || o.status === "running");
-  if (opsRunning.length) alert += `<div class="alert ok"><b>Ripartenza in corso</b><span class="note">${opsRunning.map((o) => `render di ${esc(o.target)}`).join(", ")}: il guardiano di GitHub passa ogni 15 minuti.</span></div>`;
+  if (opsRunning.length) alert += `<div class="alert ok"><b>Ripartenza in corso</b><span class="note">${opsRunning.map((o) => `lavorazione di ${esc(o.target)}`).join(", ")}: il guardiano di GitHub la prende in carico entro pochi minuti.</span></div>`;
   $("alert").innerHTML = alert;
   // 2. the next video out
   const ready = (state.queue || []).filter((q) => q.status === "approved").sort((a, b) => outAt(a) - outAt(b));
@@ -1057,7 +1026,7 @@ function fillSheet(id) {
     ${info.status === "error" && id !== "revisione" ? `<div class="row" style="margin-top:14px">${restartBtn(id, true)}</div>` : ""}
     ${workLinks(id) ? `<div class="row" style="margin-top:14px">${workLinks(id)}</div>` : ""}
     ${id === "ricerca" ? `<div class="row" style="margin-top:14px"><button class="btn" data-goto="idea">${state?.research ? `Cosa ha studiato oggi (${state.research.studied.length} video)` : "Dagli un video da studiare"}</button></div>` : ""}
-    ${isDesk ? `<div class="row" style="margin-top:14px"><button class="btn primary" data-goto="approva">${pending ? `Guarda ${pending === 1 ? "il video" : `i ${pending} video`} da approvare` : "Apri la coda di approvazione"}</button></div>` : ""}
+    ${isDesk ? `<div class="row" style="margin-top:14px"><button class="btn primary" data-goto="approva">${pending ? `Guarda ${pending === 1 ? "il video" : `i ${pending} video`} da approvare` : "Apri Approva"}</button></div>` : ""}
     ${d.skills.length ? `<h3>Con quali strumenti lavora</h3><ul class="chips">${d.skills.map((s) => `<li>${esc(s)}</li>`).join("")}</ul>` : ""}`;
 }
 sheet.addEventListener("click", (e) => {
@@ -1090,14 +1059,15 @@ if (tabNames.includes(location.hash.slice(1))) selectTab(location.hash.slice(1))
 
 // approvazioni
 $("queue").addEventListener("click", async (e) => {
-  const c = e.target.closest("[data-copy]");
-  if (c) {
-    const q = (state?.queue || []).find((x) => x.id === c.dataset.copy);
-    try { await navigator.clipboard.writeText(q?.caption || ""); toast("Didascalia copiata"); } catch { toast("Non riesco a copiare: tieni premuto sul testo"); }
+  const tt = e.target.closest("[data-tiktok]");
+  if (tt) {
+    if (demo) { toast("Nella prova non si pubblica niente"); return; }
+    tt.disabled = true;
+    const r = await fetch("/publish/tiktok", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: tt.dataset.tiktok }) });
+    toast(r.ok ? "Riprovo su TikTok: tra qualche minuto è online" : "TikTok non ha accettato il video: riprova tra poco");
+    render.queueSig = null; load();
     return;
   }
-  const dl = e.target.closest("[data-dl]");
-  if (dl) { saveFilm(state.queue.find((x) => x.id === dl.dataset.dl), dl); return; }
   const n = e.target.closest("[data-now]");
   if (n) {
     if (demo) { toast("Pubblicazione avviata (per finta: è una prova)"); return; }
@@ -1181,7 +1151,7 @@ $("voiceFilter").addEventListener("click", (e) => { const b = e.target.closest("
 $("days").addEventListener("click", async (e) => {
   const add = e.target.closest("[data-note]"), del = e.target.closest("[data-unnote]"), save = e.target.closest("[data-savenote]");
   if (add) {
-    add.outerHTML = `<span class="noteform"><input type="text" maxlength="300" placeholder="Es. domani video su Halloween" aria-label="La tua nota">
+    add.outerHTML = `<span class="noteform"><input type="text" maxlength="300" placeholder="Es.: domani video su Halloween" aria-label="La tua nota">
       <button class="btn primary" data-savenote="${add.dataset.note}">Salva</button></span>`;
     $("days").querySelector(".noteform input").focus();
     return;
@@ -1244,7 +1214,7 @@ document.addEventListener("click", async (e) => {
   if (!b) return;
   if (demo) { toast("Nella prova non riparte niente"); return; }
   const kind = b.dataset.op, target = b.dataset.target || "";
-  const what = { rerender: `il render di "${target}"`, produce: "la produzione di un video nuovo", publish: "la pubblicazione", dept: `solo ${BY_ID[target]?.name || target}` }[kind];
+  const what = { rerender: `la lavorazione di "${target}"`, produce: "la produzione di un video nuovo", publish: "la pubblicazione", dept: `solo ${BY_ID[target]?.name || target}` }[kind];
   if (!confirm(`Faccio ripartire ${what}?`)) return;
   b.disabled = true;
   const r = await fetch("/ops/command", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ kind, target }) });
@@ -1315,13 +1285,13 @@ document.addEventListener("visibilitychange", () => { if (!document.hidden) load
 const DEMO_STEPS = [
   ["ricerca", "Sto guardando le 40 storie animate più viste della settimana", "Funzionano: volpi e lanterne, finali con un piccolo colpo di scena, 35-45 secondi."],
   ["soggetto", "Scelgo la storia di oggi", "\"Il guardiano del faro e la volpe\", serie Storie del faro, episodio 1."],
-  ["copione", "Scrivo l'aggancio e il copione", "Aggancio: \"Every night, he left one window lit. Not for the ships.\" Otto righe, il finale sussurrato."],
+  ["copione", "Scrivo il gancio e il copione", "Gancio: \"Every night, he left one window lit. Not for the ships.\" Otto righe, il finale sussurrato."],
   ["regia", "Disegno le sei scene nella scatola di carta", "Faro sulla scogliera, la volpe tra le dune, la tempesta, la scala, la luce che si spegne, la lanterna."],
   ["voce", "Registro il narratore riga per riga", "Intensità crescente fino alla tempesta, sussurro sull'ultima frase."],
   ["animazione", "Animo gli strati di carta su sei macchine", "Sei scene, 42 secondi, 30 fotogrammi al secondo."],
-  ["musica", "Compongo il carillon e i suoni della carta", "Carillon in re minore, vento, fruscii di carta, il click della lanterna."],
+  ["musica", "Preparo la musica e i suoni", "Traccia di suspense, vento, passi, il clic della lanterna."],
   ["montaggio", "Metto insieme video, voce, musica e sottotitoli", "1080×1920, sottotitoli a tempo con le parole, −14 LUFS."],
-  ["qualita", "Guardo il video come uno spettatore", "Tutto a posto: aggancio chiaro nei primi 2 secondi, nessuna parola tagliata."],
+  ["qualita", "Guardo il video come uno spettatore", "Tutto a posto: gancio chiaro nei primi 2 secondi, nessuna parola tagliata."],
 ];
 $("demoBtn").addEventListener("click", () => (demo ? stopDemo() : startDemo()));
 function startDemo() {
@@ -1347,7 +1317,7 @@ function startDemo() {
         caption: "Every night, the old lighthouse keeper left one window lit. Not for the ships. 🦊🏮\n\n#bedtimestory #papercut #animatedstory #foxtales",
         platforms: ["Instagram", "YouTube", "TikTok"] });
       state.log.push({ at: now(), dept: "revisione", text: "Il video aspetta il tuo ok" });
-      render(); toast("Il video di prova aspetta il tuo ok in Da approvare");
+      render(); toast("Il video di prova aspetta il tuo ok in Approva");
     }
   };
   render(); tick();

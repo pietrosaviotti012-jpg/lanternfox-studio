@@ -27,7 +27,7 @@ if [ -n "$SEGMENTS" ]; then   # slices already rendered elsewhere (tools/segment
 else
   node core/render/video.mjs "$P" --fps 30 --workers "$WORKERS" --size 1080x1920 --q "$Q" --out "$P/out/video.mp4"
 fi
-office '{"dept":"animazione","status":"done","task":"Fotogrammi pronti"}' '{"dept":"montaggio","status":"working","task":"Mixo voce, musica e suoni; sottotitoli"}'
+office '{"dept":"animazione","status":"done","task":"Fotogrammi pronti"}' '{"dept":"montaggio","status":"working","task":"Unisco voce, musica e suoni e aggiungo i sottotitoli"}'
 $PY "$STUDIO/tools/mix.py" "$P"
 $PY "$STUDIO/tools/subs.py" "$P"
 sh core/render/mux.sh "$P/out/video.mp4" "$P/out/mix.wav" "$P/out/film.mp4" 30 1
