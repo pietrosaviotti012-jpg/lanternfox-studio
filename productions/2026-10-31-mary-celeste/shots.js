@@ -136,7 +136,8 @@ export function SHOTS(C, DUR) {
       } },
 
     // 5 · Her sails are up: low under the foremast, the set sails pull and slacken; on the quarterdeck the wheel turns by
-    //     itself, a little left, a little right. Nobody answers.
+    //     itself, a little left, a little right. They call out to her; no one answers (L05 rewritten longer and plainer:
+//     the short 'Nobody answers.' did not transcribe back twice).
     { id: 'S5', start: at('L05') - .3, in: { type: 'cut' }, sfx: [{ t: 0, type: 'wind', d: 4, v: .27 }, { t: .5, type: 'door-creak', v: .20 }, { t: C.L05.dur * .55 + .3, type: 'whoosh', v: .14 }],
       build: E => layered(E, {
         light: [-.04, .16, -.13], lightR: .3, lightCol: A.light, key: .9, amb: .45, ambCol: '#8a98a0', sky: { stops: DAY }, on: false,
