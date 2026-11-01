@@ -1,0 +1,280 @@
+{
+ "title": "On My Way · Part 2",
+ "series": "On My Way",
+ "format": "your-call",
+ "theme": "your-call/notte",
+ "captions": "pop",
+ "motion": false,
+ "hud": {
+  "tag": "ON MY WAY",
+  "part": "PART 2"
+ },
+ "lead": 0.4,
+ "tail": 3.4,
+ "lines": [
+  {
+   "id": "L01",
+   "text": "Two of you said TEXT. So at 12:03 am, you trust the car.",
+   "say": "Two of you said text. So at twelve oh three a.m., you trust the car.",
+   "em": [
+    "TEXT"
+   ],
+   "clock": "NIGHT 1 · 12:03 AM",
+   "card": {
+    "app": "On My Way",
+    "kind": "info",
+    "title": "Part 1 · your votes",
+    "body": "TEXT · 2    COUCH · 0",
+    "hold": 3.2
+   },
+   "gap": 0.3,
+   "act": {
+    "intensity": 0.5,
+    "pace": 0.32,
+    "speed": 0.95
+   }
+  },
+  {
+   "id": "L02",
+   "text": "But she's standing in front of your door. Still smiling.",
+   "em": [
+    "door"
+   ],
+   "hit": true,
+   "gap": 0.5,
+   "act": {
+    "intensity": 0.65,
+    "pace": 0.32,
+    "speed": 0.95,
+    "gain_db": 1
+   }
+  },
+  {
+   "id": "L03",
+   "text": "Your phone buzzes. Mom: I'm outside, honey. Open up.",
+   "em": [
+    "outside"
+   ],
+   "clock": "NIGHT 1 · 12:04 AM",
+   "card": {
+    "app": "Messages",
+    "kind": "info",
+    "title": "Mom",
+    "body": "I'm outside, honey. Open up 🚗",
+    "hold": 3.2
+   },
+   "gap": 0.4,
+   "act": {
+    "intensity": 0.5,
+    "pace": 0.32,
+    "speed": 0.95,
+    "gain_db": -0.5
+   }
+  },
+  {
+   "id": "L04",
+   "text": "Don't, sweetheart. That isn't me out there.",
+   "speaker": "sussurro",
+   "quote": true,
+   "em": [
+    "isn't"
+   ],
+   "gap": 0.6,
+   "act": {
+    "intensity": 0.5,
+    "pace": 0.32,
+    "speed": 0.95
+   }
+  },
+  {
+   "id": "L05",
+   "text": "Same voice. Same cardigan. Same smile.",
+   "em": [
+    "same"
+   ],
+   "gap": 0.6,
+   "act": {
+    "intensity": 0.45,
+    "pace": 0.3,
+    "speed": 0.95,
+    "gain_db": -1.5
+   }
+  },
+  {
+   "id": "L06",
+   "text": "Then the fox on the lawn lifts its lantern to the window.",
+   "em": [
+    "lantern"
+   ],
+   "gap": 0.4,
+   "act": {
+    "intensity": 0.45,
+    "pace": 0.32,
+    "speed": 0.95,
+    "gain_db": -1
+   }
+  },
+  {
+   "id": "L07",
+   "text": "The light hits the wall. You cast a shadow.",
+   "em": [
+    "shadow"
+   ],
+   "gap": 0.7,
+   "act": {
+    "intensity": 0.5,
+    "pace": 0.3,
+    "speed": 0.95,
+    "gain_db": -0.5
+   }
+  },
+  {
+   "id": "L08",
+   "text": "She doesn't.",
+   "em": [
+    "doesn't"
+   ],
+   "hit": true,
+   "tint": true,
+   "hold": 1.8,
+   "gap": 1.1,
+   "act": {
+    "intensity": 0.75,
+    "pace": 0.3,
+    "speed": 0.95,
+    "gain_db": 1
+   }
+  },
+  {
+   "id": "L09",
+   "text": "You run out the back door, around the house, into the headlights.",
+   "em": [
+    "run"
+   ],
+   "clock": "NIGHT 1 · 12:05 AM",
+   "gap": 0.4,
+   "act": {
+    "intensity": 0.7,
+    "pace": 0.36,
+    "speed": 0.97,
+    "gain_db": 1.5
+   }
+  },
+  {
+   "id": "L10",
+   "text": "Your real mom hugs you. Her coat smells like rain.",
+   "em": [
+    "hugs"
+   ],
+   "gap": 0.6,
+   "act": {
+    "intensity": 0.4,
+    "pace": 0.32,
+    "speed": 0.95,
+    "gain_db": -1
+   }
+  },
+  {
+   "id": "L11",
+   "text": "Through the window, the living room is empty.",
+   "em": [
+    "empty"
+   ],
+   "gap": 0.5,
+   "act": {
+    "intensity": 0.45,
+    "pace": 0.32,
+    "speed": 0.95,
+    "gain_db": -1.5
+   }
+  },
+  {
+   "id": "L12",
+   "text": "Only the couch cushion stays pressed down. As if someone is still sitting there.",
+   "em": [
+    "still"
+   ],
+   "gap": 0.8,
+   "act": {
+    "intensity": 0.5,
+    "pace": 0.3,
+    "speed": 0.95,
+    "gain_db": -2
+   }
+  },
+  {
+   "id": "L13",
+   "text": "The fox lowers its lantern and walks away into the dark.",
+   "em": [
+    "fox"
+   ],
+   "gap": 0.6,
+   "act": {
+    "intensity": 0.4,
+    "pace": 0.32,
+    "speed": 0.95,
+    "gain_db": -1.5
+   }
+  },
+  {
+   "id": "L14",
+   "text": "Then your phone buzzes. A message from Mom, sent at 10:00 pm: I'm home, sweetheart. Made you tea.",
+   "say": "Then your phone buzzes. A message from Mom, sent at ten p.m.: I'm home, sweetheart. Made you tea.",
+   "em": [
+    "10:00"
+   ],
+   "card": {
+    "app": "Messages",
+    "kind": "info",
+    "title": "Mom · sent 10:00 PM",
+    "body": "I'm home, sweetheart. Made you tea ❤️",
+    "hold": 4
+   },
+   "gap": 0.8,
+   "act": {
+    "intensity": 0.55,
+    "pace": 0.3,
+    "speed": 0.95,
+    "gain_db": 0.5
+   }
+  },
+  {
+   "id": "L15",
+   "text": "So who was on your couch? Tell me in the comments.",
+   "em": [
+    "who"
+   ],
+   "gap": 0.2,
+   "act": {
+    "intensity": 0.55,
+    "pace": 0.34,
+    "speed": 0.97,
+    "gain_db": 1.5
+   }
+  }
+ ],
+ "bpm": 60,
+ "seed": 31,
+ "music": [
+  {
+   "at": "S1",
+   "mood": "rise"
+  },
+  {
+   "at": "S5",
+   "mood": "hush"
+  },
+  {
+   "at": "S7",
+   "mood": "storm"
+  },
+  {
+   "at": "S10",
+   "mood": "warm"
+  },
+  {
+   "at": "S14",
+   "mood": "hush"
+  }
+ ]
+}

@@ -58,7 +58,7 @@ La Ricerca aggiunge ogni giorno 3-5 voci nuove (dalle mode del momento, da Reddi
 - ⭐ **Two Alerts** (dal 2026-10-29): alle 2:40 il telefono riceve l'allerta ufficiale "Stay indoors". Un minuto dopo arriva un secondo messaggio, dallo stesso numero: "Ignore the last alert. Leave now." STAY or LEAVE.
 - **Not Delivered** (dal 2026-10-29): durante il blackout scrivi a tua sorella "are you ok?". Il messaggio resta "not delivered" per ore, poi lei risponde da dietro la tua porta: "open, it's me". OPEN or TEXT HER AGAIN.
 
-- ⭐ **On My Way** (dal 2026-10-29, sera): tua madre scrive "on my way, 10 min". Ma è già seduta sul tuo divano. TRUST THE TEXT or THE COUCH. (Il dilemma "quale delle due è vera" è il più commentato della settimana.) → `productions/2026-10-30-on-my-way`
+- ⭐ **On My Way** (dal 2026-10-29, sera): tua madre scrive "on my way, 10 min". Ma è già seduta sul tuo divano. TRUST THE TEXT or THE COUCH. (Il dilemma "quale delle due è vera" è il più commentato della settimana.) → `productions/2026-10-30-on-my-way`, Parte 2 (TEXT) → `productions/2026-11-01-on-my-way-2`
 - ⭐ **The Last Lighthouse** (dal 2026-10-29, sera, formato conto alla rovescia): "The storm will last nine days. You have lamp oil for six." Barra: DAY 1/9 · OIL 6 · FOOD · WATER. Qualcosa sbatte alla porta della cisterna. LIGHT IT or SAVE IT.
 - **The Spare Key** (dal 2026-10-30): all'1:10 senti una chiave nella tua porta. Vivi da solo, la chiave ce l'hai tu. Poi si ferma, e una voce dice "wrong house, sorry": è la tua voce. OPEN or CALL.
 - **The Porch Light** (dal 2026-10-30): la regola di casa è lasciare la luce del portico accesa per chi torna tardi. Stanotte qualcuno la spegne da fuori. TURN IT ON or LEAVE IT.
@@ -71,6 +71,8 @@ La Ricerca aggiunge ogni giorno 3-5 voci nuove (dalle mode del momento, da Reddi
 - **Myth or Rule** (dal 2026-10-30, sera, formato regole): nel blackout, cinque cose che tutti credono e una che ti salva; ogni falso mito col timbro "✗ MYTH". Solo fatti veri di sicurezza.
 - ⭐ **Floor 31** (dal 2026-10-31, sera, a puntate): "You live on floor 31. Tonight the lights go out one floor at a time, from the bottom up." Numero del piano dipinto sul muro come contatore, regole numerate che continuano di puntata in puntata. Finale morale: la vicina del 29 bussa con il figlio. OPEN or STAY QUIET.
 - ⭐ **Sixty Seconds** (dal 2026-10-31, sera, formato conto alla rovescia, tempo reale): "The dam just broke. The water reaches your street in 60 seconds. This video is 60 seconds long." Cartello del timer ogni 15 s. Finale: "You have time to go back for one thing. What is it?"
+- ⭐ **The Mimic Call** (dal 2026-11-01, filone "mimic"): alle 2:20 tuo fratello piccolo ti chiama per nome dal corridoio. È al campo scuola fino a domenica. CHECK or LOCK.
+- **The Second Tea** (dal 2026-11-01, seguito di *On My Way*): sul tavolo ci sono due tazze di tè, e tu ne hai fatta una sola. Si usa solo se l'utente chiede una Parte 3.
 
 ## Non fare rumore (formato `silenzio.md`, dal 2026-10-31)
 - ⭐ **Hush Harbor**: "It's 3:12 am on the night ferry. The engines cut out, and the captain whispers into the radio: from now on, nobody makes a sound." Misuratore NOISE in alto, tre regole su tre oggetti (telefono, scarpe sul ponte di metallo, il parapetto). Finale: il carillon di una bambina comincia a suonare. STOP IT or THROW IT.
