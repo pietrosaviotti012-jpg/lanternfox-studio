@@ -18,6 +18,7 @@ const INSIDE = {
   pubblicazione: "Neve imbusta il video e lo spedisce alle tre cassette: Instagram, YouTube e TikTok.",
   community: "Arrivano i commenti: Ada risponde a ognuno, e a chi scrive STORY manda il messaggio.",
   statistiche: "Abaco conta sul pallottoliere e le barre del grafico crescono con le visualizzazioni.",
+  analisi: "Iris tiene due fotogrammi affiancati, il nostro e quello virale, e appunta le differenze sul taccuino.",
 };
 
 const I = {
@@ -338,6 +339,18 @@ const BUILD = {
       bars.forEach((b, i) => { const grow = speed ? Math.min(1, I.cycle(t * speed, 5) * 2 - i * 0.12) : s === "idle" ? 0.15 : 1;
         const hh = b.userData.h * Math.max(0.05, grow); b.scale.y = hh; b.position.y = 0.75 + hh / 2; });
       beads.forEach(([bd, r, i]) => { const slide = speed && i >= 5 - ((Math.floor(t * speed * 2) + r) % 5) ? 0.24 : 0; bd.position.x = I.lerp(bd.position.x, -0.22 + i * 0.06 + slide, 0.15); });
+    };
+  },
+  analisi(g) {
+    I.desk(g);
+    const frame = (x, col, bars) => { I.box(0.62, 0.92, 0.03, 0x1a2756, x, 1.2, -1.1, g); I.box(0.54, 0.84, 0.02, col, x, 1.2, -1.08, g);
+      return bars.map((hh, i) => I.box(0.34, 0.05, 0.01, 0xffb862, x, 0.95 + i * 0.12, -1.06, g)); };
+    const ours = frame(-0.42, 0x24306a, [1, 1, 1, 1]), viral = frame(0.42, 0x7a2f4a, [1, 1, 1, 1]);
+    I.box(0.42, 0.02, 0.3, 0xfbf3e2, 0.1, 0.78, -0.55, g);
+    const notes = [0, 1, 2].map((i) => I.box(0.3, 0.012, 0.03, 0x2a1d14, 0.1, 0.8, -0.63 + i * 0.08, g));
+    return (t, s, speed) => {
+      [...ours, ...viral].forEach((b, i) => { b.scale.x = speed ? 0.45 + 0.55 * Math.abs(Math.sin(t * speed + i * 0.9)) : 1; });
+      notes.forEach((n, i) => { n.scale.x = speed ? Math.min(1, I.cycle(t * speed, 4) * 3 - i) || 0.02 : 1; });
     };
   },
 };

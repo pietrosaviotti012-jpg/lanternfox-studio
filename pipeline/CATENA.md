@@ -47,6 +47,9 @@ notes = requests.get(OFFICE_URL + "/notes", headers=H, params={"dept": "soggetto
 
 Le note sono desideri dell'utente: seguile quando riguardano il tuo lavoro, ma non cambiano le regole di questo manuale (account, sicurezza, cosa si pubblica).
 
+## Cosa migliorare (leggilo prima di lavorare)
+`pipeline/MIGLIORARE.md` è scritto ogni sera dalla casetta Analisi. Soggetto, Copione e Regia applicano le regole attive.
+
 ## 1. Ricerca (`ricerca`)
 Skill: `trend-spotter`, `content-research`, `reel-analyzer`, `virality`, `hook-mining`. Ogni giro guarda cosa funziona adesso nei video animati e AI brevi: ricerca web su YouTube Shorts, Instagram Reels e TikTok ("AI animated story", "what if", "mystery", "POV your choice"), Reddit e gli account modello (Your Call TV, Kallaway per i ganci).
 Scrive `research/<data>.md` con 3 idee, ognuna con: il formato, il gancio in una riga, e perché funziona (numeri visti, commenti). Massimo 15 minuti. Le idee non usate restano per i giorni dopo.
@@ -84,6 +87,7 @@ Skill: `going-viral`, `viral-hook-writer`, `reel-scripter`, `on-screen-text-writ
 - etichetta di serie: `"hud": {"tag": "EYES DOWN", "part": "PART 1"}`, e `"clock": "DAY 1 · 01:14 AM"` sulle righe dove l'ora cambia (facoltativo per gli altri formati: per i misteri va bene l'anno, `"clock": "1930 · NOVA SCOTIA"`);
 - 9-16 righe, 30-60 secondi di voce in tutto; frasi corte; un finale con la scelta o la domanda;
 - ogni riga ha la sua recitazione `act`: `intensity` 0,3 (calmo) … 0,8 (intenso), `pace` 0,35-0,5 (più basso = più lento), `speed` 0,84-0,94, `gain_db` −4 (sussurro) … +1,5 (culmine);
+- gli orari si scrivono interi nel testo della riga, "11:52 AM": nei sottotitoli restano su una riga sola;
 - `gap` dopo ogni riga (0,2-1,3 s): i silenzi prima della svolta contano;
 - `music`: l'umore di ogni scena (`calm`, `storm`, `hush`, `rise`, `warm`, `end`): decide quanto è forte la musica.
 
@@ -116,6 +120,7 @@ Li fa GitHub Actions: un commit su `productions/<id>/` con il file `READY` avvia
 È automatico: `tools/quality.py` gira su GitHub dopo il montaggio e il risultato appare in Approva accanto al video. Non ferma mai la catena: misura volume, scene buie, gancio, durata e parole capibili. Non sa giudicare sottotitoli sopra il soggetto o qualità della storia: quello resta all'utente. In origine si controllavano:
 - l'aggancio entro 2 secondi;
 - nessun fotogramma nero o vuoto;
+- le figure toccano terra (`pipeline/FIGURE.md`, "La regola dei piedi");
 - i sottotitoli leggibili e mai sopra il soggetto;
 - la voce: Whisper sul mix finale ritrova tutte le righe;
 - il volume a −14 LUFS ± 1.
@@ -127,7 +132,7 @@ Evento `queue` con `preview_url` (il film sulla release di GitHub), `cover_url` 
 ## 11-13. Pubblicazione, community, statistiche
 - Pubblicazione: due uscite al giorno, alle 16 e alle 22 UTC (17 e 23 in Italia d'inverno). Una sola storia per uscita, la più vecchia fra quelle approvate (manuale `PUBBLICAZIONE.md`).
 - Community: `COMMUNITY.md`.
-- Statistiche: ogni sera, nel giro della Community delle 19:00 UTC. Il Soggetto le legge prima di scegliere il formato (`GET {OFFICE_URL}/stats`, `videos`): un formato che va meglio degli altri torna più spesso. Con pochi video i numeri contano poco: non cambiare rotta per un solo risultato.
+- Statistiche e Analisi: alle 20:10 UTC l'Ufficio aggiorna da solo YouTube e TikTok; alle 20:15 UTC la routine Analisi aggiunge Instagram, confronta i nostri video con quelli virali e aggiorna `pipeline/MIGLIORARE.md` (`pipeline/ANALISI.md`). Il Soggetto le legge prima di scegliere il formato (`GET {OFFICE_URL}/stats`, `videos`): un formato che va meglio degli altri torna più spesso. Con pochi video i numeri contano poco: non cambiare rotta per un solo risultato.
 
 ## Chi fa partire la catena
 La routine **"Lantern Fox · Produzione"** gira due volte al giorno, alle 5 e alle 11 UTC. Ogni giro produce un video. I passi sono:

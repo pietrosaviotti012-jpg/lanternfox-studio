@@ -1,0 +1,53 @@
+# Every evening: the sheets of our published films next to the viral ones, measured the same way (tools/look.py).
+# The Office starts it at 20:00 UTC; the timer is the spare, because GitHub's can be an hour late.
+name: look
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '20 20 * * *'
+permissions:
+  contents: write
+concurrency:
+  group: look
+jobs:
+  look:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: ffmpeg (static build)
+        run: |
+          curl -sL https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-linux64-gpl.tar.xz | tar -xJ -C /tmp
+          echo /tmp/ffmpeg-master-latest-linux64-gpl/bin >> "$GITHUB_PATH"
+      - run: pip install -q numpy pillow
+      - name: Our films (the ones already out are done once)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release list --limit 60 --json tagName --jq '.[].tagName' | grep '^film-' | while read -r TAG; do
+            ID=${TAG#film-}; D="research/nostri/$ID"
+            [ -f "$D/cuts.json" ] && continue
+            mkdir -p "$D"
+            gh release download "$TAG" -p film.mp4 -D /tmp/film --clobber || { rmdir "$D"; continue; }
+            F=/tmp/film/film.mp4
+            DUR=$(ffprobe -v error -show_entries format=duration -of csv=p=0 "$F")
+            N=$(python -c "import math; print(math.ceil($DUR / 1.5))"); COLS=$(python -c "import math; print(math.ceil(math.sqrt($N)))"); ROWS=$(python -c "import math; print(math.ceil($N / $COLS))")
+            ffmpeg -v error -y -i "$F" -vf "fps=1/1.5,scale=180:-1,tile=${COLS}x${ROWS}" -frames:v 1 "$D/sheet.jpg"
+            ffmpeg -v error -y -i "$F" -vf "fps=3,scale=270:-1,tile=9x1" -t 3 -frames:v 1 "$D/hook.jpg"
+            python - "$F" "$DUR" "$D/cuts.json" <<'PY'
+          import json, re, subprocess, sys
+          import numpy as np
+          f, dur, out = sys.argv[1], float(sys.argv[2]), sys.argv[3]
+          sc = subprocess.run(["ffmpeg", "-hide_banner", "-i", f, "-vf", "select='gt(scene,0.28)',showinfo", "-f", "null", "-"], capture_output=True, text=True).stderr
+          cuts = [round(float(x), 2) for x in re.findall(r"pts_time:([\d.]+)", sc)]
+          gaps = np.diff([0] + cuts + [dur])
+          json.dump({"cuts": cuts, "per_10s": round(10 * len(cuts) / dur, 1), "longest_shot": round(float(gaps.max()), 1), "median_shot": round(float(np.median(gaps)), 1)}, open(out, "w"), indent=1)
+          PY
+          done
+      - run: python tools/look.py
+      - name: Save
+        run: |
+          git config user.name "Lantern Fox Analisi"
+          git config user.email "analisi@lanternfox.invalid"
+          git add research/nostri research/confronto.json research/confronto.md
+          git diff --cached --quiet || { git commit -m "Analysis: our films against the viral ones"; git pull --rebase origin main && git push origin HEAD:main; }

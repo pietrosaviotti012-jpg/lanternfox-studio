@@ -63,7 +63,7 @@ const bindings = [
 ];
 // Claude routines the buttons start ("Pubblica adesso", "Rifai"): ids are plain, tokens are secrets
 if (env.YT_CLIENT_ID) bindings.push({ type: "plain_text", name: "YT_CLIENT_ID", text: env.YT_CLIENT_ID });
-for (const w of ["PUBLISH", "REDO", "PRODUCE", "RESEARCH", "COMMUNITY"]) if (env[`ROUTINE_${w}_ID`]) bindings.push({ type: "plain_text", name: `ROUTINE_${w}_ID`, text: env[`ROUTINE_${w}_ID`] });
+for (const w of ["PUBLISH", "REDO", "PRODUCE", "RESEARCH", "COMMUNITY", "ANALISI"]) if (env[`ROUTINE_${w}_ID`]) bindings.push({ type: "plain_text", name: `ROUTINE_${w}_ID`, text: env[`ROUTINE_${w}_ID`] });
 if (withSecrets) {
   bindings.push({ type: "secret_text", name: "PASSWORD", text: env.OFFICE_PASSWORD });
   bindings.push({ type: "secret_text", name: "STUDIO_SECRET", text: env.STUDIO_SECRET });

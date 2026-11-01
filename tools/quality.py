@@ -43,6 +43,13 @@ lead = float(script.get("lead", 1.4))
 first = y[:4]
 add("Gancio", lead <= 2 and (not first or max(first) >= 22), f"la voce parte dopo {it(lead)} secondi" + ("" if not first or max(first) >= 22 else ", ma i primi 2 secondi sono neri"))
 
+# the figures on the ground: shots with a figure and a camera that is not at the height of the floor (tools/ground_check.mjs)
+try:
+    g = json.loads(subprocess.run(["node", os.path.join(os.path.dirname(os.path.abspath(__file__)), "ground_check.mjs"), P], capture_output=True, text=True, check=True).stdout)
+    add("Figure a terra", g["ok"], g["detail"])
+except Exception as e:
+    print("ground check skipped:", type(e).__name__)
+
 # the words: Whisper on the final mix must find the lines over music and effects
 try:
     from faster_whisper import WhisperModel

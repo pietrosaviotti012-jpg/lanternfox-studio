@@ -14,7 +14,7 @@ const MANIFEST = JSON.stringify({
 });
 const COOKIE = "ufficio";
 const DEPTS = ["ricerca", "soggetto", "copione", "regia", "animazione", "voce", "musica", "montaggio",
-  "qualita", "revisione", "pubblicazione", "community", "statistiche"];
+  "qualita", "revisione", "pubblicazione", "community", "statistiche", "analisi"];
 const STATUSES = ["idle", "working", "done", "waiting", "error"];
 
 const SECURITY = {
@@ -84,6 +84,8 @@ const SCHEDULE = [
   { utc: "16:00", dept: "pubblicazione", who: "Pubblicazione", what: "Esce il video approvato più vecchio" },
   { utc: "19:00", dept: "community", who: "Community", what: "Risponde ai commenti" },
   { utc: "19:30", dept: "ricerca", who: "Ricerca", what: "Studia i video della giornata e raccoglie le idee per domani" },
+  { utc: "20:10", dept: "statistiche", who: "Statistiche", what: "Aggiorna i Numeri con YouTube e TikTok" },
+  { utc: "20:15", dept: "analisi", who: "Analisi", what: "Aggiunge Instagram, confronta i nostri video con quelli virali e scrive cosa migliorare" },
   { utc: "22:00", dept: "pubblicazione", who: "Pubblicazione", what: "Esce il secondo video approvato" },
 ];
 
@@ -259,7 +261,8 @@ async function applyEvent(env, event) {
   const state = await loadState(env);
   const now = new Date().toISOString();
   if (event.reset) {
-    for (const d of DEPTS) state.departments[d] = { status: "idle", task: "", output: "", updated_at: now };
+    // a new video lights the chain again; the houses of the evening keep showing their last round
+    for (const d of DEPTS) if (!EVENING_DEPTS.includes(d)) state.departments[d] = { status: "idle", task: "", output: "", updated_at: now };
   }
   if (event.video) {
     // today's videos are numbered in the order they start (a "Rifai" keeps its number); the day is Italy's
@@ -376,7 +379,7 @@ async function youtubeUpload(env, item) {
 //   video it was making from that house; voce, animazione, musica, montaggio, qualita: the render, and when it stopped on
 //   GitHub only its failed jobs run again (the voice and the frames already made are kept); pubblicazione: the publishing routine.
 const RESTART = { ricerca: "RESEARCH", soggetto: "PRODUCE", copione: "PRODUCE", regia: "PRODUCE", voce: "RENDER", animazione: "RENDER",
-  musica: "RENDER", montaggio: "RENDER", qualita: "RENDER", pubblicazione: "PUBLISH", community: "COMMUNITY", statistiche: "COMMUNITY" };
+  musica: "RENDER", montaggio: "RENDER", qualita: "RENDER", pubblicazione: "PUBLISH", community: "COMMUNITY", statistiche: "ANALISI", analisi: "ANALISI" };
 const canRestart = (env) => Object.fromEntries(Object.entries(RESTART).map(([d, w]) =>
   [d, w === "RENDER" || Boolean(env[`ROUTINE_${w}_TOKEN`]) || (w === "PRODUCE" && Boolean(env.ROUTINE_REDO_TOKEN))]));
 async function restart(env, state, kind, target, now) {
@@ -464,6 +467,7 @@ function planParts(state) {
 //   - a production slot of today that did not start 40 minutes after its time: a new video;
 //   - commands still waiting for GitHub: he wakes the watchman.
 // What he saw and did stays in state.guard for the Home card.
+const EVENING_DEPTS = ["pubblicazione", "community", "statistiche", "analisi"];
 const RENDER_DEPTS = ["voce", "animazione", "musica", "montaggio", "qualita"];
 const CHAIN_DEPTS = ["ricerca", "soggetto", "copione", "regia", ...RENDER_DEPTS];
 // the Office's own slips: a house still "at work" on a video that is already finished (it never said "done"),
@@ -524,9 +528,9 @@ async function guardRound(env, state, now) {
 // GitHub's 15-minute timer is often an hour late: with GH_DISPATCH_TOKEN (a fine-grained token that can only start
 // workflows in this repository) a command from the phone wakes the watchman at once
 const REPO = "pietrosaviotti012-jpg/lanternfox-studio";
-async function wakeWatchman(env) {
+async function wakeWatchman(env, file = "office.yml") {
   if (!env.GH_DISPATCH_TOKEN) return 0;
-  const r = await fetch(`https://api.github.com/repos/${REPO}/actions/workflows/office.yml/dispatches`, {
+  const r = await fetch(`https://api.github.com/repos/${REPO}/actions/workflows/${file}/dispatches`, {
     method: "POST", body: JSON.stringify({ ref: "main" }),
     headers: { Authorization: `Bearer ${env.GH_DISPATCH_TOKEN}`, Accept: "application/vnd.github+json", "User-Agent": "lanternfox-office" },
   });
@@ -562,6 +566,61 @@ async function tiktokEnd(env, state, item, url, error) {
   await pushAll(env, error ? { title: "TikTok: pubblicazione non riuscita", body: error, url: "/#approva", urgent: true } : { title: "Uscito su TikTok", body: item.title, url });
 }
 
+// The numbers of every platform: Instagram when the Analisi round brings them, YouTube and TikTok read here, matched to our videos
+async function collectStats(env, state, instagram) {
+  const now = new Date().toISOString();
+  const token = await youtubeToken(env), yt = {}, ids = {};
+  for (const q of state.queue) { const m = /shorts\/([\w-]+)/.exec(q.published?.youtube?.url || ""); if (m) ids[m[1]] = q.id; }
+  let ytFollowers = null, ytError = token ? "" : "YouTube non collegato";
+  if (token) {
+    const get = (path) => fetch(`https://www.googleapis.com/youtube/v3/${path}`, { headers: { Authorization: `Bearer ${token}` } }).then((r) => r.json());
+    const ch = await get("channels?part=statistics&mine=true").catch(() => ({}));
+    ytFollowers = Number(ch.items?.[0]?.statistics?.subscriberCount ?? NaN);
+    if (Object.keys(ids).length) {
+      const v = await get(`videos?part=statistics&id=${Object.keys(ids).slice(0, 50).join(",")}`).catch(() => ({}));
+      if (v.error) ytError = clip(v.error.message, 120);
+      for (const i of v.items || []) yt[ids[i.id]] = { views: +i.statistics.viewCount || 0, likes: +i.statistics.likeCount || 0, comments: +i.statistics.commentCount || 0 };
+    }
+  }
+  // TikTok from Zernio: views, how long people stay, and who is still there after 1, 3, 5 and 10 seconds
+  const tt = {};
+  let ttFollowers = null;
+  if (env.ZERNIO_API_KEY) {
+    const z = (path) => fetch(`${ZERNIO}/${path}`, { headers: { Authorization: `Bearer ${env.ZERNIO_API_KEY}` } }).then((r) => r.json()).catch(() => ({}));
+    const posts = (await z("analytics?platform=tiktok&limit=50")).posts || [];
+    ttFollowers = (await z(`accounts/follower-stats?accountIds=${ZERNIO_TIKTOK}`)).accounts?.[0]?.currentFollowers ?? null;
+    const key = (t) => String(t || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim().slice(0, 40);
+    for (const p of posts) {
+      const vid = /video\/(\d+)/.exec(p.platformPostUrl || "")?.[1], x = p.analytics || {}, c = x.retentionCurve || {};
+      const q = state.queue.find((i) => (vid && i.published?.tiktok?.url?.includes(vid)) || (key(p.content) && key(i.caption) === key(p.content)));
+      if (q && (x.views || 0) >= (tt[q.id]?.views || 0)) tt[q.id] = { views: +x.views || 0, likes: +x.likes || 0, comments: +x.comments || 0, saves: +x.saves || 0,
+        ...(x.igReelsAvgWatchTime ? { avg_watch_s: x.igReelsAvgWatchTime / 1000 } : {}), ...(x.completionRate != null ? { completion: x.completionRate } : {}),
+        ...(c[1] != null ? { retention: Object.fromEntries([1, 3, 5, 10].filter((k) => c[k] != null).map((k) => [k, c[k]])) } : {}) };
+    }
+  }
+  const ig = {};
+  for (const m of instagram?.media || []) {
+    const q = state.queue.find((x) => x.published?.instagram?.url && m.permalink && x.published.instagram.url.split("?")[0] === m.permalink.split("?")[0]);
+    if (q) ig[q.id] = { likes: +m.like_count || 0, comments: +m.comments_count || 0, ...(m.views != null ? { views: +m.views } : {}),
+      ...(m.reach != null ? { reach: +m.reach } : {}), ...(m.shares != null ? { shares: +m.shares } : {}), ...(m.saved != null ? { saved: +m.saved } : {}),
+      ...(m.avg_watch_s != null ? { avg_watch_s: +m.avg_watch_s } : {}) };
+  }
+  const old = Object.fromEntries((state.stats?.videos || []).map((v) => [v.id, v]));
+  const videos = state.queue.filter((q) => q.published?.youtube?.url || q.published?.instagram?.url).map((q) => ({ id: q.id, title: q.title,
+    youtube: yt[q.id] || old[q.id]?.youtube || null, instagram: ig[q.id] || old[q.id]?.instagram || null, tiktok: tt[q.id] || old[q.id]?.tiktok || null }));
+  const total = (v) => (v.youtube?.views || 0) + (v.instagram?.views || 0) + (v.tiktok?.views || 0), week = Date.now() - 7 * 864e5;
+  const recent = videos.filter((v) => { const p = state.queue.find((q) => q.id === v.id).published; return Object.values(p).some((x) => x?.at && Date.parse(x.at) > week); });
+  const best = [...videos].sort((a, b) => total(b) - total(a))[0];
+  const stats = { ...(state.stats || {}), videos, updated_at: now, views_7d: recent.reduce((n, v) => n + total(v), 0),
+    best: best ? { title: best.title, views: total(best) } : null,
+    followers: { ...(state.stats?.followers || {}), ...(Number.isFinite(ytFollowers) ? { youtube: ytFollowers } : {}), ...(instagram?.followers != null ? { instagram: +instagram.followers } : {}), ...(ttFollowers != null ? { tiktok: +ttFollowers } : {}) } };
+  state.stats = stats;
+  state.departments.statistiche = { status: ytError ? "error" : "done", task: ytError ? `YouTube: ${ytError}` : `Contati ${videos.length} video: ${stats.views_7d.toLocaleString("it-IT", { useGrouping: "always" })} visualizzazioni in 7 giorni`, output: "", updated_at: now };
+  state.log.push({ at: now, dept: "statistiche", status: ytError ? "error" : "done", text: state.departments.statistiche.task });
+  await saveState(env, state);
+  return { ok: !ytError, stats };
+}
+
 async function publishNow(env, state, item, why) {
   const now = new Date().toISOString(), started = await fireRoutine(env, "PUBLISH", `Pubblica adesso: ${item.id}`);
   const ok = started >= 200 && started < 300;
@@ -577,6 +636,10 @@ async function watch(env) {
   const state = await loadState(env), now = new Date().toISOString(), t = Date.now(), before = JSON.stringify(state);
   tidy(state, now);
   await tiktokCheck(env, state);
+  // the evening: our films measured against the viral ones, then the Numeri, whatever the routines do
+  const utc = now.slice(11, 16), day = romeDay(t);
+  if (utc >= "20:00" && state.look_day !== day) { state.look_day = day; await wakeWatchman(env, "look.yml"); }
+  if (utc >= "20:10" && state.stats_day !== day) { state.stats_day = day; await collectStats(env, state); }
   for (const q of state.queue) if (q.status === "approved" && q.publish_exact && t >= Date.parse(q.publish_after)
     && !(q.now_at && t - Date.parse(q.now_at) < RESERVE_MS) && PLATFORMS.some((p) => !sent(q.published?.[p]))) await publishNow(env, state, q, "All'orario che hai scelto esce");
   const done = state.auto_guard?.day === romeDay(t) ? state.auto_guard.depts : [];
@@ -825,41 +888,21 @@ export default {
     // Statistiche (Abaco): the Community's evening round brings Instagram's numbers, the Office adds YouTube's and matches them to our videos
     if (url.pathname === "/stats/collect" && request.method === "POST") {
       if (!(await publishOk(request, env))) return json({ error: "non autorizzato" }, 401);
-      const state = await loadState(env), now = new Date().toISOString(), { instagram } = await request.json().catch(() => ({}));
-      const token = await youtubeToken(env), yt = {}, ids = {};
-      for (const q of state.queue) { const m = /shorts\/([\w-]+)/.exec(q.published?.youtube?.url || ""); if (m) ids[m[1]] = q.id; }
-      let ytFollowers = null, ytError = token ? "" : "YouTube non collegato";
-      if (token) {
-        const get = (path) => fetch(`https://www.googleapis.com/youtube/v3/${path}`, { headers: { Authorization: `Bearer ${token}` } }).then((r) => r.json());
-        const ch = await get("channels?part=statistics&mine=true").catch(() => ({}));
-        ytFollowers = Number(ch.items?.[0]?.statistics?.subscriberCount ?? NaN);
-        if (Object.keys(ids).length) {
-          const v = await get(`videos?part=statistics&id=${Object.keys(ids).slice(0, 50).join(",")}`).catch(() => ({}));
-          if (v.error) ytError = clip(v.error.message, 120);
-          for (const i of v.items || []) yt[ids[i.id]] = { views: +i.statistics.viewCount || 0, likes: +i.statistics.likeCount || 0, comments: +i.statistics.commentCount || 0 };
-        }
-      }
-      const ig = {};
-      for (const m of instagram?.media || []) {
-        const q = state.queue.find((x) => x.published?.instagram?.url && m.permalink && x.published.instagram.url.split("?")[0] === m.permalink.split("?")[0]);
-        if (q) ig[q.id] = { likes: +m.like_count || 0, comments: +m.comments_count || 0, ...(m.views != null ? { views: +m.views } : {}),
-          ...(m.reach != null ? { reach: +m.reach } : {}), ...(m.shares != null ? { shares: +m.shares } : {}), ...(m.saved != null ? { saved: +m.saved } : {}),
-          ...(m.avg_watch_s != null ? { avg_watch_s: +m.avg_watch_s } : {}) };
-      }
-      const old = Object.fromEntries((state.stats?.videos || []).map((v) => [v.id, v]));
-      const videos = state.queue.filter((q) => q.published?.youtube?.url || q.published?.instagram?.url).map((q) => ({ id: q.id, title: q.title,
-        youtube: yt[q.id] || old[q.id]?.youtube || null, instagram: ig[q.id] || old[q.id]?.instagram || null }));
-      const total = (v) => (v.youtube?.views || 0) + (v.instagram?.views || 0), week = Date.now() - 7 * 864e5;
-      const recent = videos.filter((v) => { const p = state.queue.find((q) => q.id === v.id).published; return Object.values(p).some((x) => x?.at && Date.parse(x.at) > week); });
-      const best = [...videos].sort((a, b) => total(b) - total(a))[0];
-      const stats = { ...(state.stats || {}), videos, updated_at: now, views_7d: recent.reduce((n, v) => n + total(v), 0),
-        best: best ? { title: best.title, views: total(best) } : null,
-        followers: { ...(state.stats?.followers || {}), ...(Number.isFinite(ytFollowers) ? { youtube: ytFollowers } : {}), ...(instagram?.followers != null ? { instagram: +instagram.followers } : {}) } };
-      state.stats = stats;
-      state.departments.statistiche = { status: ytError ? "error" : "done", task: ytError ? `YouTube: ${ytError}` : `Contati ${videos.length} video: ${stats.views_7d.toLocaleString("it-IT")} visualizzazioni in 7 giorni`, output: "", updated_at: now };
-      state.log.push({ at: now, dept: "statistiche", status: ytError ? "error" : "done", text: state.departments.statistiche.task });
+      const state = await loadState(env), { instagram } = await request.json().catch(() => ({}));
+      const r = await collectStats(env, state, instagram);
       await saveState(env, state);
-      return json({ ok: !ytError, stats });
+      return json(r);
+    }
+    // what the Analisi house found tonight: it goes in Numeri, "Cosa migliorare"
+    if (url.pathname === "/analysis" && request.method === "POST") {
+      if (!(await publishOk(request, env))) return json({ error: "non autorizzato" }, 401);
+      const b = await request.json().catch(() => ({})), state = await loadState(env), now = new Date().toISOString();
+      state.analysis = { at: now, date: clip(b.date, 10), summary: clip(b.summary, 600), next: [].concat(b.next || []).slice(0, 6).map((x) => clip(x, 240)),
+        gaps: [].concat(b.gaps || []).slice(0, 6).map((g) => ({ what: clip(g.what, 80), ours: clip(g.ours, 200), viral: clip(g.viral, 200), fix: clip(g.fix, 240) })) };
+      state.departments.analisi = { status: "done", task: "Confronto finito: cosa migliorare è in Numeri", output: "", updated_at: now };
+      state.log.push({ at: now, dept: "analisi", status: "done", text: `Iris ha confrontato i video: ${clip(b.summary, 200)}` });
+      await saveState(env, state);
+      return json({ ok: true });
     }
     // the numbers for the routines: which videos and formats are working (Soggetto, Ricerca)
     if (url.pathname === "/stats" && request.method === "GET") {
@@ -1053,7 +1096,7 @@ export default {
       state.publish_at_utc = String(env.PUBLISH_AT_UTC || "22").split(",").map(Number);   // the publishing slots (UTC hours)
       state.youtube = JSON.parse((await env.DATA.get("yt_channel")) || "null");
       state.schedule = SCHEDULE; state.can_produce = Boolean(env.ROUTINE_PRODUCE_TOKEN); state.can_restart = canRestart(env); state.build = "__BUILD__";
-      state.links = { repo: REPO, routines: Object.fromEntries(["PRODUCE", "PUBLISH", "RESEARCH", "COMMUNITY"].map((w) => [w, env[`ROUTINE_${w}_ID`] || null])) };
+      state.links = { repo: REPO, routines: Object.fromEntries(["PRODUCE", "PUBLISH", "RESEARCH", "COMMUNITY", "ANALISI"].map((w) => [w, env[`ROUTINE_${w}_ID`] || null])) };
       return json(state);
     }
     // "Collega YouTube": Google's consent page, then back here with a code that becomes the refresh token

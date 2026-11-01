@@ -8,6 +8,14 @@ La guida del reparto Regia. I motivi sono in `engine/kit/motifs.js`.
 3. **Grande è vicino, scuro è davanti.** Le figure più vicine alla camera sono le più scure. Mai un mostro chiaro su fondo chiaro.
 4. **Tagliala.** Una figura tagliata dal bordo o da un foglio sembra più grande e fa più paura.
 
+## La regola dei piedi
+Capita spesso: la figura non tocca terra. Non è un errore di disegno, è prospettiva. Figura e pavimento stanno su fogli a profondità diverse, e si incontrano sullo schermo solo se la camera è **all'altezza del pavimento e dritta**.
+- **Camera:** `py` e `ty` uguali alla quota su cui stanno i piedi (`by`). Con il pavimento a `y = 0`: `cam: [[0, [0, 0, .8, 0, 0, -.07]]]`. Per zoomare cambia solo `pz`. Per salire o scendere, sposta tutta la scena con `move`, non la camera.
+- **Stesso piano:** la figura sta su un foglio pochi millimetri davanti al pavimento che calpesta, mai lontana da lui.
+- **Un filo di pavimento davanti:** un foglio davanti ai piedi, col bordo appena sopra le suole, nasconde ogni piccolo stacco. Esempio: `floorFront` in `productions/2026-11-01-torn-rule-2/shots.js`.
+- **Chi sta sul tetto o su un rialzo:** vale la stessa regola, con la camera alla quota di quel tetto.
+- **Controllo:** `sh tools/check.sh` e il Controllo qualità segnalano le inquadrature con la camera sbagliata. Non vedono ogni caso: guarda sempre i fotogrammi con `tools/stills.sh`, ingrandendo i piedi.
+
 ## Il mostro: mostra meno
 Il mostro cresce in tre tempi, e il terzo spesso non serve.
 1. **Traccia:** un suono, una luce che si spegne, una porta socchiusa, impronte. Nessuna figura.

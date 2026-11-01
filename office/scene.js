@@ -634,13 +634,13 @@ const PHASES = [
     text: "Il narratore registra riga per riga, sei macchine disegnano i fotogrammi, arrivano musica e suoni, poi il montaggio e il controllo. Circa 25 minuti." },
   { title: "Decidi tu", depts: ["revisione"],
     text: "Guardi il video in Approva: Pubblica, oppure Rifai con una nota su cosa cambiare." },
-  { title: "L'uscita", depts: ["pubblicazione", "community", "statistiche"],
-    text: "All'orario scelto, o subito con Pubblica adesso, esce su Instagram, YouTube e TikTok; poi risposte ai commenti e numeri della sera." },
+  { title: "L'uscita", depts: ["pubblicazione", "community", "statistiche", "analisi"],
+    text: "All'orario scelto, o subito con Pubblica adesso, esce su Instagram, YouTube e TikTok; poi risposte ai commenti, numeri della sera e confronto con i video virali." },
 ];
 
 // how long each house usually works on one video (minutes, from the real runs): the bar and the "verso le…" come from here
 const TYPICAL = { ricerca: 5, soggetto: 3, copione: 4, regia: 8, voce: 8, animazione: 11, musica: 1, montaggio: 3, qualita: 1,
-  revisione: 0, pubblicazione: 3, community: 1, statistiche: 2 };
+  revisione: 0, pubblicazione: 3, community: 1, statistiche: 2, analisi: 10 };
 const CHAIN_TO_DESK = ["ricerca", "soggetto", "copione", "regia", "voce", "animazione", "musica", "montaggio", "qualita"];
 function progress(id, info) {
   if (!info || info.status !== "working" || !info.updated_at || !TYPICAL[id]) return null;
@@ -747,6 +747,8 @@ function render() {
 
   renderDays();
   renderStats();
+  renderAnalysis();
+  renderEarn();
   renderControl();
   $("bellDot").hidden = Boolean(state.devices);
   if (selected) fillSheet(selected);
@@ -889,7 +891,7 @@ function renderDays() {
 
 // where each house's work can be seen in detail: the render's jobs and logs on GitHub, or the Claude routine's runs
 const WORKS = { ricerca: "RESEARCH", soggetto: "PRODUCE", copione: "PRODUCE", regia: "PRODUCE", voce: "RENDER", animazione: "RENDER",
-  musica: "RENDER", montaggio: "RENDER", qualita: "RENDER", pubblicazione: "PUBLISH", community: "COMMUNITY", statistiche: "COMMUNITY" };
+  musica: "RENDER", montaggio: "RENDER", qualita: "RENDER", pubblicazione: "PUBLISH", community: "COMMUNITY", statistiche: "ANALISI", analisi: "ANALISI" };
 function workLinks(id) {
   const L = state?.links, w = WORKS[id];
   if (!L || !w) return "";
@@ -978,7 +980,7 @@ function renderStats() {
   const s = state.stats;
   if (!s) { $("stats").innerHTML = `<div class="empty"><strong>Ancora niente da contare</strong>Le statistiche arrivano la sera dopo il primo video pubblicato.</div>`; return; }
   const f = s.followers || {};
-  const n = (x) => (x ?? "–").toLocaleString?.("it-IT") ?? x;
+  const n = (x) => (x ?? "–").toLocaleString?.("it-IT", { useGrouping: "always" }) ?? x;
   $("stats").innerHTML = `<h3 style="margin-top:0">Follower</h3><div class="nums">
     <div class="num"><b>${n(f.instagram)}</b><span>Instagram</span></div>
     <div class="num"><b>${n(f.youtube)}</b><span>YouTube</span></div>
@@ -987,8 +989,43 @@ function renderStats() {
     <div class="num" style="grid-column: span 2"><b style="font-size:1.1rem">${esc(s.best ? s.best.title : "–")}</b><span>la storia più vista${s.best ? ` (${n(s.best.views)})` : ""}</span></div></div>
     ${(s.videos || []).length ? `<h3>Video per video</h3><ul class="ideas">${[...s.videos].reverse().map((v) => `<li><span>${esc(v.title)}</span>
       <span class="note">YouTube: ${v.youtube ? `${n(v.youtube.views)} viste, ${n(v.youtube.likes)} like, ${n(v.youtube.comments)} commenti` : "–"}</span>
+      <span class="note">TikTok: ${v.tiktok ? `${n(v.tiktok.views)} viste, ${n(v.tiktok.likes)} like, ${n(v.tiktok.comments)} commenti${v.tiktok.avg_watch_s ? `, guardato in media ${v.tiktok.avg_watch_s.toFixed(0)} s` : ""}${v.tiktok.retention?.[3] != null ? `, dopo 3 secondi resta il ${Math.round(v.tiktok.retention[3] * 100)}%` : ""}` : "–"}</span>
       <span class="note">Instagram: ${v.instagram ? `${v.instagram.views != null ? n(v.instagram.views) + " viste, " : ""}${n(v.instagram.likes)} like, ${n(v.instagram.comments)} commenti${v.instagram.shares != null ? `, ${n(v.instagram.shares)} condivisioni` : ""}${v.instagram.avg_watch_s != null ? `, guardato in media ${v.instagram.avg_watch_s.toFixed(0)} s` : ""}` : "–"}</span></li>`).join("")}</ul>` : ""}
-    <p class="note" style="margin-top:12px">Aggiornate alle ${fmtTime(s.updated_at)}. Le visualizzazioni contano solo YouTube${(s.videos || []).some((v) => v.instagram?.views != null) ? " e Instagram" : ": Instagram non le fornisce ancora"}.</p>`;
+    <p class="note" style="margin-top:12px">Aggiornate il ${fmtDayTime(s.updated_at)}. Le visualizzazioni contano YouTube, Instagram e TikTok.</p>`;
+}
+
+// what the Analisi house found: the differences with the viral videos and what changes next
+function renderAnalysis() {
+  const a = state.analysis, el = $("analysis");
+  if (!a) { el.innerHTML = `<div class="empty"><strong>Iris non ha ancora fatto il primo confronto</strong>Ogni sera alle ${fmtTime(utcToday("20:15").toISOString())} confronta i nostri video con quelli virali e scrive qui cosa cambiare.</div>`; return; }
+  el.innerHTML = `<p class="note" style="margin:0 0 10px">${esc(a.summary)}</p>
+    ${a.next?.length ? `<ol class="ideas" style="padding:0">${a.next.map((x) => `<li>${esc(x)}</li>`).join("")}</ol>` : ""}
+    ${a.gaps?.length ? `<ul class="ideas" style="margin-top:8px">${a.gaps.map((g) => `<li><b>${esc(g.what)}</b>
+      <span class="note">Noi: ${esc(g.ours)}</span><span class="note">Video virali: ${esc(g.viral)}</span><span>${esc(g.fix)}</span></li>`).join("")}</ul>` : ""}
+    <p class="note" style="margin-top:12px">Ultimo confronto: ${fmtDayTime(a.at)}.</p>`;
+}
+
+// when the money can start: what each platform asks, how far we are, and the views a day that it would take
+function renderEarn() {
+  const s = state.stats || {}, f = s.followers || {}, vids = s.videos || [];
+  const n = (x) => Number(x || 0).toLocaleString("it-IT", { useGrouping: "always" });
+  const sum = (key) => vids.reduce((m, v) => m + (v[key]?.views || 0), 0);
+  const firstOut = Math.min(...(state.queue || []).flatMap((q) => Object.values(q.published || {}).map((p) => Date.parse(p?.at)).filter(Boolean)), Date.now());
+  const days = Math.max(1, (Date.now() - firstOut) / 864e5);
+  const bar = (label, now, goal) => `<p class="note" style="margin:10px 0 0">${label}: ${n(now)} su ${n(goal)}</p><div class="meter" style="margin-top:4px"><i style="width:${Math.min(100, Math.max(1, 100 * now / goal)).toFixed(1)}%"></i></div>`;
+  const pace = (views, goal, span) => `<p class="note" style="margin:8px 0 0">Oggi fai circa ${n(Math.round(views / days))} viste al giorno: ne servono ${n(Math.ceil(goal / span))} al giorno per ${span} giorni di fila.</p>`;
+  $("earn").innerHTML = `<ul class="ideas">
+    <li><b>YouTube</b><span class="note"><b>Come paga:</b> quando entri nel Programma partner, ricevi il 45% della tua parte di incassi pubblicitari degli Shorts (il 55% sui video lunghi). I soldi arrivano con AdSense, tra il 21 e il 26 del mese, se il saldo ha superato la soglia.</span>
+      <span class="note"><b>Da quando:</b> 1.000 iscritti e 10 milioni di viste Shorts in 90 giorni. Dal 1° febbraio 2027, per chi fa domanda, le viste diventano 20 milioni. Con 500 iscritti e 3 milioni di viste si sbloccano solo abbonamenti e acquisti dei fan, non la pubblicità.</span>
+      ${bar("Iscritti", f.youtube, 1000)}${bar("Viste Shorts", sum("youtube"), 10000000)}${pace(sum("youtube"), 10000000, 90)}</li>
+    <li><b>TikTok</b><span class="note"><b>Come paga:</b> Creator Rewards paga i video originali in base alle viste valide. Le guide dicono che i video devono superare 1 minuto: i nostri spesso sono più corti, quindi per guadagnare qui andrebbero allungati.</span>
+      <span class="note"><b>Da quando:</b> 10.000 follower, 100.000 viste in 30 giorni, 18 anni e account personale. <b>L'Italia non è nell'elenco ufficiale</b> (Stati Uniti, Regno Unito, Germania, Giappone, Corea del Sud, Francia, Messico, Brasile): controlla in TikTok Studio.</span>
+      ${bar("Follower", f.tiktok, 10000)}${bar("Viste", sum("tiktok"), 100000)}${pace(sum("tiktok"), 100000, 30)}</li>
+    <li><b>Instagram</b><span class="note"><b>Come paga:</b> non paga per visualizzazione. Si guadagna con i regali sui Reel, gli abbonamenti e le collaborazioni con i marchi. I bonus sui Reel arrivano solo su invito.</span>
+      <span class="note"><b>Da quando:</b> i regali chiedono 500 follower, account professionale, 18 anni e un Paese abilitato. Controlla nell'app se l'Italia è inclusa.</span>
+      ${bar("Follower", f.instagram, 500)}</li></ul>
+    <p class="note" style="margin-top:12px"><b>L'età:</b> TikTok e Instagram chiedono 18 anni. Su YouTube i pagamenti di un minorenne li gestisce un adulto, con il suo account AdSense: parlane con i tuoi genitori prima di attivare qualsiasi guadagno. I guadagni vanno anche dichiarati.</p>
+    <p class="note">Regole lette il 1° novembre 2026: cambiano spesso, controlla sempre YouTube Studio e TikTok Studio.</p>`;
 }
 
 // scheda del reparto

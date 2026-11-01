@@ -34,15 +34,18 @@ const DEPTS = [
   { id: "revisione", name: "La tua scrivania", who: "Tu", animal: "lantern", fur: "#ffb862", at: [-10, 4.4], big: true,
     does: "Qui arriva il video finito. Lo guardi, e scegli: pubblica o rifai.",
     skills: [] },
-  { id: "pubblicazione", name: "Pubblicazione", who: "Neve, la cicogna", animal: "stork", fur: "#eef0f4", at: [-3.3, 4.4],
+  { id: "pubblicazione", name: "Pubblicazione", who: "Neve, la cicogna", animal: "stork", fur: "#eef0f4", at: [-5, 4.4],
     does: "Pubblica su Instagram, YouTube e TikTok all'ora giusta.",
     skills: ["caption-and-hashtags", "hashtag-keyword-research", "cross-platform-reformatter"] },
-  { id: "community", name: "Community", who: "Ada, la lontra", animal: "otter", fur: "#7a5a44", at: [3.3, 4.4],
+  { id: "community", name: "Community", who: "Ada, la lontra", animal: "otter", fur: "#7a5a44", at: [0, 4.4],
     does: "Risponde ai commenti e manda il messaggio a chi scrive la parola chiave.",
     skills: ["comment-responder", "dm-script-writer", "comment-mining"] },
-  { id: "statistiche", name: "Statistiche", who: "Abaco, l'orso", animal: "bear", fur: "#6e4d36", at: [10, 4.4],
-    does: "Legge i numeri della sera e dice alla Ricerca cosa rifare e cosa lasciar perdere.",
+  { id: "statistiche", name: "Statistiche", who: "Abaco, l'orso", animal: "bear", fur: "#6e4d36", at: [5, 4.4],
+    does: "Ogni sera raccoglie i numeri di YouTube, TikTok e Instagram e aggiorna la scheda Numeri.",
     skills: ["analytics-readout", "content-audit"] },
+  { id: "analisi", name: "Analisi", who: "Iris, la lince", animal: "lynx", fur: "#c9a36a", at: [10, 4.4],
+    does: "Confronta la grafica dei nostri video con quelli virali, guarda dove il pubblico se ne va e scrive cosa cambiare.",
+    skills: ["reel-analyzer", "competitor-teardown", "analytics-readout"] },
 ];
 const BY_ID = Object.fromEntries(DEPTS.map((d) => [d.id, d]));
 const STATUS_TEXT = { idle: "A riposo", working: "Al lavoro", done: "Fatto", waiting: "Aspetta te", error: "Si è fermato" };
@@ -168,6 +171,13 @@ const FIGURES = {
     shape(fur, () => { ell(124, 190, 50, 50); tri([86, 110], [88, 62], [116, 96]); tri([162, 110], [160, 62], [132, 96]); ell(124, 120, 42, 36); });
     shape("#6a8a5a", () => { ell(108, 120, 7, 9); ell(140, 120, 7, 9); });
     eye(108, 121, 3); eye(140, 121, 3); shape("#e9a8a0", () => tri([118, 136], [130, 136], [124, 144]));
+  },
+  lynx: ({ g, fur, shape, ell, tri, eye }) => {
+    shape(fur, () => { ell(128, 190, 50, 50); tri([90, 108], [84, 54], [118, 92]); tri([166, 108], [172, 54], [138, 92]); ell(128, 122, 44, 38); });
+    shape("#2a1d14", () => { tri([82, 62], [86, 34], [92, 62]); tri([174, 62], [170, 34], [164, 62]); });
+    shape("#f3e6cf", () => { ell(128, 138, 24, 16); ell(128, 196, 26, 34); });
+    shape("#d8a43a", () => { ell(112, 118, 7, 9); ell(144, 118, 7, 9); });
+    eye(112, 119, 3); eye(144, 119, 3); shape("#e9a8a0", () => tri([122, 132], [134, 132], [128, 139]));
   },
   stork: ({ g, fur, shape, ell, tri, eye }) => {
     shape("#e0543a", () => { g.rect(108, 200, 6, 40); g.rect(130, 200, 6, 40); });
