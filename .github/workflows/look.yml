@@ -32,8 +32,8 @@ jobs:
             F=/tmp/film/film.mp4
             DUR=$(ffprobe -v error -show_entries format=duration -of csv=p=0 "$F")
             N=$(python -c "import math; print(math.ceil($DUR / 1.5))"); COLS=$(python -c "import math; print(math.ceil(math.sqrt($N)))"); ROWS=$(python -c "import math; print(math.ceil($N / $COLS))")
-            ffmpeg -v error -y -i "$F" -vf "fps=1/1.5,scale=180:-1,tile=${COLS}x${ROWS}" -frames:v 1 "$D/sheet.jpg"
-            ffmpeg -v error -y -i "$F" -vf "fps=3,scale=270:-1,tile=9x1" -t 3 -frames:v 1 "$D/hook.jpg"
+            ffmpeg -nostdin -v error -y -i "$F" -vf "fps=1/1.5,scale=180:-1,tile=${COLS}x${ROWS}" -frames:v 1 "$D/sheet.jpg"
+            ffmpeg -nostdin -v error -y -i "$F" -vf "fps=3,scale=270:-1,tile=9x1" -t 3 -frames:v 1 "$D/hook.jpg"
             python - "$F" "$DUR" "$D/cuts.json" <<'PY'
           import json, re, subprocess, sys
           import numpy as np
