@@ -420,6 +420,25 @@ export function doorFrame(x, o) {
   x.fillRect(cx - w / 2 - w * .08, by, w * .08, h + w * .08); x.fillRect(cx + w / 2, by, w * .08, h + w * .08); x.fillRect(cx - w / 2 - w * .08, by + h, w * 1.16, w * .08);
 }
 
+// —— Added for "The Torn Rule · Part 2": a door that reads as a door at a glance ——
+// A front door seen from the front: four panels, a brass knob, a small window high up and the thin line of light under it.
+// cx, by = bottom centre, w, h = leaf size. o.lit: the window and the gap glow in g (light from outside). o.frame: frame colour.
+export function doorLeaf(x, o, g) {
+  const { cx, by, w, h, col = '#3a2418', panel = '#24150d', knob = '#d8b26a', glass = '#2a2030', underCol = '#e0a070',
+    frame = null, win = true, under = true, lit = true, knobSide = 1 } = o;
+  const gap = h * .025, x0 = cx - w / 2, m = w * .14, pw = (w - 3 * m) / 2, wy = by + h * .7, wh = h * .2;
+  if (x) {
+    if (frame) doorFrame(x, { cx, by, w, h, col: frame });
+    x.fillStyle = col; x.fillRect(x0, by + gap, w, h - gap);
+    x.fillStyle = panel;
+    for (const c of [0, 1]) { const px = x0 + m + c * (pw + m); x.fillRect(px, by + h * .08, pw, h * .26); x.fillRect(px, by + h * .4, pw, h * .24); if (!win) x.fillRect(px, wy, pw, wh); }
+    if (win) { x.fillStyle = glass; x.fillRect(x0 + m, wy, w - 2 * m, wh); x.fillStyle = col; x.fillRect(cx - w * .015, wy, w * .03, wh); }
+    x.fillStyle = knob; x.beginPath(); x.arc(cx + knobSide * (w / 2 - m * .9), by + h * .5, w * .045, 0, TAU); x.fill();
+    if (under) { x.fillStyle = underCol; x.fillRect(x0, by, w, gap); }
+  }
+  if (g && lit) { g.fillStyle = '#fff'; if (win) { g.fillRect(x0 + m, wy, w / 2 - m - w * .015, wh); g.fillRect(cx + w * .015, wy, w / 2 - m - w * .015, wh); } if (under) g.fillRect(x0, by, w, gap); }
+}
+
 // —— Added for "The Flannan Isles Keepers" (True Mysteries): a wall clock, oilskins on a peg, a flagpole, a railing that bends, a lamp lens ——
 
 // A round wall clock: case, face (cream paper), hour marks, two hands at h:m. The face can glow in g (moonlight on it).
