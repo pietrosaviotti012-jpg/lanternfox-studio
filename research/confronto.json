@@ -155,6 +155,24 @@
    "cambi_10s": 4.0,
    "movimento": 5.2
   },
+  "2026-10-28-stars-go-out": {
+   "luce": 11,
+   "contrasto": 12,
+   "saturazione": 72,
+   "buio": 73,
+   "colori": 1,
+   "cambi_10s": 5.8,
+   "movimento": 4.9
+  },
+  "2026-10-29-clocks-stop": {
+   "luce": 24,
+   "contrasto": 22,
+   "saturazione": 64,
+   "buio": 44,
+   "colori": 2,
+   "cambi_10s": 5.4,
+   "movimento": 7.0
+  },
   "2026-10-30-moon-gone": {
    "luce": 19,
    "contrasto": 18,
@@ -173,6 +191,24 @@
    "cambi_10s": 3.3,
    "movimento": 3.7
   },
+  "2026-10-30-torn-rule": {
+   "luce": 13,
+   "contrasto": 17,
+   "saturazione": 64,
+   "buio": 74,
+   "colori": 4,
+   "cambi_10s": 3.4,
+   "movimento": 3.9
+  },
+  "2026-10-31-lantern-night-2": {
+   "luce": 14,
+   "contrasto": 16,
+   "saturazione": 63,
+   "buio": 68,
+   "colori": 3,
+   "cambi_10s": 4.2,
+   "movimento": 4.8
+  },
   "2026-10-31-mary-celeste": {
    "luce": 15,
    "contrasto": 15,
@@ -181,6 +217,15 @@
    "colori": 2,
    "cambi_10s": 4.8,
    "movimento": 5.2
+  },
+  "2026-11-01-on-my-way-2": {
+   "luce": 11,
+   "contrasto": 12,
+   "saturazione": 69,
+   "buio": 81,
+   "colori": 2,
+   "cambi_10s": 2.6,
+   "movimento": 2.8
   },
   "2026-11-01-torn-rule-2": {
    "luce": 12,
@@ -196,27 +241,27 @@
   {
    "misura": "Cambi d'immagine ogni 10 secondi",
    "virali": 4.7,
-   "nostri": 3.5
+   "nostri": 3.8
   },
   {
    "misura": "Quanto cambia l'immagine ogni 1,5 secondi",
    "virali": 5.4,
-   "nostri": 4.1
+   "nostri": 4.5
   },
   {
    "misura": "Luce media (0-100)",
    "virali": 16.0,
-   "nostri": 11.5
+   "nostri": 12.0
   },
   {
    "misura": "Contrasto",
    "virali": 16.0,
-   "nostri": 13.5
+   "nostri": 14.0
   },
   {
    "misura": "Saturazione",
    "virali": 23.0,
-   "nostri": 66.5
+   "nostri": 64.0
   },
   {
    "misura": "Parte quasi nera dell'immagine (%)",
