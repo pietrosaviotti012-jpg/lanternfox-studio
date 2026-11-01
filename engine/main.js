@@ -86,8 +86,19 @@ const CAPS = script.captions || 'pop';
 const norm = w => w.toLowerCase().replace(/[^a-z0-9']/g, '');
 // the words of each line, grouped into chunks of 2-3 that end at punctuation when they can; times are film times
 const CHUNKS = {};
+// a time is one block on screen, "11:52 AM": Whisper can hand it over in pieces ("11:", "52", "am"), and a colon would end the chunk
+const joinTimes = ws => {
+  const out = [];
+  for (const [w, s, e] of ws) {
+    const p = out[out.length - 1];
+    if (p && (/^\d{1,2}:$/.test(p[0]) && /^\d{2}\b/.test(w) || /^\d{1,2}$/.test(p[0]) && /^:\d{2}\b/.test(w))) { p[0] += w; p[2] = e; }
+    else if (p && /^\d{1,2}(:\d{2})?$/.test(p[0]) && /^[ap]\.?m\b\.?[.,!?]?$/i.test(w)) { p[0] += '\u00a0' + w.replace(/\./g, '').replace(/[,!?]$/, '').toUpperCase() + (/[.,!?]$/.test(w) && !/\.m\.$/i.test(w) ? w.slice(-1) : ''); p[2] = e; }
+    else out.push([w, s, e]);
+  }
+  return out;
+};
 for (const L of script.lines) {
-  const c = C[L.id], ws = WORDS[L.id]?.length ? WORDS[L.id] : L.text.split(/\s+/).map((w, k, a) => [w, c.dur * k / a.length, c.dur * (k + 1) / a.length]);
+  const c = C[L.id], ws = joinTimes(WORDS[L.id]?.length ? WORDS[L.id] : L.text.split(/\s+/).map((w, k, a) => [w, c.dur * k / a.length, c.dur * (k + 1) / a.length]));
   const em = new Set((L.em || []).map(norm)), out = [];
   let cur = [];
   ws.forEach(([w, s, e], k) => {
