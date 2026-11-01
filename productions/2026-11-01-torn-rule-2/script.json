@@ -1,0 +1,317 @@
+{
+ "title": "The Torn Rule · Part 2",
+ "series": "The Torn Rule",
+ "format": "rules",
+ "theme": "regole/notte",
+ "voice": {
+  "preset": "cupo"
+ },
+ "captions": "pop",
+ "hud": {
+  "tag": "THE TORN RULE",
+  "part": "PART 2",
+  "clock": "3:34 AM"
+ },
+ "fx": "dust",
+ "lead": 0.4,
+ "tail": 3.4,
+ "lines": [
+  {
+   "id": "L01",
+   "text": "Two of you said SILENT. So at 3:34 am, you don't make a sound.",
+   "say": "Two of you said silent. So at three thirty-four a.m., you don't make a sound.",
+   "em": [
+    "SILENT"
+   ],
+   "clock": "3:34 AM",
+   "card": {
+    "app": "The Torn Rule",
+    "kind": "info",
+    "title": "Part 1 · your votes",
+    "body": "SILENT · 2    ANSWER · 0",
+    "hold": 3.2
+   },
+   "gap": 0.5,
+   "act": {
+    "intensity": 0.5,
+    "pace": 0.32,
+    "speed": 0.95
+   }
+  },
+  {
+   "id": "L02",
+   "text": "Then, behind you, someone answers the door.",
+   "em": [
+    "answers"
+   ],
+   "gap": 0.25,
+   "act": {
+    "intensity": 0.55,
+    "pace": 0.32,
+    "speed": 0.95
+   }
+  },
+  {
+   "id": "L03",
+   "text": "In your voice.",
+   "em": [
+    "your"
+   ],
+   "hit": true,
+   "tint": true,
+   "gap": 0.6,
+   "act": {
+    "intensity": 0.7,
+    "pace": 0.3,
+    "speed": 0.9,
+    "gain_db": 1
+   }
+  },
+  {
+   "id": "L04",
+   "text": "Coming! Just a second!",
+   "speaker": "uomo-giovane",
+   "quote": true,
+   "em": [
+    "Coming"
+   ],
+   "gap": 0.6,
+   "act": {
+    "intensity": 0.55,
+    "pace": 0.36,
+    "speed": 0.97,
+    "gain_db": 0
+   }
+  },
+  {
+   "id": "L05",
+   "text": "You live alone. And you haven't moved from the window.",
+   "em": [
+    "alone"
+   ],
+   "gap": 0.4,
+   "act": {
+    "intensity": 0.5,
+    "pace": 0.32,
+    "speed": 0.92,
+    "gain_db": -1
+   }
+  },
+  {
+   "id": "L06",
+   "text": "Your phone lights up. Unknown number.",
+   "em": [
+    "Unknown"
+   ],
+   "clock": "3:35 AM",
+   "gap": 0.35,
+   "act": {
+    "intensity": 0.45,
+    "pace": 0.32,
+    "speed": 0.95,
+    "gain_db": -1.5
+   },
+   "phone": {
+    "app": "messages",
+    "from": "Unknown number",
+    "thread": [
+     {
+      "me": false,
+      "text": "don't let anyone finish rule three"
+     },
+     {
+      "me": false,
+      "text": "good. you stayed silent."
+     },
+     {
+      "me": false,
+      "text": "now look at the roof."
+     }
+    ]
+   }
+  },
+  {
+   "id": "L07",
+   "text": "On the roof across the road, the tiny light is moving.",
+   "em": [
+    "moving"
+   ],
+   "gap": 0.35,
+   "act": {
+    "intensity": 0.45,
+    "pace": 0.32,
+    "speed": 0.95,
+    "gain_db": -1
+   }
+  },
+  {
+   "id": "L08",
+   "text": "A fox, with a lantern. It slides a scrap of paper under your back door.",
+   "em": [
+    "fox",
+    "paper"
+   ],
+   "gap": 0.7,
+   "act": {
+    "intensity": 0.45,
+    "pace": 0.32,
+    "speed": 0.95,
+    "gain_db": -1
+   }
+  },
+  {
+   "id": "L09",
+   "text": "The other half of rule three.",
+   "em": [
+    "half"
+   ],
+   "sub": false,
+   "gap": 0.4,
+   "act": {
+    "intensity": 0.5,
+    "pace": 0.3,
+    "speed": 0.9,
+    "gain_db": -1
+   }
+  },
+  {
+   "id": "L10",
+   "text": "If someone knocks three times, say nothing. The one who answers is not you.",
+   "sub": false,
+   "em": [
+    "not",
+    "you"
+   ],
+   "gap": 0.9,
+   "act": {
+    "intensity": 0.6,
+    "pace": 0.3,
+    "speed": 0.9,
+    "gain_db": -2
+   }
+  },
+  {
+   "id": "L11",
+   "text": "Footsteps. Your footsteps. Down the hall.",
+   "em": [
+    "Your"
+   ],
+   "clock": "3:36 AM",
+   "gap": 0.3,
+   "act": {
+    "intensity": 0.55,
+    "pace": 0.34,
+    "speed": 0.95,
+    "gain_db": -2
+   }
+  },
+  {
+   "id": "L12",
+   "text": "The front door opens, and it walks out.",
+   "em": [
+    "opens"
+   ],
+   "hit": true,
+   "tint": true,
+   "gap": 0.5,
+   "act": {
+    "intensity": 0.7,
+    "pace": 0.32,
+    "speed": 0.92,
+    "gain_db": 1
+   }
+  },
+  {
+   "id": "L13",
+   "text": "Your neighbors step aside, and the tall shadow walks it into the dark.",
+   "em": [
+    "shadow"
+   ],
+   "tint": true,
+   "gap": 0.8,
+   "act": {
+    "intensity": 0.55,
+    "pace": 0.3,
+    "speed": 0.92,
+    "gain_db": -1
+   }
+  },
+  {
+   "id": "L14",
+   "text": "At 6 am, the lights come back. Every phone gets one last line.",
+   "say": "At six a.m., the lights come back. Every phone gets one last line.",
+   "em": [
+    "lights"
+   ],
+   "clock": "6:00 AM",
+   "gap": 0.3,
+   "act": {
+    "intensity": 0.45,
+    "pace": 0.34,
+    "speed": 0.94
+   }
+  },
+  {
+   "id": "L15",
+   "text": "All clear. Thank you for your silence.",
+   "speaker": "uomo-radio",
+   "vfx": "radio",
+   "quote": true,
+   "em": [
+    "silence"
+   ],
+   "card": {
+    "app": "Emergency alert",
+    "title": "ALL CLEAR",
+    "body": "Thank you for your silence.",
+    "hold": 3
+   },
+   "gap": 0.6,
+   "act": {
+    "intensity": 0.5,
+    "pace": 0.34,
+    "speed": 0.97,
+    "gain_db": 1
+   }
+  },
+  {
+   "id": "L16",
+   "text": "But if the one who answered wasn't you... how long had it been living with you?",
+   "em": [
+    "how",
+    "long"
+   ],
+   "gap": 0.2,
+   "act": {
+    "intensity": 0.6,
+    "pace": 0.36,
+    "speed": 0.97,
+    "gain_db": 2
+   }
+  }
+ ],
+ "bpm": 60,
+ "seed": 32,
+ "music": [
+  {
+   "at": "S1",
+   "mood": "hush"
+  },
+  {
+   "at": "S6",
+   "mood": "rise"
+  },
+  {
+   "at": "S11",
+   "mood": "storm"
+  },
+  {
+   "at": "S14",
+   "mood": "warm"
+  },
+  {
+   "at": "S16",
+   "mood": "hush"
+  }
+ ]
+}

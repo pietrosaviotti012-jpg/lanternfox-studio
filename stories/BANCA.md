@@ -64,6 +64,8 @@ La Ricerca aggiunge ogni giorno 3-5 voci nuove (dalle mode del momento, da Reddi
 - **The Porch Light** (dal 2026-10-30): la regola di casa è lasciare la luce del portico accesa per chi torna tardi. Stanotte qualcuno la spegne da fuori. TURN IT ON or LEAVE IT.
 - ⭐ **The Last Knock** (dal 2026-10-31, Halloween): alle 23:48 la ciotola delle caramelle è vuota, poi un ultimo colpo alla porta. Un bambino con la maschera da volpe chiede una lanterna, non dolci; nella brina dietro di lui non ci sono impronte. OPEN or LIGHTS OFF.
 - **The Ghost Ship** (dal 2026-10-31, sera): alle 4:10 il tuo traghetto notturno si ferma nella nebbia. Accanto c'è un veliero con tutte le lampade accese e nessuno sul ponte. Una scialuppa vuota batte contro il vostro scafo. BOARD or STAY. (Seguito ideale del mistero Mary Celeste.)
+- ⭐ **The Quiet Hour** (dal 2026-11-01, formato regole): alle 2:00 tutte le radio del paese dicono la stessa cosa: per un'ora nessuno pronuncia il proprio nome. Alle 2:51 il citofono suona e una voce dice il tuo. SAY IT or HANG UP.
+- **The Torn Rule** (serie, formato regole): Parte 1 → `productions/2026-10-30-torn-rule`, Parte 2 (SILENT) → `productions/2026-11-01-torn-rule-2`
 - **Rule 3** (dal 2026-10-29, sera, formato regole): la sirena del paese suona due volte l'anno. Stanotte ha suonato tre volte. La regola 3 dice cosa fare, ma nessuno la ricorda.
 
 - ⭐ **From: Me** (dal 2026-10-30, sera, formato telefono): alle 3:07 ricevi un messaggio dal tuo numero: "Don't open the door for me." Poi le regole, poi qualcuno bussa con la tua voce. PHONE or DOOR.
