@@ -6,9 +6,8 @@
    "saturazione": 13,
    "buio": 63,
    "colori": 5,
-   "tagli_10s": 0.5,
-   "inquadratura_s": 5.6,
-   "piu_lunga_s": 56.0
+   "cambi_10s": 3.6,
+   "movimento": 3.9
   },
   "De2K6qcyco3": {
    "luce": 26,
@@ -16,9 +15,8 @@
    "saturazione": 23,
    "buio": 36,
    "colori": 2,
-   "tagli_10s": 2.5,
-   "inquadratura_s": 2.9,
-   "piu_lunga_s": 16.7
+   "cambi_10s": 4.8,
+   "movimento": 9.1
   },
   "De5-cuzIAyW": {
    "luce": 12,
@@ -26,9 +24,8 @@
    "saturazione": 22,
    "buio": 68,
    "colori": 3,
-   "tagli_10s": 1.0,
-   "inquadratura_s": 8.7,
-   "piu_lunga_s": 15.4
+   "cambi_10s": 4.4,
+   "movimento": 5.9
   },
   "De5QPFnvk-i": {
    "luce": 30,
@@ -36,9 +33,8 @@
    "saturazione": 22,
    "buio": 9,
    "colori": 3,
-   "tagli_10s": 2.4,
-   "inquadratura_s": 3.1,
-   "piu_lunga_s": 17.1
+   "cambi_10s": 5.4,
+   "movimento": 11.5
   },
   "DecvxHktyGJ": {
    "luce": 42,
@@ -46,9 +42,8 @@
    "saturazione": 21,
    "buio": 28,
    "colori": 3,
-   "tagli_10s": 3.2,
-   "inquadratura_s": 2.7,
-   "piu_lunga_s": 7.5
+   "cambi_10s": 4.7,
+   "movimento": 12.9
   },
   "Dehmjd-JHXv": {
    "luce": 13,
@@ -56,9 +51,8 @@
    "saturazione": 38,
    "buio": 55,
    "colori": 3,
-   "tagli_10s": 0.9,
-   "inquadratura_s": 9.1,
-   "piu_lunga_s": 23.9
+   "cambi_10s": 3.1,
+   "movimento": 2.5
   },
   "DeiLquUOdXr": {
    "luce": 21,
@@ -66,9 +60,8 @@
    "saturazione": 42,
    "buio": 33,
    "colori": 2,
-   "tagli_10s": 4.5,
-   "inquadratura_s": 1.3,
-   "piu_lunga_s": 11.9
+   "cambi_10s": 5.2,
+   "movimento": 9.1
   },
   "DekW1PjyfuH": {
    "luce": 20,
@@ -76,9 +69,8 @@
    "saturazione": 21,
    "buio": 33,
    "colori": 4,
-   "tagli_10s": 0.9,
-   "inquadratura_s": 8.5,
-   "piu_lunga_s": 17.0
+   "cambi_10s": 5.3,
+   "movimento": 6.7
   },
   "Dekb57IoCNF": {
    "luce": 11,
@@ -86,9 +78,8 @@
    "saturazione": 36,
    "buio": 73,
    "colori": 1,
-   "tagli_10s": 0.7,
-   "inquadratura_s": 11.2,
-   "piu_lunga_s": 31.1
+   "cambi_10s": 4.9,
+   "movimento": 5.4
   },
   "DemlE72OuLB": {
    "luce": 12,
@@ -96,9 +87,8 @@
    "saturazione": 33,
    "buio": 73,
    "colori": 4,
-   "tagli_10s": 0.2,
-   "inquadratura_s": 29.4,
-   "piu_lunga_s": 41.0
+   "cambi_10s": 4.4,
+   "movimento": 4.7
   },
   "DeuA-yvq3Jy": {
    "luce": 40,
@@ -106,9 +96,8 @@
    "saturazione": 18,
    "buio": 23,
    "colori": 4,
-   "tagli_10s": 5.3,
-   "inquadratura_s": 1.8,
-   "piu_lunga_s": 5.2
+   "cambi_10s": 5.9,
+   "movimento": 16.7
   },
   "DexaQbfJY4E": {
    "luce": 14,
@@ -116,9 +105,8 @@
    "saturazione": 23,
    "buio": 59,
    "colori": 2,
-   "tagli_10s": 0.1,
-   "inquadratura_s": 50.3,
-   "piu_lunga_s": 94.4
+   "cambi_10s": 4.6,
+   "movimento": 4.7
   },
   "DfB24tJN8dG": {
    "luce": 19,
@@ -126,9 +114,8 @@
    "saturazione": 38,
    "buio": 30,
    "colori": 2,
-   "tagli_10s": 0.4,
-   "inquadratura_s": 17.2,
-   "piu_lunga_s": 28.8
+   "cambi_10s": 3.9,
+   "movimento": 3.7
   },
   "DfC8DBQo8N7": {
    "luce": 16,
@@ -136,9 +123,8 @@
    "saturazione": 38,
    "buio": 47,
    "colori": 2,
-   "tagli_10s": 0.7,
-   "inquadratura_s": 12.7,
-   "piu_lunga_s": 38.9
+   "cambi_10s": 3.9,
+   "movimento": 5.4
   },
   "DfDdT8sxlnq": {
    "luce": 11,
@@ -146,9 +132,8 @@
    "saturazione": 24,
    "buio": 68,
    "colori": 4,
-   "tagli_10s": 0.6,
-   "inquadratura_s": 8.5,
-   "piu_lunga_s": 45.7
+   "cambi_10s": 4.7,
+   "movimento": 5.3
   }
  },
  "nostri": {
@@ -158,9 +143,8 @@
    "saturazione": 72,
    "buio": 88,
    "colori": 1,
-   "tagli_10s": 0.0,
-   "inquadratura_s": 54.3,
-   "piu_lunga_s": 54.3
+   "cambi_10s": 2.4,
+   "movimento": 2.7
   },
   "2026-10-28-lighthouse-fox": {
    "luce": 11,
@@ -168,9 +152,8 @@
    "saturazione": 76,
    "buio": 69,
    "colori": 1,
-   "tagli_10s": 0.0,
-   "inquadratura_s": 40.9,
-   "piu_lunga_s": 40.9
+   "cambi_10s": 4.0,
+   "movimento": 5.2
   },
   "2026-10-30-moon-gone": {
    "luce": 19,
@@ -178,9 +161,8 @@
    "saturazione": 63,
    "buio": 41,
    "colori": 2,
-   "tagli_10s": 0.0,
-   "inquadratura_s": 55.0,
-   "piu_lunga_s": 55.0
+   "cambi_10s": 3.8,
+   "movimento": 4.5
   },
   "2026-10-30-on-my-way": {
    "luce": 11,
@@ -188,9 +170,8 @@
    "saturazione": 64,
    "buio": 78,
    "colori": 2,
-   "tagli_10s": 0.0,
-   "inquadratura_s": 57.4,
-   "piu_lunga_s": 57.4
+   "cambi_10s": 3.3,
+   "movimento": 3.7
   },
   "2026-10-31-mary-celeste": {
    "luce": 15,
@@ -198,9 +179,8 @@
    "saturazione": 46,
    "buio": 62,
    "colori": 2,
-   "tagli_10s": 0.5,
-   "inquadratura_s": 13.4,
-   "piu_lunga_s": 30.4
+   "cambi_10s": 4.8,
+   "movimento": 5.2
   },
   "2026-11-01-torn-rule-2": {
    "luce": 12,
@@ -208,26 +188,20 @@
    "saturazione": 69,
    "buio": 77,
    "colori": 4,
-   "tagli_10s": 0.2,
-   "inquadratura_s": 30.3,
-   "piu_lunga_s": 49.4
+   "cambi_10s": 2.6,
+   "movimento": 2.6
   }
  },
  "tabella": [
   {
-   "misura": "Tagli ogni 10 secondi",
-   "virali": 0.9,
-   "nostri": 0.0
+   "misura": "Cambi d'immagine ogni 10 secondi",
+   "virali": 4.7,
+   "nostri": 3.5
   },
   {
-   "misura": "Inquadratura tipica (secondi)",
-   "virali": 8.5,
-   "nostri": 47.6
-  },
-  {
-   "misura": "Inquadratura più lunga (secondi)",
-   "virali": 23.9,
-   "nostri": 51.8
+   "misura": "Quanto cambia l'immagine ogni 1,5 secondi",
+   "virali": 5.4,
+   "nostri": 4.1
   },
   {
    "misura": "Luce media (0-100)",
