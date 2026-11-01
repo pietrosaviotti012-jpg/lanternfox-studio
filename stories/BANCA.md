@@ -76,6 +76,11 @@ La Ricerca aggiunge ogni giorno 3-5 voci nuove (dalle mode del momento, da Reddi
 - ⭐ **The Mimic Call** (dal 2026-11-01, filone "mimic"): alle 2:20 tuo fratello piccolo ti chiama per nome dal corridoio. È al campo scuola fino a domenica. CHECK or LOCK.
 - **The Second Tea** (dal 2026-11-01, seguito di *On My Way*): sul tavolo ci sono due tazze di tè, e tu ne hai fatta una sola. Si usa solo se l'utente chiede una Parte 3.
 
+- ⭐ **Lamp Room · Night 1/7** (dal 2026-11-01, sera, formato regole a puntate): custode dell'ultimo faro, la barca arriva fra sette giorni. GOOD NEWS / BAD NEWS sulle risorse. Alle 2:40 bussano: "The lamp's gone out, let me in!", ma la lampada sopra di te gira. OPEN or STAY UP.
+- ⭐ **The Main Hall** (dal 2026-11-01, sera, formato your call): "If the museum alarm tells you to go to the main hall, don't. This morning you saw its doors being chained from the outside." Indizio di stamattina in flashback. Finale: la guida bussa con la parola d'ordine della gita. UNLOCK or WAIT.
+- **4%** (dal 2026-11-01, sera, formato telefono): la batteria è il timer; ti basta per un solo messaggio. MOM o UNKNOWN?
+- **Intercom** (dal 2026-11-01, sera, formato non fare rumore): l'interfono del palazzo: "Apartment 6B, we know you're in there." Nessuno sa che sei a casa. STAY or RUN.
+
 ## Non fare rumore (formato `silenzio.md`, dal 2026-10-31)
 - ⭐ **Hush Harbor**: "It's 3:12 am on the night ferry. The engines cut out, and the captain whispers into the radio: from now on, nobody makes a sound." Misuratore NOISE in alto, tre regole su tre oggetti (telefono, scarpe sul ponte di metallo, il parapetto). Finale: il carillon di una bambina comincia a suonare. STOP IT or THROW IT.
 - **Library Hours**: addormentato in biblioteca, alle 2:14 si accende il cartello "QUIET PLEASE. IT IS LISTENING." Finale: qualcuno sta per starnutire. HELP or HIDE.
