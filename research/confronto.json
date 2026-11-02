@@ -235,6 +235,24 @@
    "colori": 4,
    "cambi_10s": 2.6,
    "movimento": 2.6
+  },
+  "2026-11-02-hush-harbor": {
+   "luce": 13,
+   "contrasto": 14,
+   "saturazione": 65,
+   "buio": 67,
+   "colori": 1,
+   "cambi_10s": 3.8,
+   "movimento": 3.8
+  },
+  "2026-11-02-lamp-room": {
+   "luce": 16,
+   "contrasto": 16,
+   "saturazione": 66,
+   "buio": 58,
+   "colori": 3,
+   "cambi_10s": 3.5,
+   "movimento": 4.2
   }
  },
  "tabella": [
@@ -246,12 +264,12 @@
   {
    "misura": "Quanto cambia l'immagine ogni 1,5 secondi",
    "virali": 5.4,
-   "nostri": 4.5
+   "nostri": 4.2
   },
   {
    "misura": "Luce media (0-100)",
    "virali": 16.0,
-   "nostri": 12.0
+   "nostri": 13.0
   },
   {
    "misura": "Contrasto",
@@ -261,12 +279,12 @@
   {
    "misura": "Saturazione",
    "virali": 23.0,
-   "nostri": 64.0
+   "nostri": 65.0
   },
   {
    "misura": "Parte quasi nera dell'immagine (%)",
    "virali": 47.0,
-   "nostri": 73.0
+   "nostri": 69.0
   },
   {
    "misura": "Colori forti diversi",
