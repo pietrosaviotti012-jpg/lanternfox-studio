@@ -43,6 +43,12 @@ lead = float(script.get("lead", 1.4))
 first = y[:4]
 add("Gancio", lead <= 2 and (not first or max(first) >= 22), f"la voce parte dopo {it(lead)} secondi" + ("" if not first or max(first) >= 22 else ", ma i primi 2 secondi sono neri"))
 
+# a sound in the first two seconds: every reference film measured by Real SFX has one (the music alone does not count)
+evp = os.path.join(P, "events.json")
+if os.path.exists(evp):
+    first = [e for e in json.load(open(evp))["ev"] if e["type"] not in ("line", "shot") and e["t"] < 2]
+    add("Suono nel gancio", bool(first), f"{len(first)} effetti nei primi 2 secondi" if first else "nessun effetto nei primi 2 secondi: aggiungine uno sul primo evento")
+
 # the figures on the ground: shots with a figure and a camera that is not at the height of the floor (tools/ground_check.mjs)
 try:
     g = json.loads(subprocess.run(["node", os.path.join(os.path.dirname(os.path.abspath(__file__)), "ground_check.mjs"), P], capture_output=True, text=True, check=True).stdout)

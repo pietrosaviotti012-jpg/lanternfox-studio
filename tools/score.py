@@ -35,11 +35,11 @@ if family in CAT:
         f = 2 * SR; r = np.linspace(0, 1, f, dtype=np.float32)[:, None]
         x = np.concatenate([x[:-f], x[-f:] * (1 - r) + x[:f] * r, x[f:]])
     x = x[:want].copy()
-    LEVEL = {"hush": .45, "calm": .6, "warm": .65, "rise": .85, "storm": 1, "end": .7}
+    LEVEL = {"hush": .5, "calm": .65, "warm": .7, "rise": .85, "storm": 1, "end": .9}   # the end holds up: it closes on the choice, not on a fade
     t = np.arange(want) / SR
     points = sorted([(t0, LEVEL.get(mood, .7)) for t0, _, mood in sections] + [(max(t0, t1 - 1.2), LEVEL.get(mood, .7) if mood != "rise" else 1) for t0, t1, mood in sections])
     x *= np.interp(t, [p[0] for p in points], [p[1] for p in points])[:, None].astype(np.float32)
-    fade = int(1.5 * SR); x[-fade:] *= np.linspace(1, 0, fade, dtype=np.float32)[:, None]
+    fade = int(.8 * SR); x[-fade:] *= np.linspace(1, 0, fade, dtype=np.float32)[:, None]
     os.makedirs(os.path.join(prod, "out"), exist_ok=True)
     sf.write(os.path.join(prod, "out", "music.wav"), x / max(1e-6, np.abs(x).max()) * .7, SR)
     print("music", e["file"], round(DUR, 2), "s,", len(sections), "sections:", ", ".join(m for _, _, m in sections))

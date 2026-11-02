@@ -94,6 +94,14 @@ def sample(fam, d, cap=6):
     if CAT[fam]["kind"] != "oneshot" and f: x[:f] *= np.linspace(0, 1, f, dtype=np.float32)
     return x * 10 ** ((-24 if CAT[fam]["kind"] == "oneshot" else -31) / 20 - e["rms"] / 20)
 
+# the loud point of a sound lands on the moment, not its start: a knock or a door begins a little before what you see
+# (the reference films measured by Real SFX put the peak 6-20 ms after the picture event). "anchor": "start" in sfx keeps the old way.
+def peak_of(x):
+    head = np.abs(x[:int(.5 * SR)])
+    if not len(head): return 0
+    env = np.convolve(head, np.ones(int(.01 * SR)) / (.01 * SR), mode="same")
+    return float(np.argmax(env)) / SR
+
 GAIN = {"click": -26, "shimmer": -30, "chime": -28, "whoosh": -30, "thunder": -20, "crack": -24, "rain": -30, "wind": -32, "waves": -31, "steps": -27, "paper": -30}
 for e in ev["ev"]:
     k = e["type"]
@@ -101,7 +109,9 @@ for e in ev["ev"]:
     d = e.get("d", 4.0); v = e.get("v", 1.0)
     fam = pack.get("swap", {}).get(k, k)
     if fam in CAT and not fam.startswith("m-"):
-        add(fx, sample(fam, e.get("d", 4.0 if CAT[fam]["kind"] != "oneshot" else None)), e["t"], v * 1.6, pan=e.get("pan", 0)); continue
+        y = sample(fam, e.get("d", 4.0 if CAT[fam]["kind"] != "oneshot" else None))
+        lead = peak_of(y) - .012 if CAT[fam]["kind"] == "oneshot" and e.get("anchor", "peak") == "peak" else 0
+        add(fx, y, max(0, e["t"] - max(0, lead)), v * 1.6, pan=e.get("pan", (number(prod, fam, e["t"]) % 61 - 30) / 100)); continue   # earshot heard us almost mono: each sound a little to one side
     x = {"click": lambda: switch(), "shimmer": shimmer, "chime": chime, "whoosh": lambda: lp(sfx.whoosh(rng.uniform(.35, .9)), rng.uniform(1800, 7000)), "thunder": thunder, "crack": crack,
          "rain": lambda: rain(d), "wind": lambda: wind(d), "waves": lambda: waves(d), "steps": lambda: steps(e.get("n", 8), e.get("every", .4)), "paper": paper}.get(k)
     if x is None: print("unknown sfx", k); continue
@@ -117,8 +127,9 @@ if bed and bed in CAT:
 music, _ = sf.read(os.path.join(prod, "out", "music.wav"), dtype="float32")
 music = np.pad(music, ((0, max(0, N - len(music))), (0, 0)))[:N]
 env = np.convolve(speech.astype(np.float32), np.ones(int(.25 * SR)) / (.25 * SR), mode="same")
-duck = 10 ** (-5.5 * np.clip(env * 3, 0, 1) / 20)
-music *= (10 ** (-27.5 / 20) / rms(music))
+# earshot (2026-11-02): the music was heard in under half of The Mary Celeste. A little louder, ducked a little more under the voice
+duck = 10 ** (-6.5 * np.clip(env * 3, 0, 1) / 20)
+music *= (10 ** (-25 / 20) / rms(music))
 music *= duck[:, None]
 
 mix = voice + music + fx

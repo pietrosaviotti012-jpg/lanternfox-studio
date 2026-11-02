@@ -29,6 +29,15 @@ sfx: [{ t: .4, type: 'knock', v: .9 }, { t: 1.6, type: 'door-creak', v: .8 }, { 
 
 Tutte le famiglie sono in `sounds/CATALOGO.json`: anche quelle di un altro formato si possono usare se la storia lo chiede. Restano i vecchi nomi sintetici: `click`, `whoosh`.
 
+## Tempo e volume (dalle misure di Real SFX su 13 film professionali)
+- **Il colpo cade sull'evento.** Il mix mette il punto più forte di un suono breve sul momento scritto in `t`, non il suo inizio: scrivi in `t` l'istante in cui la porta sbatte, non quando comincia il gesto. `"anchor": "start"` fa partire il suono da `t`.
+- **Sempre un suono nei primi 2 secondi**, oltre alla musica: il Controllo qualità lo segnala in Approva.
+- **La voce comanda.** Gli effetti stanno 6-10 dB sotto la voce, e mai una parola importante sopra un colpo (`pipeline/VOCE.md`).
+- **Poco e giusto.** Nei film di riferimento solo una parte degli eventi ha un suono preciso: meglio pochi suoni nel punto giusto che uno su ogni taglio.
+
+## Ascoltare la libreria
+Noi non sentiamo, earshot sì. `tools/sounds_listen.py` confronta ogni file con quello che la sua famiglia dovrebbe essere e dice se è una registrazione vera: il risultato è in `sounds/ASCOLTO.md`, con in cima i file da sostituire. Va rifatto quando si aggiungono suoni. Gira sul computer dell'utente, dove earshot è installato (`~/tools/earshot`).
+
 ## Per cambiare
 Nel `script.json`: `"track": "m-dread"` cambia la musica, `"track": "carillon"` rimette il carillon, `"bed": "cave"` cambia l'ambiente, `"bed": false` lo toglie.
 
