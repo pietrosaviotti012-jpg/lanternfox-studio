@@ -1059,3 +1059,46 @@ export function metalDeck(x, o) {
   for (let i = 0; i < n; i++) { const k = (i / n) ** 1.8, y = y1 - (y1 - y0) * k; x.fillRect(x0, y - .0004 - k * .001, x1 - x0, .0008 + k * .0016); }
   x.fillStyle = 'rgba(0,0,0,.35)'; x.fillRect(x0, y1 - .004, x1 - x0, .004);
 }
+
+// (Lamp Room) the coast guard radio set on its desk: a boxy set with a grille, a dial window that glows and two knobs.
+// cord = how far the power cord hangs from the back corner; the plug dangles at its end, unplugged. Returns the plug's point.
+export function radioSet(x, o, g) {
+  const { cx, by, s, col = '#1a1f1c', face = '#2a3430', cord = 0, swing = 0, box = true } = o, w = s, h = s * .55;
+  if (x && box) {
+    x.fillStyle = col; x.fillRect(cx - w / 2, by, w, h);
+    x.fillStyle = face; x.fillRect(cx - w * .46, by + h * .1, w * .92, h * .8);
+    x.fillStyle = col; for (let i = 0; i < 5; i++) for (let j = 0; j < 4; j++) { x.beginPath(); x.arc(cx - w * .36 + i * w * .055, by + h * .25 + j * h * .17, w * .014, 0, TAU); x.fill(); }
+    x.fillStyle = '#3a3020'; x.fillRect(cx + w * .02, by + h * .52, w * .38, h * .26);
+    x.fillStyle = col; for (const k of [.12, .32]) { x.beginPath(); x.arc(cx + w * k, by + h * .28, w * .045, 0, TAU); x.fill(); }
+    x.fillRect(cx + w * .38, by + h, w * .015, h * .9);                                       // antenna
+  }
+  if (g && box) { g.fillStyle = '#fff'; g.fillRect(cx + w * .02, by + h * .52, w * .38, h * .26); g.beginPath(); g.arc(cx + w * .43, by + h * .2, w * .02, 0, TAU); g.fill(); }
+  let plug = null;
+  if (cord) {
+    const x0 = cx + w * .44, y0 = by, ex = x0 + Math.sin(swing) * cord, ey = y0 - Math.cos(swing) * cord;
+    if (x) { x.strokeStyle = '#0a0c0c'; x.lineWidth = s * .018; x.lineCap = 'round';
+      x.beginPath(); x.moveTo(x0, y0); x.quadraticCurveTo(x0 + Math.sin(swing) * cord * .3 + s * .04, y0 - cord * .5, ex, ey); x.stroke();
+      x.fillStyle = '#1a1a18'; x.fillRect(ex - s * .04, ey - s * .07, s * .08, s * .07);
+      x.fillStyle = '#b8a888'; for (const d of [-1, 1]) x.fillRect(ex + d * s * .018 - s * .006, ey - s * .11, s * .012, s * .04); }
+    plug = [ex, ey];
+  }
+  return { plug };
+}
+// (Lamp Room) a wall socket: a plate with two dark holes
+export function socket(x, o) {
+  const { cx, cy, s, col = '#cfc6b0' } = o;
+  x.fillStyle = col; x.fillRect(cx - s / 2, cy - s * .65, s, s * 1.3);
+  x.fillStyle = '#141412'; for (const d of [-1, 1]) x.fillRect(cx + d * s * .17 - s * .05, cy - s * .2, s * .1, s * .4);
+}
+// (Lamp Room) a door bolt: two staples on a back plate, the bar through them, a knob; rust spots. bend (0..1) bows the bar
+// out of its staples, as if pushed from the other side.
+export function doorBolt(x, o) {
+  const { cx, cy, s, bend = 0, col = '#4a4842', rust = '#8a3a1e', plate = '#2e2c28' } = o;
+  x.fillStyle = plate; x.fillRect(cx - s * .7, cy - s * .16, s * 1.4, s * .32);
+  x.strokeStyle = col; x.lineCap = 'round'; x.lineWidth = s * .12;
+  x.beginPath(); x.moveTo(cx - s * .62, cy); x.quadraticCurveTo(cx, cy + bend * s * .5, cx + s * .62, cy + bend * s * .12); x.stroke();
+  x.fillStyle = col; x.beginPath(); x.arc(cx + s * .66, cy + bend * s * .12, s * .09, 0, TAU); x.fill();
+  x.fillStyle = '#1e1c18'; for (const k of [-.4, .3]) x.fillRect(cx + k * s - s * .06, cy - s * .2, s * .12, s * .4);
+  x.fillStyle = rust; const R = mulberry(9);
+  for (let i = 0; i < 14; i++) { const u = (R() - .5) * 1.3, v = (R() - .5) * .3; x.beginPath(); x.arc(cx + u * s, cy + v * s + bend * s * .5 * (1 - (2 * u / 1.3) ** 2) * (Math.abs(v) < .1 ? 1 : 0), s * (.02 + R() * .035), 0, TAU); x.fill(); }
+}

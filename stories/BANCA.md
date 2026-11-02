@@ -45,6 +45,7 @@ La Ricerca aggiunge ogni giorno 3-5 voci nuove (dalle mode del momento, da Reddi
 - What if the Moon moved away 3.8 cm every second instead of every year? (dal 2026-10-30, sera: seguito naturale della Luna, collana "il cielo")
 - What if the Sun were the size of the Moon in the sky? (I fatti veri sulla distanza, la luce che cambia colore.) (dal 2026-10-30, sera)
 - What if Earth had rings like Saturn? (Un arco che taglia il cielo di giorno, l'ombra degli anelli d'inverno, notti mai buie. Fatti veri.) (dal 2026-10-31)
+- What if every lighthouse went dark for one night? (Alle 21 tutti i fari della Terra si spengono. Fatti veri: il GPS delle navi, i pescatori piccoli, ogni faro ha il suo ritmo di luce come un nome. Chiusa: "Would you notice from your window?") (dal 2026-11-02, sera)
 - What if sound stopped for one minute? ("You don't hear the crash. You see it." Chiusa: "Would you notice first, or would your dog?") (dal 2026-10-29, sera)
 
 ## Your Call (seconda persona, scelta finale)
@@ -77,7 +78,8 @@ La Ricerca aggiunge ogni giorno 3-5 voci nuove (dalle mode del momento, da Reddi
 - ⭐ **The Mimic Call** (dal 2026-11-01, filone "mimic"): alle 2:20 tuo fratello piccolo ti chiama per nome dal corridoio. È al campo scuola fino a domenica. CHECK or LOCK.
 - **The Second Tea** (dal 2026-11-01, seguito di *On My Way*): sul tavolo ci sono due tazze di tè, e tu ne hai fatta una sola. Si usa solo se l'utente chiede una Parte 3.
 
-- ⭐ **Lamp Room · Night 1/7** (dal 2026-11-01, sera, formato regole a puntate): custode dell'ultimo faro, la barca arriva fra sette giorni. GOOD NEWS / BAD NEWS sulle risorse. Alle 2:40 bussano: "The lamp's gone out, let me in!", ma la lampada sopra di te gira. OPEN or STAY UP.
+- ⭐ **Lamp Room · Night 1/7** (dal 2026-11-01, sera, formato regole a puntate): custode dell'ultimo faro, la barca arriva fra sette giorni. GOOD NEWS / BAD NEWS sulle risorse. Alle 2:40 bussano: "The lamp's gone out, let me in!", ma la lampada sopra di te gira. OPEN or STAY UP. → `productions/2026-11-02-lamp-room` (OPEN or STAY)
+- **The 4:44 Ferry** (dal 2026-11-02, sera, formato regole): un traghetto parte alle 4:44, non è sull'orario e i vecchi del porto dicono di non comprare mai il biglietto. Stanotte ce l'hai in tasca, col tuo nome. BOARD or TEAR IT.
 - ⭐ **The Main Hall** (dal 2026-11-01, sera, formato your call): "If the museum alarm tells you to go to the main hall, don't. This morning you saw its doors being chained from the outside." Indizio di stamattina in flashback. Finale: la guida bussa con la parola d'ordine della gita. UNLOCK or WAIT.
 - **4%** (dal 2026-11-01, sera, formato telefono): la batteria è il timer; ti basta per un solo messaggio. MOM o UNKNOWN?
 - **Intercom** (dal 2026-11-01, sera, formato non fare rumore): l'interfono del palazzo: "Apartment 6B, we know you're in there." Nessuno sa che sei a casa. STAY or RUN.
