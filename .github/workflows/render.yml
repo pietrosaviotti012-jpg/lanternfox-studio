@@ -167,6 +167,19 @@ jobs:
           PY: python
           VIDEO_ID: ${{ needs.voice.outputs.id }}
         run: sh tools/build.sh "${{ needs.voice.outputs.dir }}"
+      - name: Listening cache (earshot models, ~1.1 GB, downloaded once)
+        uses: actions/cache@v4
+        with:
+          path: /home/runner/.cache/earshot
+          key: earshot-591fa3e
+      - name: Listening with earshot (it never stops the chain)
+        continue-on-error: true
+        timeout-minutes: 15
+        run: |
+          python -m venv /tmp/es
+          /tmp/es/bin/pip install -q torch --index-url https://download.pytorch.org/whl/cpu
+          /tmp/es/bin/pip install -q "earshot @ git+https://github.com/Leonxlnx/earshot@591fa3e028032e6dce56620a20e932e35667e8d8"
+          /tmp/es/bin/python -I tools/earshot_check.py "${{ needs.voice.outputs.dir }}"
       - name: Quality check (it never stops the chain)
         env:
           P: ${{ needs.voice.outputs.dir }}

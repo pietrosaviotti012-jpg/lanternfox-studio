@@ -56,6 +56,12 @@ try:
 except Exception as e:
     print("ground check skipped:", type(e).__name__)
 
+# the sound heard by earshot (tools/earshot_check.py, the step before this one): advice against professional films
+ep = os.path.join(P, "out", "earshot.json")
+if os.path.exists(ep):
+    e = json.load(open(ep, encoding="utf8"))
+    add("Suono (earshot)", e["ok"], e["detail"])
+
 # the words: Whisper on the final mix must find the lines over music and effects
 try:
     from faster_whisper import WhisperModel
