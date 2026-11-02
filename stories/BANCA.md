@@ -66,6 +66,7 @@ La Ricerca aggiunge ogni giorno 3-5 voci nuove (dalle mode del momento, da Reddi
 - **The Ghost Ship** (dal 2026-10-31, sera): alle 4:10 il tuo traghetto notturno si ferma nella nebbia. Accanto c'è un veliero con tutte le lampade accese e nessuno sul ponte. Una scialuppa vuota batte contro il vostro scafo. BOARD or STAY. (Seguito ideale del mistero Mary Celeste.)
 - ⭐ **The Quiet Hour** (dal 2026-11-01, formato regole): alle 2:00 tutte le radio del paese dicono la stessa cosa: per un'ora nessuno pronuncia il proprio nome. Alle 2:51 il citofono suona e una voce dice il tuo. SAY IT or HANG UP.
 - **The Torn Rule** (serie, formato regole): Parte 1 → `productions/2026-10-30-torn-rule`, Parte 2 (SILENT) → `productions/2026-11-01-torn-rule-2`
+- **The Snow Count** (dal 2026-11-02, formato regole): "In our town, when it snows after midnight, you count the people in your house every hour." Alle 3:00 conti quattro. Vivete in tre. COUNT AGAIN or WAKE THEM.
 - **Rule 3** (dal 2026-10-29, sera, formato regole): la sirena del paese suona due volte l'anno. Stanotte ha suonato tre volte. La regola 3 dice cosa fare, ma nessuno la ricorda.
 
 - ⭐ **From: Me** (dal 2026-10-30, sera, formato telefono): alle 3:07 ricevi un messaggio dal tuo numero: "Don't open the door for me." Poi le regole, poi qualcuno bussa con la tua voce. PHONE or DOOR.
@@ -82,7 +83,8 @@ La Ricerca aggiunge ogni giorno 3-5 voci nuove (dalle mode del momento, da Reddi
 - **Intercom** (dal 2026-11-01, sera, formato non fare rumore): l'interfono del palazzo: "Apartment 6B, we know you're in there." Nessuno sa che sei a casa. STAY or RUN.
 
 ## Non fare rumore (formato `silenzio.md`, dal 2026-10-31)
-- ⭐ **Hush Harbor**: "It's 3:12 am on the night ferry. The engines cut out, and the captain whispers into the radio: from now on, nobody makes a sound." Misuratore NOISE in alto, tre regole su tre oggetti (telefono, scarpe sul ponte di metallo, il parapetto). Finale: il carillon di una bambina comincia a suonare. STOP IT or THROW IT.
+- ⭐ **Hush Harbor**: "It's 3:12 am on the night ferry. The engines cut out, and the captain whispers into the radio: from now on, nobody makes a sound." Misuratore NOISE in alto, tre regole su tre oggetti (telefono, scarpe sul ponte di metallo, il parapetto). Finale: il carillon di una bambina comincia a suonare. STOP IT or THROW IT. → `productions/2026-11-02-hush-harbor` (STOP or THROW)
+- **The Night Bus** (dal 2026-11-02): "It's 1:40 am. The night bus stops between two towns, and the driver turns off every light." Cartello sul vetro: "IF IT KNOCKS, NOBODY ANSWERS". Finale: il telefono di uno sconosciuto addormentato comincia a squillare. ANSWER IT or LET IT RING.
 - **Library Hours**: addormentato in biblioteca, alle 2:14 si accende il cartello "QUIET PLEASE. IT IS LISTENING." Finale: qualcuno sta per starnutire. HELP or HIDE.
 
 ## I soldi che scottano (formato `soldi.md`, dal 2026-10-30)

@@ -1,5 +1,5 @@
 {
- "alias": {"legend": "mystery", "misteri": "mystery", "regole": "rules", "telefono": "phone", "conto-alla-rovescia": "countdown", "tale": "fable", "fiaba": "fable"},
+ "alias": {"legend": "mystery", "misteri": "mystery", "regole": "rules", "silence": "rules", "silenzio": "rules", "telefono": "phone", "conto-alla-rovescia": "countdown", "tale": "fable", "fiaba": "fable"},
  "formats": {
   "your-call": {
    "music": ["m-suspense", "m-dread"], "bed": ["room", "wind", "forest"],

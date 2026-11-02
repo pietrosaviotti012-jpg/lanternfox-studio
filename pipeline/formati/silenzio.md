@@ -22,3 +22,6 @@ Un posto banale, un'ora strana e un suono collettivo: "You're doing laundry at 1
 
 ## Come finisce
 Primo piano di chi sta per fare rumore (il neonato col labbro che trema, il cane che annusa la porta), poi `choice` con un dilemma morale: `{"question": "The baby is about to cry", "a": {"word": "HELP"}, "b": {"word": "WALK AWAY"}}`. Poi `next` con il cartello di serie che passa da DAY 1 a DAY 2. Nelle puntate dopo le regole continuano la numerazione (RULE #4, #5…): chi arriva tardi va a cercare le prime.
+
+## Nel motore (dal 2026-11-02)
+`meta.format` è `"silence"`: tema `regole` (`engine/kit/themes.js`, alias) e pacchetto di suoni `rules` (`sounds/PACCHETTI.json`, alias). Il narratore si sceglie in `script.json` con `"voice": {"preset": "cupo"}`. Primo video: `productions/2026-11-02-hush-harbor`.

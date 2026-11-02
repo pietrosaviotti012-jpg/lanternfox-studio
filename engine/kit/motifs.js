@@ -956,3 +956,106 @@ export function barrel(x, o) {
   x.lineTo(cx + w * .42, by + h); x.quadraticCurveTo(cx + w * .56, by + h / 2, cx + w * .42, by); x.closePath(); x.fill();
   x.fillStyle = band; for (const v of [.18, .78]) x.fillRect(cx - w * .5, by + h * v, w, h * .06);
 }
+
+// —— Added for "Hush Harbor · Part 1" (Non fare rumore): a night ferry, a wall loudspeaker, a music box, a pair of shoes,
+// a channel buoy, a ribbed metal deck ——
+
+// A car ferry seen from the side, facing right: a long low hull, two decks of square windows, a wheelhouse and a funnel.
+// cx, by = bottom centre of the hull at the waterline, s = length. The windows burn in g when o.lit.
+export function ferry(x, o, g) {
+  const { cx, by, s, col = '#0e2219', glass = '#081610', lit = true } = o;
+  const h = s * .09, x0 = cx - s / 2;
+  const wins = [];
+  for (let d = 0; d < 2; d++) for (let i = 0; i < 11; i++) {
+    const wx = x0 + s * (.16 + i * .062) + (d ? s * .04 : 0), wy = by + h + s * (.025 + d * .055);
+    if (d === 1 && i > 8) continue;
+    wins.push([wx, wy, s * .03, s * .026]);
+  }
+  if (x) {
+    x.fillStyle = col;
+    x.beginPath(); x.moveTo(x0, by + h); x.lineTo(x0 + s * .04, by); x.lineTo(cx + s * .44, by); x.lineTo(cx + s * .5, by + h * 1.15); x.closePath(); x.fill();   // hull
+    x.fillRect(x0 + s * .12, by + h, s * .76, s * .055);                                   // main deck
+    x.fillRect(x0 + s * .16, by + h + s * .055, s * .62, s * .052);                        // upper deck
+    x.fillRect(x0 + s * .58, by + h + s * .107, s * .14, s * .04);                         // wheelhouse
+    x.fillRect(x0 + s * .3, by + h + s * .107, s * .05, s * .07);                          // funnel
+    x.fillRect(x0 + s * .66, by + h + s * .147, s * .004, s * .05);                        // mast
+    x.fillStyle = glass; for (const [wx, wy, ww, wh] of wins) x.fillRect(wx, wy, ww, wh);
+    x.fillRect(x0 + s * .6, by + h + s * .118, s * .1, s * .018);                          // wheelhouse windows
+    x.fillStyle = 'rgba(0,0,0,.35)'; x.fillRect(x0 + s * .04, by + h * .55, s * .9, h * .05);   // rubbing strake
+  }
+  if (g && lit) { g.fillStyle = '#fff'; for (const [wx, wy, ww, wh] of wins) g.fillRect(wx, wy, ww, wh); g.fillRect(x0 + s * .6, by + h + s * .118, s * .1, s * .018); }
+}
+
+// A round loudspeaker on a wall bracket: a square back box, a round grille with horizontal slots. When it speaks the slots
+// glow in g (o.on: 0..1 scales the glow width).
+export function speakerBox(x, o, g) {
+  const { cx, cy, r, col = '#1a1f1c', grille = '#0a0d0b', ring = '#3a4440' } = o;
+  if (x) {
+    x.fillStyle = col; x.fillRect(cx - r * 1.2, cy - r * 1.2, r * 2.4, r * 2.4);
+    x.fillRect(cx - r * .12, cy + r * 1.2, r * .24, r * .6);                       // bracket
+    x.fillStyle = ring; x.beginPath(); x.arc(cx, cy, r, 0, TAU); x.fill();
+    x.fillStyle = grille; x.beginPath(); x.arc(cx, cy, r * .86, 0, TAU); x.fill();
+    x.fillStyle = col; for (let i = -3; i <= 3; i++) { const w = Math.sqrt(1 - (i / 4) ** 2) * r * .8; x.fillRect(cx - w, cy + i * r * .2 - r * .04, w * 2, r * .08); }
+    x.fillStyle = '#c8342b'; x.beginPath(); x.arc(cx + r * .95, cy - r * .95, r * .1, 0, TAU); x.fill();   // the red tally light
+  }
+  if (g) { g.fillStyle = '#fff'; for (let i = -3; i <= 3; i++) { const w = Math.sqrt(1 - (i / 4) ** 2) * r * .8; g.fillRect(cx - w, cy + i * r * .2 + r * .04, w * 2, r * .08); }
+    g.beginPath(); g.arc(cx + r * .95, cy - r * .95, r * .12, 0, TAU); g.fill(); }
+}
+
+// A music box on a table, seen from the front: a wooden box, the lid open behind it, a little paper dancer on top.
+// cx, by = bottom centre, s = box width. The inside of the lid (a mirror) and the dancer glow in g.
+export function musicBox(x, o, g) {
+  const { cx, by, s, col = '#6a3a2a', lid = '#4a2418', trim = '#d8b26a', dancer = '#f2e8d8' } = o;
+  const bh = s * .45, ly = by + bh;
+  if (x) {
+    x.fillStyle = lid; x.fillRect(cx - s * .48, ly, s * .96, s * .5);                       // the lid, standing open behind
+    x.fillStyle = '#2a3a3a'; x.fillRect(cx - s * .4, ly + s * .06, s * .8, s * .38);           // its mirror
+    x.fillStyle = col; x.fillRect(cx - s / 2, by, s, bh);
+    x.fillStyle = trim; x.fillRect(cx - s / 2, by + bh * .82, s, bh * .06); x.fillRect(cx - s * .06, by + bh * .3, s * .12, bh * .2);
+    x.fillStyle = dancer;                                                                     // the dancer: a cone skirt, a head, arms up
+    x.beginPath(); x.moveTo(cx - s * .1, ly); x.lineTo(cx + s * .1, ly); x.lineTo(cx, ly + s * .2); x.closePath(); x.fill();
+    x.fillRect(cx - s * .012, ly + s * .16, s * .024, s * .1);
+    x.beginPath(); x.arc(cx, ly + s * .3, s * .035, 0, TAU); x.fill();
+    x.strokeStyle = dancer; x.lineWidth = s * .012; x.beginPath(); x.moveTo(cx - s * .07, ly + s * .34); x.lineTo(cx, ly + s * .24); x.lineTo(cx + s * .07, ly + s * .34); x.stroke();
+  }
+  if (g) { g.fillStyle = 'rgba(255,255,255,.75)'; g.fillRect(cx - s * .4, ly + s * .06, s * .8, s * .38);
+    g.fillStyle = '#fff'; g.beginPath(); g.arc(cx, ly + s * .3, s * .04, 0, TAU); g.fill(); }
+}
+
+// A pair of shoes side by side, seen from the front-side, toes to the right. cx, by = bottom centre, s = shoe length.
+export function shoes(x, o) {
+  const { cx, by, s, col = '#1a1410', sole = '#0a0806' } = o;
+  for (const d of [-.3, .3]) {
+    const sx = cx + d * s * .55;
+    x.fillStyle = col; x.beginPath(); x.moveTo(sx - s * .5, by); x.lineTo(sx - s * .5, by + s * .38); x.lineTo(sx - s * .1, by + s * .4);
+    x.quadraticCurveTo(sx + s * .45, by + s * .3, sx + s * .5, by); x.closePath(); x.fill();
+    x.fillStyle = sole; x.fillRect(sx - s * .5, by, s, s * .07);
+  }
+}
+
+// A channel buoy: a rounded float on the water, a cage on top with a little lamp. cx, by = waterline centre, s = height.
+// Returns the top of the cage (where something can sit).
+export function buoy(x, o, g) {
+  const { cx, by, s, col = '#3a1410', band = '#d8d0b8', lamp = false } = o;
+  const top = by + s * .78;
+  if (x) {
+    x.fillStyle = col; x.beginPath(); x.moveTo(cx - s * .3, by - s * .08); x.quadraticCurveTo(cx - s * .34, by + s * .3, cx - s * .18, by + s * .42);
+    x.lineTo(cx + s * .18, by + s * .42); x.quadraticCurveTo(cx + s * .34, by + s * .3, cx + s * .3, by - s * .08); x.closePath(); x.fill();
+    x.fillStyle = band; x.fillRect(cx - s * .29, by + s * .16, s * .58, s * .08);
+    x.fillStyle = col; x.fillRect(cx - s * .2, by + s * .42, s * .4, s * .03);
+    for (const d of [-.16, 0, .16]) x.fillRect(cx + d * s - s * .012, by + s * .42, s * .024, s * .36);
+    x.fillRect(cx - s * .2, top - s * .03, s * .4, s * .03);
+  }
+  if (lamp && g) { g.fillStyle = '#fff'; g.beginPath(); g.arc(cx, by + s * .6, s * .05, 0, TAU); g.fill(); }
+  return top;
+}
+
+// A ribbed metal deck seen from standing height: flat colour with lighter ribs that crowd together towards the horizon (y1).
+// x0..x1 wide, from y0 (near, bottom) up to y1 (the floor line). Keeps the lower frame from being an empty dark band.
+export function metalDeck(x, o) {
+  const { x0, x1, y0, y1, col = '#0b1712', rib = 'rgba(160,200,180,.10)', n = 14 } = o;
+  x.fillStyle = col; x.fillRect(x0, y0, x1 - x0, y1 - y0);
+  x.fillStyle = rib;
+  for (let i = 0; i < n; i++) { const k = (i / n) ** 1.8, y = y1 - (y1 - y0) * k; x.fillRect(x0, y - .0004 - k * .001, x1 - x0, .0008 + k * .0016); }
+  x.fillStyle = 'rgba(0,0,0,.35)'; x.fillRect(x0, y1 - .004, x1 - x0, .004);
+}
