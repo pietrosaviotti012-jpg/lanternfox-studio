@@ -83,11 +83,14 @@ La Ricerca aggiunge ogni giorno 3-5 voci nuove (dalle mode del momento, da Reddi
 - ⭐ **The Main Hall** (dal 2026-11-01, sera, formato your call): "If the museum alarm tells you to go to the main hall, don't. This morning you saw its doors being chained from the outside." Indizio di stamattina in flashback. Finale: la guida bussa con la parola d'ordine della gita. UNLOCK or WAIT.
 - **4%** (dal 2026-11-01, sera, formato telefono): la batteria è il timer; ti basta per un solo messaggio. MOM o UNKNOWN?
 - **Intercom** (dal 2026-11-01, sera, formato non fare rumore): l'interfono del palazzo: "Apartment 6B, we know you're in there." Nessuno sa che sei a casa. STAY or RUN.
+- ⭐ **Low Tide · Day 1/7** (dal 2026-11-02, giro della sera, formato regole a puntate): il faro è tagliato fuori dal mare e la strada di pietra si apre solo con la bassa marea. Stanotte si apre alle 2:10 e qualcuno la sta percorrendo. La marea è il timer nell'HUD, tre regole scritte sul vetro della lanterna. LIGHT THE LAMP or STAY DARK.
+- **6:13** (dal 2026-11-02, giro della sera, formato misteri a puntate): ogni mattina alle 6:13 la vecchia radio del faro trasmette dieci secondi di statico. Oggi dentro c'è una voce che conta alla rovescia. TURN IT OFF or LISTEN.
 
 ## Non fare rumore (formato `silenzio.md`, dal 2026-10-31)
 - ⭐ **Hush Harbor**: "It's 3:12 am on the night ferry. The engines cut out, and the captain whispers into the radio: from now on, nobody makes a sound." Misuratore NOISE in alto, tre regole su tre oggetti (telefono, scarpe sul ponte di metallo, il parapetto). Finale: il carillon di una bambina comincia a suonare. STOP IT or THROW IT. → `productions/2026-11-02-hush-harbor` (STOP or THROW)
 - **The Night Bus** (dal 2026-11-02): "It's 1:40 am. The night bus stops between two towns, and the driver turns off every light." Cartello sul vetro: "IF IT KNOCKS, NOBODY ANSWERS". Finale: il telefono di uno sconosciuto addormentato comincia a squillare. ANSWER IT or LET IT RING.
 - **Library Hours**: addormentato in biblioteca, alle 2:14 si accende il cartello "QUIET PLEASE. IT IS LISTENING." Finale: qualcuno sta per starnutire. HELP or HIDE.
+- ⭐ **Look Empty** (dal 2026-11-02, giro della sera): "The rule is simple: your house has to look abandoned. No light, no smoke, no footprints in the snow." Checklist in alto che si spunta. Finale: un bambino in strada ti saluta dalla finestra, come se ti vedesse. WAVE BACK or HIDE.
 
 ## I soldi che scottano (formato `soldi.md`, dal 2026-10-30)
 - ⭐ **The Wrong Transfer**: "At 2:14 AM, your bank app says you have $4,800,000. Yesterday you had $212." Fatti veri su schede crema (un bonifico sbagliato si può riprendere, spenderlo è reato). Contatore SUSPICION. TELL THE BANK or WAIT.
