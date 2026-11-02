@@ -84,8 +84,30 @@ const bottomDoor = (name, z, cx, w, h, o = {}) => ({ name, z, trans: .05, glow: 
     if (o.feet) { g.fillStyle = '#000'; for (const d of [-1, 1]) g.fillRect(cx + d * w * .16 - w * .07, 0, w * .14, h * .025); } } });
 const sweep = (speed = .55, amp = .7, base = Math.PI * .92) => t => base + Math.sin(t * speed) * amp;
 
+// Screen fixes for this film (the Ufficio's "Rifai" note): the notifications (line.card) sit lower, clear of the series tag,
+// the clock and the resources bar at the top left; during the three rules the white ticker strip on the TV scrolls without
+// ever stopping or jumping back, and the TV stays up between one rule and the next. Styles are injected once from here and
+// driven by the shots' update(), which knows the film time.
+if (typeof document !== 'undefined' && !document.getElementById('lamp-room-ui')) {
+  const st = document.createElement('style'); st.id = 'lamp-room-ui';
+  st.textContent = '#card { top: 440px !important; }'
+    + ' #ui .tv .ticker { transform: translateX(var(--tick, 0px)) !important; }'
+    + ' #ui.rules-on .tv { opacity: 1 !important; }';
+  document.head.append(st);
+}
+const rulesUI = (C) => {
+  const a = C.L04.at - .1, b = C.L07.at - .05;
+  return start => t => {
+    const ui = typeof document !== 'undefined' && document.getElementById('ui'); if (!ui) return;
+    const g = start + t;
+    ui.style.setProperty('--tick', `${(-Math.max(0, g - a) * 150).toFixed(0)}px`);
+    ui.classList.toggle('rules-on', g > a + .25 && g < b - .3);
+  };
+};
+
 export function SHOTS(C, DUR) {
   const at = id => C[id].at;
+  const rules = rulesUI(C);
   return [
     // 1 · The hook, already lit: you in the lamp room, the great lens burning behind you, the night sea and the moon in the
     //     panes. The beam swings across. Slow push in.
@@ -144,6 +166,7 @@ export function SHOTS(C, DUR) {
       build: E => {
         const un = E.word('L03', 4);
         return layered(E, {
+        update: rules(at('L03') - .1),
           light: [0, .06, -.13], lightR: .1, lightCol: T.light, key: 1.05, amb: .85, ambCol: '#9ab8aa', sky: { stops: NIGHT }, on: false,
           layers: [
             room('wall', -.115),
@@ -166,6 +189,7 @@ export function SHOTS(C, DUR) {
     // 5 · Rule one, the lamp never goes out (the screen is the overlay): the great lens alone, turning, its beam sweeping
     { id: 'S5', start: at('L04') - .3, in: { type: 'dissolve', dur: .4 }, sfx: [{ t: .1, type: 'chime', v: 0.21 }, { t: 0, type: 'static', d: C.L04.dur + .3, v: 0.12 }],
       build: E => layered(E, {
+        update: rules(at('L04') - .3),
         light: [0, .07, -.135], lightR: .12, lightCol: '#ffd9a0', key: 1.05, amb: .85, ambCol: '#9ab8aa', sky: { stops: NIGHT, stars: 100 }, on: false,
         layers: [
           room('wall', -.115, [[-.06, .07, .06, .1], [.06, .07, .06, .1]]),
@@ -181,6 +205,7 @@ export function SHOTS(C, DUR) {
     // 6 · Rule two, the bottom door stays shut: the foot of the tower, the heavy door, cold light under it
     { id: 'S6', start: at('L05') - .15, sfx: [{ t: .15, type: 'wind', d: C.L05.dur + .4, v: 0.3 }],
       build: E => layered(E, {
+        update: rules(at('L05') - .15),
         light: [0, .07, -.135], lightR: .1, lightCol: T.light, key: 1.05, amb: .85, ambCol: '#9ab8aa', sky: { stops: NIGHT }, on: false,
         layers: [ bottomDoor('door', -.11, 0, .05, .085, { bolt: 0 }) ],
         glows: { door: [[0, .7]] },
@@ -193,6 +218,7 @@ export function SHOTS(C, DUR) {
       build: E => {
         const look = E.word('L06', 11);
         return layered(E, {
+        update: rules(at('L06') - .15),
           light: [.0, .07, -.135], lightR: .1, lightCol: T.light, key: 1.05, amb: .85, ambCol: '#9ab8aa', sky: { stops: NIGHT }, on: false,
           layers: [
             room('wall', -.115, [[.05, .08, .04, .05]]),
@@ -212,6 +238,7 @@ export function SHOTS(C, DUR) {
       build: E => {
         const xs = [-.075, -.05, -.025, 0, .025, .05, .075];
         return layered(E, {
+        update: rules(at('L07') - .2),
           light: [0, .07, -.135], lightR: .12, lightCol: '#ffd9a0', key: 1.05, amb: .85, ambCol: '#9ab8aa', sky: { stops: NIGHT }, on: false,
           layers: [
             room('wall', -.115, [[0, .095, .04, .04]]),
@@ -229,6 +256,7 @@ export function SHOTS(C, DUR) {
     // 9 · Bad news: the bolt on the bottom door, large, rust eating the bar. Hard cut.
     { id: 'S9', start: at('L08') - .15, sfx: [{ t: .1, type: 'door-metal', v: 0.24 }],
       build: E => layered(E, {
+        update: rules(at('L08') - .15),
         light: [0, .07, -.13], lightR: .1, lightCol: T.light, key: 1.05, amb: .85, ambCol: '#9ab8aa', sky: { stops: NIGHT }, on: false,
         layers: [ bottomDoor('door', -.11, 0, .05, .085, { bolt: 0 }) ],
         glows: { door: [[0, .7]] },
