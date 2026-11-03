@@ -86,20 +86,19 @@ const sweep = (speed = .55, amp = .7, base = Math.PI * .92) => t => base + Math.
 
 // Screen fixes for this film (the Ufficio's "Rifai" notes): the notifications (line.card) sit lower, clear of the series
 // tag, the clock and the resources bar at the top left; the TV stays up between one rule and the next. The white ticker
-// strip with the three rules is always on screen, from the first frame to the last, and always scrolling at the same
-// speed, looping seamlessly (it never stops, never jumps back). It is its own strip, full width, in the free band between
-// the pop captions (they end at 1260 px) and the platforms' buttons (bottom 30 %), so it never covers the TV, the end
-// choice or the "Night 2" card; the TV's own ticker is hidden so there is only one. Styles are injected once from here;
-// every shot's update() drives the strip and the TV with the film time.
+// strip with the three rules lives inside the TV box, along its bottom edge, and shows only while the radio reads the
+// rules (it follows the TV: it fades in and out with it, and is gone for the rest of the film). While it is up it scrolls
+// at one constant speed, looping seamlessly with the film time (it never stops or jumps back between one rule and the
+// next). It is drawn over the TV's own ticker, which is hidden, so there is only one. Styles are injected once from here;
+// every shot's update() drives the strip with the film time.
 const CRAWL = 'COAST GUARD · CHANNEL 16 · RULE 1: THE LAMP NEVER GOES OUT · RULE 2: THE BOTTOM DOOR STAYS SHUT UNTIL SUNRISE · RULE 3: IF SOMEONE KNOCKS, LOOK UP FIRST · KEEP THE OIL CLOSE · WHATEVER YOU HEAR · ';
 if (typeof document !== 'undefined' && !document.getElementById('lamp-room-ui')) {
   const st = document.createElement('style'); st.id = 'lamp-room-ui';
   st.textContent = '#card { top: 440px !important; }'
     + ' #ui .tv .ticker { display: none !important; }'
     + ' #ui.rules-on .tv { opacity: 1 !important; }'
-    + ' #ui #lamp-crawl { position: absolute; left: 0; right: 0; top: 1266px; opacity: 1; overflow: hidden; padding: 10px 0;'
-    + ' background: #fbf3e4; color: #12080a; font-family: Anton; font-size: 30px; letter-spacing: .02em; white-space: nowrap;'
-    + ' box-shadow: 0 6px 22px rgba(0,0,0,.5); }'
+    + ' #ui #lamp-crawl { position: absolute; left: 84px; width: 912px; bottom: 1006px; opacity: 0; overflow: hidden; padding: 10px 0;'
+    + ' background: #fbf3e4; color: #12080a; font-family: Anton; font-size: 30px; letter-spacing: .02em; white-space: nowrap; }'
     + ' #ui #lamp-crawl .run { display: inline-block; will-change: transform; }'
     + ' #ui #lamp-crawl .run span { display: inline-block; }';
   document.head.append(st);
@@ -113,6 +112,9 @@ const crawl = g => {
     el.innerHTML = `<div class="run">${Array.from({ length: 6 }, () => `<span>${CRAWL.replace(/ /g, '&nbsp;')}</span>`).join('')}</div>`;
     ui.append(el);
   }
+  // only while the TV with the rules is up: same opacity as the TV (forced to 1 between one rule and the next)
+  const tv = ui.querySelector('.tv');
+  el.style.opacity = ui.classList.contains('rules-on') ? 1 : (parseFloat(tv?.style.opacity) || 0);
   const run = el.firstChild, w = run.firstChild.offsetWidth || 3600;   // one copy: the loop length
   run.style.transform = `translateX(${(-((Math.max(0, g) * crawlSpeed) % w)).toFixed(1)}px)`;
 };
