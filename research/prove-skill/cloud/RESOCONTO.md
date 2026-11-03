@@ -54,9 +54,13 @@ Poi tutto il resto è andato: npm, HyperFrames, venv, Kokoro (~310 MB) e Parakee
 - Correzioni dai provini: la maglietta blu colorava il pezzo sbagliato del busto (il primo figlio dello `spine` è il gruppo del petto, non la mesh); gli anelli dell'abbaio erano di taglio rispetto alla camera; l'inquadratura del muro non mostrava l'altro lato (aggiunta una seconda camera con l'uomo colpito dall'onda); l'alone del frigorifero bruciava tutta l'immagine.
 - Limiti: senza GPU serve `GL=swiftshader` (con la GPU di default va in timeout); circa 5 s a fotogramma per processo, 801 fotogrammi. Il personaggio di base ha le sopracciglia aggrottate, quindi sembra arrabbiato anche quando dovrebbe essere stupito. Nessuna musica o effetto sonoro: la skill monta solo la voce.
 
+## Nota sui file video
+`.gitignore` del repository esclude `*.mp4`: i sei video sono stati aggiunti con `git add -f`. Il render originale di stick-figure pesava 114 MB (CRF 17 con grana), oltre il limite di 100 MB di GitHub: la copia nel ramo è ricompressa a CRF 24 (13 MB), stessa risoluzione e audio.
+
 ## Problemi delle skill in cloud
 - **Download bloccati dal proxy**: Chromium e ffmpeg di Playwright, GSAP da cdnjs. Il setup non ha alternative e si ferma (`set -e`). Utile: usare `PLAYWRIGHT_BROWSERS_PATH`/Chromium già presente, e GSAP da npm.
 - **Versione di Playwright fissata a 1.49.1**: non combacia con il Chromium preinstallato (1243); serve il trucco dei link.
 - **Niente GPU**: map-route e breakdown (three.js su HyperFrames) vanno circa al doppio del tempo indicato; zach-d-films parte solo con `GL=swiftshader` (senza va in timeout) e costa molti secondi a fotogramma.
 - **Percorsi relativi**: nessun problema, ma il controllo di sicurezza del container blocca `rm` con glob relativi dopo `cd` (ho dovuto usare percorsi assoluti).
+- stick-figure esce a CRF 17 con grana: 114 MB per 43 s, troppo per git/GitHub.
 - stick-figure e zach-d-films chiedono "mostra il copione all'utente prima di animare": in una routine senza nessuno davanti non è possibile, quindi ho proceduto.
