@@ -52,6 +52,8 @@ La Ricerca aggiunge ogni giorno 3-5 voci nuove (dalle mode del momento, da Reddi
 
 - ⭐ What if you could see sound for one day? (Il cane che abbaia è un'onda rossa che attraversa il muro, il frigorifero ronza in verde, il silenzio della neve. Personaggio con nome e indovinello finale: "Which room in your house is loudest at 3 AM?") (dal 2026-11-03, giro delle 11)
 - What if gravity switched off for five seconds? (Fatti veri: tu continui a muoverti a 1.600 km/h con la Terra, l'aria e il mare no. Personaggio: un pescatore con la lanterna in mano. Chiusa a indovinello: "What hits the ground first when it comes back?") (dal 2026-11-03, giro delle 11)
+- ⭐ What if you could see a number over everyone's head, and yours just changed to 1? (Il potere solo tuo, dai what if virali della settimana. Personaggio con nome ed età, chiusa a indovinello su cosa conta il numero.) (dal 2026-11-03, sera)
+- What if a man who pumped gas his whole life secretly owned millions? (What if che si rivela vero alla fine: Ronald Read, Vermont, 2014. Ponte con i Soldi che scottano.) (dal 2026-11-03, sera)
 
 ## Your Call (seconda persona, scelta finale)
 - ⭐ **Lantern Night** (serie): la parte 2 segue GO o STAY. → `productions/2026-10-28-lantern-night-1`, Parte 2 (GO) → `productions/2026-10-31-lantern-night-2`
@@ -90,12 +92,14 @@ La Ricerca aggiunge ogni giorno 3-5 voci nuove (dalle mode del momento, da Reddi
 - **Intercom** (dal 2026-11-01, sera, formato non fare rumore): l'interfono del palazzo: "Apartment 6B, we know you're in there." Nessuno sa che sei a casa. STAY or RUN.
 - ⭐ **Low Tide · Day 1/7** (dal 2026-11-02, giro della sera, formato regole a puntate): il faro è tagliato fuori dal mare e la strada di pietra si apre solo con la bassa marea. Stanotte si apre alle 2:10 e qualcuno la sta percorrendo. La marea è il timer nell'HUD, tre regole scritte sul vetro della lanterna. LIGHT THE LAMP or STAY DARK.
 - **6:13** (dal 2026-11-02, giro della sera, formato misteri a puntate): ogni mattina alle 6:13 la vecchia radio del faro trasmette dieci secondi di statico. Oggi dentro c'è una voce che conta alla rovescia. TURN IT OFF or LISTEN.
+- ⭐ **The Gate · Day 1/30** (dal 2026-11-03, sera, formato regole a puntate, "un luogo e un ordine"): "Your whole job is one gate on the harbor road. One order: after dark, nobody comes through." Finale: un bambino con una lanterna chiede di passare, ma il suo fiato non fa vapore nel freddo. OPEN or HOLD. Ogni Parte salta di dieci giorni.
 
 ## Non fare rumore (formato `silenzio.md`, dal 2026-10-31)
 - ⭐ **Hush Harbor**: "It's 3:12 am on the night ferry. The engines cut out, and the captain whispers into the radio: from now on, nobody makes a sound." Misuratore NOISE in alto, tre regole su tre oggetti (telefono, scarpe sul ponte di metallo, il parapetto). Finale: il carillon di una bambina comincia a suonare. STOP IT or THROW IT. → `productions/2026-11-02-hush-harbor` (STOP or THROW)
 - **The Night Bus** (dal 2026-11-02): "It's 1:40 am. The night bus stops between two towns, and the driver turns off every light." Cartello sul vetro: "IF IT KNOCKS, NOBODY ANSWERS". Finale: il telefono di uno sconosciuto addormentato comincia a squillare. ANSWER IT or LET IT RING.
 - **Library Hours**: addormentato in biblioteca, alle 2:14 si accende il cartello "QUIET PLEASE. IT IS LISTENING." Finale: qualcuno sta per starnutire. HELP or HIDE.
 - ⭐ **Look Empty** (dal 2026-11-02, giro della sera): "The rule is simple: your house has to look abandoned. No light, no smoke, no footprints in the snow." Checklist in alto che si spunta. Finale: un bambino in strada ti saluta dalla finestra, come se ti vedesse. WAVE BACK or HIDE.
+- **After Closing · Night 1** (dal 2026-11-03, sera): "The shop closed at nine. You were still in the back, and the shutters came down." Una regola sola: se chiama il tuo nome, non rispondere. Il taccuino come HUD. WRITE IT DOWN or ANSWER.
 
 ## Il telefono sa qualcosa (formato `telefono.md`, dal 2026-11-03)
 - ⭐ **Find My** (dal 2026-11-03): "Your phone says your little sister's phone is in your room. She's been at Grandma's all week." Il puntino della mappa si avvicina stanza per stanza. CALL HER or CHECK THE CLOSET.
