@@ -28,6 +28,8 @@ La Ricerca aggiunge ogni giorno 3-5 voci nuove (dalle mode del momento, da Reddi
 - **Le luci di Hessdalen (Norvegia, dal 1981)**: luci che restano sospese nella valle anche per un'ora; dal 1998 un osservatorio automatico le filma. Fatto documentato, spiegazione ancora aperta. (dal 2026-10-31)
 - **La grande bufala della Luna (1835)**: un giornale di New York racconta per sei giorni che un telescopio ha visto uomini-pipistrello sulla Luna, e la città ci crede. Fatto vero e documentato (The Sun, agosto 1835). (dal 2026-10-30, sera)
 
+- **Le "notti nere" del 1780 (New England)**: il 19 maggio 1780 a mezzogiorno il cielo diventa nero, nelle chiese si accendono le candele, i polli vanno a dormire. Fatto documentato (fumo di incendi nei boschi del Canada). Gancio: "At noon on May 19, 1780, the sky over New England turned black." (dal 2026-11-03, giro delle 11: seguito naturale del What if del Sole)
+
 ## What if
 - ⭐ What if every star went out tonight? → `productions/2026-10-28-stars-go-out`
 - ⭐ What if the Moon disappeared for one night? (Le maree, gli animali, il buio.) → `productions/2026-10-30-moon-gone`
@@ -37,7 +39,7 @@ La Ricerca aggiunge ogni giorno 3-5 voci nuove (dalle mode del momento, da Reddi
 - What if the ocean drained overnight? ("By sunrise, you could walk to America." I fatti veri: le fosse, i relitti, l'acqua che resta nei laghi salati.) (rilanciata il 2026-10-31)
 - What if animals could talk, for one day only?
 - ⭐ What if every clock in the world stopped at the same second? (Il primo a cadere è il GPS: si lega all'orologio fermo delle Flannan.) (dal 2026-10-29) → `productions/2026-10-29-clocks-stop`
-- What if the Sun went out for eight minutes? (Nessuno se ne accorge per 8 minuti e 20 secondi: la luce è in viaggio. Poi il freddo, piano.) (dal 2026-10-29)
+- What if the Sun went out for eight minutes? (Nessuno se ne accorge per 8 minuti e 20 secondi: la luce è in viaggio. Poi il freddo, piano.) (dal 2026-10-29) → `productions/2026-11-03-sun-eight-minutes` (con Mila, 10 anni, e l'indovinello MOON or STARS)
 - What if the internet went quiet for one day? (Niente mappe, niente pagamenti, il primo vicino che bussa alla porta.) (dal 2026-10-29)
 - What if the sun didn't rise tomorrow? (Alle 6:40 il cielo resta nero. Le piante, il freddo, le stelle di giorno: cosa succede ora per ora, con i fatti veri.) (dal 2026-10-29, dal "the sun should be up" di *Eyes Down*)
 
@@ -47,6 +49,9 @@ La Ricerca aggiunge ogni giorno 3-5 voci nuove (dalle mode del momento, da Reddi
 - What if Earth had rings like Saturn? (Un arco che taglia il cielo di giorno, l'ombra degli anelli d'inverno, notti mai buie. Fatti veri.) (dal 2026-10-31)
 - What if every lighthouse went dark for one night? (Alle 21 tutti i fari della Terra si spengono. Fatti veri: il GPS delle navi, i pescatori piccoli, ogni faro ha il suo ritmo di luce come un nome. Chiusa: "Would you notice from your window?") (dal 2026-11-02, sera)
 - What if sound stopped for one minute? ("You don't hear the crash. You see it." Chiusa: "Would you notice first, or would your dog?") (dal 2026-10-29, sera)
+
+- ⭐ What if you could see sound for one day? (Il cane che abbaia è un'onda rossa che attraversa il muro, il frigorifero ronza in verde, il silenzio della neve. Personaggio con nome e indovinello finale: "Which room in your house is loudest at 3 AM?") (dal 2026-11-03, giro delle 11)
+- What if gravity switched off for five seconds? (Fatti veri: tu continui a muoverti a 1.600 km/h con la Terra, l'aria e il mare no. Personaggio: un pescatore con la lanterna in mano. Chiusa a indovinello: "What hits the ground first when it comes back?") (dal 2026-11-03, giro delle 11)
 
 ## Your Call (seconda persona, scelta finale)
 - ⭐ **Lantern Night** (serie): la parte 2 segue GO o STAY. → `productions/2026-10-28-lantern-night-1`, Parte 2 (GO) → `productions/2026-10-31-lantern-night-2`
