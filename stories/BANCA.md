@@ -70,7 +70,7 @@ La Ricerca aggiunge ogni giorno 3-5 voci nuove (dalle mode del momento, da Reddi
 - **The Snow Count** (dal 2026-11-02, formato regole): "In our town, when it snows after midnight, you count the people in your house every hour." Alle 3:00 conti quattro. Vivete in tre. COUNT AGAIN or WAKE THEM.
 - **Rule 3** (dal 2026-10-29, sera, formato regole): la sirena del paese suona due volte l'anno. Stanotte ha suonato tre volte. La regola 3 dice cosa fare, ma nessuno la ricorda.
 
-- ⭐ **From: Me** (dal 2026-10-30, sera, formato telefono): alle 3:07 ricevi un messaggio dal tuo numero: "Don't open the door for me." Poi le regole, poi qualcuno bussa con la tua voce. PHONE or DOOR.
+- ⭐ **From: Me** (dal 2026-10-30, sera, formato telefono): alle 3:07 ricevi un messaggio dal tuo numero: "Don't open the door for me." Poi le regole, poi qualcuno bussa con la tua voce. PHONE or DOOR.  → `productions/2026-11-03-from-me`
 - **The Last Ferry** (dal 2026-10-30, sera, formato conto alla rovescia): "If the flood starts while you're driving the last ferry, you're the safest person in town. Unless you forget one thing." Checklist con le spunte, finale a indovinello "What did he forget?".
 - **Myth or Rule** (dal 2026-10-30, sera, formato regole): nel blackout, cinque cose che tutti credono e una che ti salva; ogni falso mito col timbro "✗ MYTH". Solo fatti veri di sicurezza.
 - ⭐ **Floor 31** (dal 2026-10-31, sera, a puntate): "You live on floor 31. Tonight the lights go out one floor at a time, from the bottom up." Numero del piano dipinto sul muro come contatore, regole numerate che continuano di puntata in puntata. Finale morale: la vicina del 29 bussa con il figlio. OPEN or STAY QUIET.
@@ -91,6 +91,11 @@ La Ricerca aggiunge ogni giorno 3-5 voci nuove (dalle mode del momento, da Reddi
 - **The Night Bus** (dal 2026-11-02): "It's 1:40 am. The night bus stops between two towns, and the driver turns off every light." Cartello sul vetro: "IF IT KNOCKS, NOBODY ANSWERS". Finale: il telefono di uno sconosciuto addormentato comincia a squillare. ANSWER IT or LET IT RING.
 - **Library Hours**: addormentato in biblioteca, alle 2:14 si accende il cartello "QUIET PLEASE. IT IS LISTENING." Finale: qualcuno sta per starnutire. HELP or HIDE.
 - ⭐ **Look Empty** (dal 2026-11-02, giro della sera): "The rule is simple: your house has to look abandoned. No light, no smoke, no footprints in the snow." Checklist in alto che si spunta. Finale: un bambino in strada ti saluta dalla finestra, come se ti vedesse. WAVE BACK or HIDE.
+
+## Il telefono sa qualcosa (formato `telefono.md`, dal 2026-11-03)
+- ⭐ **Find My** (dal 2026-11-03): "Your phone says your little sister's phone is in your room. She's been at Grandma's all week." Il puntino della mappa si avvicina stanza per stanza. CALL HER or CHECK THE CLOSET.
+- **Screen Time** (dal 2026-11-03): il rapporto settimanale dice che hai usato il telefono 3 ore stanotte, tra le 2 e le 5, mentre dormivi. App più usata: Camera, 214 foto. OPEN THE GALLERY or DELETE THEM.
+- **Battery 1%** (dal 2026-11-03): il telefono si è caricato da solo fino al 100% durante il blackout. Nessuno l'ha attaccato alla presa. Poi arriva un messaggio: "you're welcome". REPLY or UNPLUG.
 
 ## I soldi che scottano (formato `soldi.md`, dal 2026-10-30)
 - ⭐ **The Wrong Transfer**: "At 2:14 AM, your bank app says you have $4,800,000. Yesterday you had $212." Fatti veri su schede crema (un bonifico sbagliato si può riprendere, spenderlo è reato). Contatore SUSPICION. TELL THE BANK or WAIT.

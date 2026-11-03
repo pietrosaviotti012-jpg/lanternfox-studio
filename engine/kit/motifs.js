@@ -1102,3 +1102,46 @@ export function doorBolt(x, o) {
   x.fillStyle = rust; const R = mulberry(9);
   for (let i = 0; i < 14; i++) { const u = (R() - .5) * 1.3, v = (R() - .5) * .3; x.beginPath(); x.arc(cx + u * s, cy + v * s + bend * s * .5 * (1 - (2 * u / 1.3) ** 2) * (Math.abs(v) < .1 ? 1 : 0), s * (.02 + R() * .035), 0, TAU); x.fill(); }
 }
+
+// —— Added for "From: Me · Night 1" (Il telefono sa qualcosa): a bed to sit up in, a nightstand, a key ——
+
+// A bed seen from the front, foot towards the camera. by = floor line, w = width, h = mattress top above the floor.
+// o.part: 'back' (headboard and pillow, a sheet behind the sitter) | 'front' (the blanket and the bed's foot, a sheet in
+// front of the sitter that covers the legs up to the waist) | 'all'. o.cover: blanket height above the mattress (front).
+export function bed(x, o) {
+  const { cx, by, w, h, col = '#2a2238', blanket = '#3a4a7a', fold = '#d8d2e6', pillow = '#c9c4d8', part = 'all', cover = h * .9 } = o;
+  if (!x) return;
+  if (part !== 'front') {
+    x.fillStyle = col; x.fillRect(cx - w / 2, by, w, h * 2.4);                                   // headboard
+    x.beginPath(); x.arc(cx, by + h * 2.4, w / 2, Math.PI, 0, true); x.lineTo(cx + w / 2, by + h * 2.4); x.fill();
+    x.fillStyle = 'rgba(0,0,0,.25)'; for (const d of [-1, 1]) x.fillRect(cx + d * w * .25 - w * .1, by + h * 1.3, w * .2, h * .9);
+    x.fillStyle = pillow; x.beginPath(); x.ellipse(cx, by + h * 1.15, w * .38, h * .28, 0, 0, TAU); x.fill();
+  }
+  if (part !== 'back') {
+    x.fillStyle = col; x.fillRect(cx - w * .52, by - h * .02, w * .06, h * .5); x.fillRect(cx + w * .46, by - h * .02, w * .06, h * .5);   // legs
+    x.fillStyle = blanket; x.beginPath(); x.moveTo(cx - w * .5, by + h * .3); x.lineTo(cx - w * .5, by + h + cover * .85);
+    x.quadraticCurveTo(cx - w * .2, by + h + cover * 1.05, cx, by + h + cover); x.quadraticCurveTo(cx + w * .25, by + h + cover * .95, cx + w * .5, by + h + cover * .8);
+    x.lineTo(cx + w * .5, by + h * .3); x.closePath(); x.fill();
+    x.fillStyle = fold; x.fillRect(cx - w * .5, by + h + cover * .72, w, h * .14);               // the turned-down sheet
+    x.fillStyle = 'rgba(0,0,0,.18)'; for (const k of [.3, .55]) x.fillRect(cx - w * .5, by + h * (k + .2), w, h * .02);
+  }
+}
+
+// A small nightstand with a drawer; by = floor line
+export function nightstand(x, o) {
+  const { cx, by, w, h, col = '#2a2238', knob = '#c9a86a' } = o;
+  x.fillStyle = col; x.fillRect(cx - w / 2, by + h * .08, w, h * .92); x.fillRect(cx - w * .45, by, w * .08, h * .1); x.fillRect(cx + w * .37, by, w * .08, h * .1);
+  x.fillStyle = 'rgba(0,0,0,.3)'; x.fillRect(cx - w * .42, by + h * .55, w * .84, h * .02);
+  x.fillStyle = knob; x.beginPath(); x.arc(cx, by + h * .75, w * .05, 0, TAU); x.fill();
+}
+
+// A house key seen from the side: round bow with a hole, a shaft and teeth. cx, cy = centre of the bow, s = length, rot in radians
+export function houseKey(x, o) {
+  const { cx, cy, s, rot = 0, col = '#d8b26a' } = o;
+  x.save(); x.translate(cx, cy); x.rotate(rot); x.fillStyle = col;
+  x.beginPath(); x.arc(0, 0, s * .2, 0, TAU); x.fill();
+  x.fillRect(s * .15, -s * .045, s * .85, s * .09);
+  for (const [tx, th] of [[.6, .12], [.72, .08], [.84, .14]]) x.fillRect(s * tx, -s * .045 - s * th, s * .07, s * th);
+  x.save(); x.globalCompositeOperation = 'destination-out'; x.beginPath(); x.arc(-s * .04, 0, s * .07, 0, TAU); x.fill(); x.restore();
+  x.restore();
+}
