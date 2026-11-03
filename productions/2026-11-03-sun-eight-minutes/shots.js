@@ -16,7 +16,7 @@
 // - level camera at the floor in every shot with a figure (lv()), face close-ups at S4, S9 and S14;
 // - the choice on screen at the end (script.choice), a riddle with two answers (the "What if" variant of rule 4).
 import { layered } from './engine/kit/shot.js';
-import { person, humanHead, SKIN, foxCameo, streetlamp, houses, starField, paperMoon, hangLantern } from './engine/kit/motifs.js';
+import { person, SKIN, foxCameo, streetlamp, houses, starField, paperMoon, hangLantern } from './engine/kit/motifs.js';
 import { theme } from './engine/kit/themes.js';
 import { waves, waterTop } from './engine/art.js';
 import { text } from './engine/paper.js';
@@ -80,12 +80,10 @@ const yard = (P, z = -.07) => ({ name: 'yard', z, trans: .03, shadow: false,
 const tree = (P, cx, z = -.095, s = .1) => ({ name: 'tree', z, trans: .15,
   draw: x => { x.fillStyle = P.tree; x.fillRect(cx - s * .04, 0, s * .08, s * .55);
     for (const [u, v, r] of [[0, .72, .3], [-.22, .58, .22], [.22, .6, .22], [0, .5, .24]]) { x.beginPath(); x.arc(cx + u * s, v * s, r * s, 0, TAU); x.fill(); } } });
-// Mila standing, and her face touched by the sky: a soft light on one side of the face only, so the skin keeps its colour
-// (same geometry as the human person(): humanHead)
-const faceGlow = (g, o) => { const { cx, hy, hr } = humanHead({ age: 'adult', ...o }); g.fillStyle = 'rgba(255,255,255,.35)';
-  g.beginPath(); g.ellipse(cx + hr * .25, hy, hr * .6, hr * .85, 0, 0, TAU); g.fill(); };
-const mila = (name, cx, by, s, face, z = -.09, o = {}) => ({ name, z, trans: .02, glow: (o.glow ?? .5) * .6, glowCol: o.col || '#ffe2c4',
-  draw: x => person(x, { ...MILA, cx, by, s, face, arms: o.arms || 'down' }), glowDraw: g => faceGlow(g, { age: 'child', cx, by, s }) });
+// Mila standing. No light drawn on the face (the redo note: no yellow oval around people's faces); o.glow is kept for the
+// old calls but does nothing, the scene light alone colours her
+const mila = (name, cx, by, s, face, z = -.09, o = {}) => ({ name, z, trans: .02, glow: 0,
+  draw: x => person(x, { ...MILA, cx, by, s, face, arms: o.arms || 'down' }) });
 const foxAt = (cx, by, s, z, flip = false) => ({ name: 'fox', z, trans: .2, glow: 3.4, w: s * 2.8, h: s * 2.8, x: cx, y: by + s,
   draw: x => foxCameo(x, { cx: 0, by: -s, s, pose: 'watch', flip }), glowDraw: g => foxCameo(null, { cx: 0, by: -s, s, pose: 'watch', flip }, g) });
 // a small bird in silhouette, sitting (wing tucked) on y = by
@@ -406,7 +404,7 @@ export function SHOTS(C, DUR) {
     { id: 'S14', start: at('L14') - .1, sfx: [{ t: 0, type: 'whoosh', v: .4 }, { t: .2, type: 'waves', d: 4, v: .3 }],
       build: E => {
         const sw = E.word('L14', 10);
-        const face = f => ({ draw: x => person(x, { ...GRANDPA, cx: 0, by: -.34, s: .44, face: f }), glowDraw: g => faceGlow(g, { cx: 0, by: -.34, s: .44 }) });
+        const face = f => ({ draw: x => person(x, { ...GRANDPA, cx: 0, by: -.34, s: .44, face: f }) });   // no face glow
         return layered(E, {
           light: [.04, .12, -.12], lightR: .22, lightCol: '#e8f0ff', key: .85, amb: .5, sky: { stops: [[0, '#081a32'], [.6, '#123a5a'], [1, '#2a6a80']] }, on: false,
           layers: [
