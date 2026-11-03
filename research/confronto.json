@@ -253,6 +253,24 @@
    "colori": 3,
    "cambi_10s": 3.5,
    "movimento": 4.2
+  },
+  "2026-11-03-sun-eight-minutes": {
+   "luce": 18,
+   "contrasto": 16,
+   "saturazione": 71,
+   "buio": 52,
+   "colori": 3,
+   "cambi_10s": 2.6,
+   "movimento": 2.9
+  },
+  "strange-days-1": {
+   "luce": 28,
+   "contrasto": 22,
+   "saturazione": 36,
+   "buio": 21,
+   "colori": 3,
+   "cambi_10s": 6.2,
+   "movimento": 11.4
   }
  },
  "tabella": [
@@ -274,7 +292,7 @@
   {
    "misura": "Contrasto",
    "virali": 16.0,
-   "nostri": 14.0
+   "nostri": 15.0
   },
   {
    "misura": "Saturazione",
@@ -284,7 +302,7 @@
   {
    "misura": "Parte quasi nera dell'immagine (%)",
    "virali": 47.0,
-   "nostri": 69.0
+   "nostri": 68.0
   },
   {
    "misura": "Colori forti diversi",
