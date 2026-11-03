@@ -1,0 +1,6 @@
+{
+  "title": "Two Alerts", "subtitle": "Exploded view",
+  "labels": [["Cover glass", "cracked at 2:41 am"], ["Screen", "two alerts, one minute apart"], ["Frame", "still warm"],
+             ["Logic board", "both alerts logged"], ["Battery", "41% and falling"], ["Back glass", ""]],
+  "time": "2:40", "date": "Tuesday 3 November", "accent": "#F08A5D"
+}
