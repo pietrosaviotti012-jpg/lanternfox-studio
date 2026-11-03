@@ -1,0 +1,5 @@
+{
+  "destination": "Night Train Station", "minutes": 17, "distance": 1.4, "unit": "km",
+  "places": ["Lantern Street", "Old Quay", "Clock Tower", "Fox Park", "The Canal"],
+  "accent": "#2f7cf6", "seed": 7
+}
