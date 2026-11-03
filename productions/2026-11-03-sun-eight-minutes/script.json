@@ -53,13 +53,12 @@
    "act": {
     "intensity": 0.5,
     "pace": 0.32,
-    "speed": 0.94
+    "speed": 0.95
    }
   },
   {
    "id": "L03",
    "text": "Then, at 12:08 PM, noon turns to night.",
-   "say": "Then, at twelve oh eight, noon turns to night.",
    "em": [
     "night"
    ],
@@ -69,7 +68,7 @@
    "act": {
     "intensity": 0.7,
     "pace": 0.3,
-    "speed": 0.92,
+    "speed": 0.95,
     "gain_db": 1.0
    }
   },
@@ -107,7 +106,7 @@
    "act": {
     "intensity": 0.5,
     "pace": 0.32,
-    "speed": 0.94
+    "speed": 0.95
    }
   },
   {
@@ -120,7 +119,7 @@
    "act": {
     "intensity": 0.42,
     "pace": 0.32,
-    "speed": 0.94,
+    "speed": 0.95,
     "gain_db": -1
    }
   },
@@ -134,7 +133,7 @@
    "act": {
     "intensity": 0.45,
     "pace": 0.32,
-    "speed": 0.94
+    "speed": 0.95
    }
   },
   {
@@ -147,7 +146,7 @@
    "act": {
     "intensity": 0.5,
     "pace": 0.3,
-    "speed": 0.92
+    "speed": 0.95
    }
   },
   {
@@ -160,7 +159,7 @@
    "act": {
     "intensity": 0.45,
     "pace": 0.32,
-    "speed": 0.94,
+    "speed": 0.95,
     "gain_db": -1
    }
   },
@@ -174,13 +173,12 @@
    "act": {
     "intensity": 0.5,
     "pace": 0.32,
-    "speed": 0.94
+    "speed": 0.95
    }
   },
   {
    "id": "L11",
    "text": "At 12:16 PM, the light comes back.",
-   "say": "At twelve sixteen, the light comes back.",
    "em": [
     "light"
    ],
@@ -202,7 +200,7 @@
    "act": {
     "intensity": 0.5,
     "pace": 0.3,
-    "speed": 0.92,
+    "speed": 0.95,
     "gain_db": -1.5
    },
    "sub": false
@@ -222,7 +220,7 @@
    "act": {
     "intensity": 0.5,
     "pace": 0.33,
-    "speed": 0.94
+    "speed": 0.95
    }
   },
   {
@@ -236,7 +234,7 @@
    "act": {
     "intensity": 0.62,
     "pace": 0.31,
-    "speed": 0.93,
+    "speed": 0.95,
     "gain_db": 1.0
    }
   },

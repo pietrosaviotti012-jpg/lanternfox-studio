@@ -16,14 +16,14 @@
 // - level camera at the floor in every shot with a figure (lv()), face close-ups at S4, S9 and S14;
 // - the choice on screen at the end (script.choice), a riddle with two answers (the "What if" variant of rule 4).
 import { layered } from './engine/kit/shot.js';
-import { person, foxCameo, streetlamp, houses, starField, paperMoon, hangLantern } from './engine/kit/motifs.js';
+import { person, humanHead, SKIN, foxCameo, streetlamp, houses, starField, paperMoon, hangLantern } from './engine/kit/motifs.js';
 import { theme } from './engine/kit/themes.js';
 import { waves, waterTop } from './engine/art.js';
 import { text } from './engine/paper.js';
 import { seg, ss, lerp, clamp, TAU } from './engine/lib.js';
 
 const T = theme('what-if', 'notte'), DAWN = theme('what-if', 'alba');
-const MILA = { coat: '#f2b632', pants: '#2d3a50', hat: false, hair: '#3a2418' };   // the one strong colour: her yellow coat
+const MILA = { human: true, age: 'child', skin: SKIN.tan, coat: '#f2b632', pants: '#2d3a50', hat: false, hair: '#3a2418', hairStyle: 'long' };   // the one strong colour: her yellow coat
 const DAY = [[0, '#2a6a96'], [.45, '#4f97b8'], [.8, '#9ccfd0'], [1, '#f2e2b0']];
 const NIGHT = [[0, '#06101e'], [.5, '#0e2440'], [.85, '#1c4060'], [1, '#2c5a70']];
 const SPACE = [[0, '#050c1c'], [.6, '#0b2040'], [1, '#143858']];
@@ -80,10 +80,12 @@ const yard = (P, z = -.07) => ({ name: 'yard', z, trans: .03, shadow: false,
 const tree = (P, cx, z = -.095, s = .1) => ({ name: 'tree', z, trans: .15,
   draw: x => { x.fillStyle = P.tree; x.fillRect(cx - s * .04, 0, s * .08, s * .55);
     for (const [u, v, r] of [[0, .72, .3], [-.22, .58, .22], [.22, .6, .22], [0, .5, .24]]) { x.beginPath(); x.arc(cx + u * s, v * s, r * s, 0, TAU); x.fill(); } } });
-// Mila standing, and her face lit by the sky (eyes and mouth stay dark: same geometry as person())
-const faceGlow = (g, { cx, by, s }) => { const hr = s * .16, hy = by + s * .78; g.fillStyle = '#fff'; g.beginPath(); g.arc(cx, hy, hr, 0, TAU); g.fill(); };
-const mila = (name, cx, by, s, face, z = -.09, o = {}) => ({ name, z, trans: .02, glow: o.glow ?? .5, glowCol: o.col || '#dff2ff',
-  draw: x => person(x, { ...MILA, cx, by, s, face, arms: o.arms || 'down' }), glowDraw: g => faceGlow(g, { cx, by, s }) });
+// Mila standing, and her face touched by the sky: a soft light on one side of the face only, so the skin keeps its colour
+// (same geometry as the human person(): humanHead)
+const faceGlow = (g, o) => { const { cx, hy, hr } = humanHead({ age: 'adult', ...o }); g.fillStyle = 'rgba(255,255,255,.35)';
+  g.beginPath(); g.ellipse(cx + hr * .25, hy, hr * .6, hr * .85, 0, 0, TAU); g.fill(); };
+const mila = (name, cx, by, s, face, z = -.09, o = {}) => ({ name, z, trans: .02, glow: (o.glow ?? .5) * .6, glowCol: o.col || '#ffe2c4',
+  draw: x => person(x, { ...MILA, cx, by, s, face, arms: o.arms || 'down' }), glowDraw: g => faceGlow(g, { age: 'child', cx, by, s }) });
 const foxAt = (cx, by, s, z, flip = false) => ({ name: 'fox', z, trans: .2, glow: 3.4, w: s * 2.8, h: s * 2.8, x: cx, y: by + s,
   draw: x => foxCameo(x, { cx: 0, by: -s, s, pose: 'watch', flip }), glowDraw: g => foxCameo(null, { cx: 0, by: -s, s, pose: 'watch', flip }, g) });
 // a small bird in silhouette, sitting (wing tucked) on y = by
@@ -99,7 +101,7 @@ const sea = (base, col, line, r = .008) => x => {
 };
 const moonLayer = (name, cx, cy, r, z = -.13) => ({ name, z, ...NOGLOW, glow: 3.2, glowCol: '#fff0c8', w: r * 2.4, h: r * 2.4, x: cx, y: cy,
   draw: x => paperMoon(x, { cx: 0, cy: 0, r }), glowDraw: g => paperMoon(null, { cx: 0, cy: 0, r }, g) });
-const GRANDPA = { coat: '#3a5a6a', pants: '#1c2a34', hat: '#c8342b' };                   // the red beanie
+const GRANDPA = { human: true, skin: '#d9a07a', coat: '#3a5a6a', pants: '#1c2a34', hat: '#c8342b', beard: '#cfc9c0' };   // the red beanie, a grey beard
 
 // the daylight schoolyard (S1, S3, S11, S15)
 const dayYard = (o = {}) => [
@@ -197,7 +199,7 @@ export function SHOTS(C, DUR) {
         layers: [
           stars('stars', 150, 12, -.14, -.05),
           { ...school(N, true, -.125), name: 'nschool' },
-          mila('mila', .012, -.13, .23, 'surprised', -.09, { glow: .7 }),
+          mila('mila', .012, -.215, .32, 'surprised', -.09, { glow: .7 }),
         ],
         flicker: ['nschool'],
         cam: [[0, lv(.36, 0)], [E.dur, lv(.34, .005)]],
@@ -302,7 +304,7 @@ export function SHOTS(C, DUR) {
             { name: 'bulb', z: -.108, ...NOGLOW, w: .02, h: .02, x: .022, y: .012, draw: x => { x.fillStyle = '#d7263d'; x.beginPath(); x.arc(0, 0, .0045, 0, TAU); x.fill(); } },
             { name: 'breath', z: -.092, ...NOGLOW, glow: 1.2, glowCol: '#dff2ff', w: .05, h: .03, x: -.005, y: .058, draw: () => {},
               glowDraw: g => { g.fillStyle = 'rgba(255,255,255,.5)'; for (const [u, v, r] of [[-.008, 0, .006], [.002, .003, .008], [.012, .001, .006]]) { g.beginPath(); g.arc(u, v, r, 0, TAU); g.fill(); } } },
-            mila('mila', -.035, -.09, .2, 'scared', -.09, { glow: .6 }),
+            mila('mila', -.035, -.175, .29, 'scared', -.09, { glow: .6 }),
           ],
           update: (t, L) => { L.merc.scale.y = 1 - .45 * ramp(t, go, go + 2.2);
             const b = (t % 1.8) / 1.8; L.breath.position.x = -.005 + .016 * b; L.breath.material.userData.u.uGlowLit.value = Math.sin(b * Math.PI); },
@@ -404,12 +406,12 @@ export function SHOTS(C, DUR) {
     { id: 'S14', start: at('L14') - .1, sfx: [{ t: 0, type: 'whoosh', v: .4 }, { t: .2, type: 'waves', d: 4, v: .3 }],
       build: E => {
         const sw = E.word('L14', 10);
-        const face = f => ({ draw: x => person(x, { ...GRANDPA, cx: 0, by: -.16, s: .25, face: f }), glowDraw: g => faceGlow(g, { cx: 0, by: -.16, s: .25 }) });
+        const face = f => ({ draw: x => person(x, { ...GRANDPA, cx: 0, by: -.34, s: .44, face: f }), glowDraw: g => faceGlow(g, { cx: 0, by: -.34, s: .44 }) });
         return layered(E, {
           light: [.04, .12, -.12], lightR: .22, lightCol: '#e8f0ff', key: .85, amb: .5, sky: { stops: [[0, '#081a32'], [.6, '#123a5a'], [1, '#2a6a80']] }, on: false,
           layers: [
             stars('stars', 140, 61, -.14, -.05),
-            { name: 'g1', z: -.09, trans: .02, glow: .9, glowCol: '#e8f0ff', ...face('calm') },
+            { name: 'g1', z: -.09, trans: .02, glow: .55, glowCol: '#dfe8ff', ...face('calm') },
             { name: 'g2', z: -.089, trans: .02, glow: .25, glowCol: '#ffcf8a', ...face('scared') },
             { name: 'lan', z: -.085, ...NOGLOW, glow: 3, glowCol: '#ffcf8a', w: .04, h: .05, x: .06, y: -.03,
               draw: x => hangLantern(x, { cx: 0, cy: 0, r: .009, string: .006 }), glowDraw: g => hangLantern(null, { cx: 0, cy: 0, r: .009, string: .006 }, g) },

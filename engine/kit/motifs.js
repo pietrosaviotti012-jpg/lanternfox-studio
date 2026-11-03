@@ -645,6 +645,7 @@ export function oven(x, o, g) {
 // at a glance, and one strong colour on the clothes. Front view. y goes up: by = feet, s = height.
 // o.face: 'calm' | 'scared' | 'surprised' | 'sleeping' | 'smile'; o.hair (colour, with a bun); o.coat, o.hat (beanie colour or false), o.skin; o.arms: 'down' | 'up'
 export function person(x, o) {
+  if (o.human) return human(x, o);
   const { cx, by, s, face = 'calm', coat = '#f2b632', hat = false, skin = '#efe6d8', pants = '#2d3550', arms = 'down', dark = '#16181f' } = o;
   if (!x) return {};
   const hr = s * .16, hy = by + s * .78;
@@ -693,6 +694,112 @@ export function person(x, o) {
   else if (face === 'scared') { x.beginPath(); x.moveTo(cx - hr * .22, my); for (let i = 1; i <= 4; i++) x.lineTo(cx - hr * .22 + i * hr * .11, my + (i % 2 ? hr * .06 : 0)); x.stroke(); }
   else if (face === 'smile') { x.beginPath(); x.arc(cx, my + hr * .16, hr * .26, Math.PI * 1.15, Math.PI * 1.85); x.stroke(); }
   else if (face === 'calm') { x.beginPath(); x.moveTo(cx - hr * .14, my); x.lineTo(cx + hr * .14, my); x.stroke(); }
+  return { head: [cx, hy], r: hr };
+}
+
+// —— Added for "What If the Sun Went Out" (redo): a more human person. person(x, { human: true, … }) or human(x, o).
+// Same feet (by) and the same height (top of the head at by + .94 s) as person(), but real proportions: a smaller head
+// (o.age 'child': a fifth of the height, 'adult': a sixth), a neck, sloping shoulders, a coat that narrows at the waist,
+// arms in two pieces with elbows and hands, tapered legs, shoes with a toe. A skin tone (o.skin, never paper white),
+// ears, eyebrows, a nose, cheeks, hair that frames the face (o.hair, o.hairStyle 'long' | 'short' | 'bun'), o.beard.
+// humanHead(o) gives the head's centre and radius, for a glow that lights just the face. ——
+export const SKIN = { light: '#e8b896', tan: '#c98e62', olive: '#b07a4e', brown: '#8a5636', deep: '#5e3822' };
+const shade = (hex, k) => { const n = parseInt(hex.slice(1), 16), f = c => Math.max(0, Math.min(255, Math.round(c * k)));
+  return '#' + [n >> 16 & 255, n >> 8 & 255, n & 255].map(f).map(c => c.toString(16).padStart(2, '0')).join(''); };
+export function humanHead(o) {
+  const hr = o.s * (o.age === 'child' ? .105 : .088);
+  return { cx: o.cx, hy: o.by + o.s * .94 - hr, hr };
+}
+export function human(x, o) {
+  const { cx, by, s, face = 'calm', coat = '#f2b632', hat = false, skin = SKIN.tan, pants = '#2d3550', arms = 'down', dark = '#16181f',
+    hair = false, hairStyle = 'short', beard = false, age = 'adult' } = o;
+  const { hy, hr } = humanHead(o);
+  if (!x) return { head: [cx, hy], r: hr };
+  const kid = age === 'child', sh = s * (kid ? .115 : .14), shY = hy - hr - s * (kid ? .05 : .055);   // shoulder half-width, height
+  const waist = by + s * (kid ? .42 : .47), hem = by + s * (kid ? .36 : .4), skinD = shade(skin, .82), coatD = shade(coat, .78);
+  x.lineCap = 'round'; x.lineJoin = 'round';
+  // hair behind the head (long hair falls to the shoulders)
+  if (hair && hairStyle === 'long') { x.fillStyle = hair; x.beginPath(); x.ellipse(cx, hy - hr * .35, hr * 1.12, hr * 1.35, 0, 0, TAU); x.fill(); }
+  // legs: tapered, a little apart, with shoes that point forward
+  x.fillStyle = pants;
+  for (const d of [-1, 1]) {
+    x.beginPath(); x.moveTo(cx + d * s * .008, hem + s * .02); x.lineTo(cx + d * s * .085, hem + s * .02);
+    x.lineTo(cx + d * s * .068, by + s * .035); x.lineTo(cx + d * s * .022, by + s * .035); x.closePath(); x.fill();
+  }
+  x.fillStyle = dark;
+  for (const d of [-1, 1]) { x.beginPath(); x.ellipse(cx + d * s * .052, by + s * .018, s * .045, s * .02, 0, 0, TAU); x.fill(); }
+  // arms behind the coat edge: shoulder → elbow → wrist, sleeves in the coat colour, a hand with a thumb
+  const arm = d => {
+    const up = arms === 'up', ua = s * (kid ? .15 : .17), fa = s * (kid ? .13 : .15);
+    const a1 = up ? d * 2.3 : d * .12, a2 = up ? d * 2.75 : d * -.08;                    // angles from straight down
+    const p0 = [cx + d * sh * .92, shY - s * .02], p1 = [p0[0] + Math.sin(a1) * ua, p0[1] - Math.cos(a1) * ua];
+    const p2 = [p1[0] + Math.sin(a2) * fa, p1[1] - Math.cos(a2) * fa];
+    x.strokeStyle = coat; x.lineWidth = s * (kid ? .058 : .066);
+    x.beginPath(); x.moveTo(...p0); x.lineTo(...p1); x.lineTo(...p2); x.stroke();
+    x.strokeStyle = coatD; x.lineWidth = s * .012; x.beginPath(); x.moveTo(p2[0] - s * .024, p2[1]); x.lineTo(p2[0] + s * .024, p2[1]); x.stroke();   // cuff
+    const hx = p2[0] + Math.sin(a2) * s * .03, hyy = p2[1] - Math.cos(a2) * s * .03;
+    x.fillStyle = skin; x.beginPath(); x.ellipse(hx, hyy, s * .024, s * .03, a2, 0, TAU); x.fill();
+    x.beginPath(); x.ellipse(hx - d * s * .02, hyy + s * .008, s * .009, s * .016, -d * .6 + a2, 0, TAU); x.fill();       // thumb
+  };
+  arm(-1); arm(1);
+  // neck
+  x.fillStyle = skinD; x.fillRect(cx - hr * .34, shY - s * .01, hr * .68, hy - shY);
+  // the coat: sloping shoulders, narrower at the waist, flaring a little to the hem, a collar and buttons
+  x.fillStyle = coat; x.beginPath();
+  x.moveTo(cx - hr * .5, shY + s * .012);
+  x.quadraticCurveTo(cx - sh * .9, shY + s * .008, cx - sh, shY - s * .04);
+  x.quadraticCurveTo(cx - sh * .86, waist + s * .05, cx - sh * .82, waist);
+  x.lineTo(cx - sh * .95, hem); x.lineTo(cx + sh * .95, hem); x.lineTo(cx + sh * .82, waist);
+  x.quadraticCurveTo(cx + sh * .86, waist + s * .05, cx + sh, shY - s * .04);
+  x.quadraticCurveTo(cx + sh * .9, shY + s * .008, cx + hr * .5, shY + s * .012); x.closePath(); x.fill();
+  x.fillStyle = coatD;                                                                     // collar: a V under the chin
+  x.beginPath(); x.moveTo(cx - hr * .55, shY + s * .012); x.lineTo(cx, shY - s * .05); x.lineTo(cx + hr * .55, shY + s * .012);
+  x.lineTo(cx + hr * .3, shY + s * .02); x.lineTo(cx, shY - s * .025); x.lineTo(cx - hr * .3, shY + s * .02); x.closePath(); x.fill();
+  x.strokeStyle = coatD; x.lineWidth = s * .006;
+  x.beginPath(); x.moveTo(cx, shY - s * .05); x.lineTo(cx, hem); x.stroke();                       // the opening
+  x.beginPath(); x.moveTo(cx - sh * .84, waist + s * .01); x.lineTo(cx + sh * .84, waist + s * .01); x.stroke();   // the belt line
+  x.fillStyle = coatD; for (let i = 1; i <= 3; i++) { x.beginPath(); x.arc(cx + s * .014, shY - s * .05 - i * (shY - waist - s * .05) / 3.6, s * .006, 0, TAU); x.fill(); }
+  // ears, then the head
+  x.fillStyle = skinD; for (const d of [-1, 1]) { x.beginPath(); x.ellipse(cx + d * hr * .96, hy - hr * .05, hr * .17, hr * .24, 0, 0, TAU); x.fill(); }
+  x.fillStyle = skin; x.beginPath(); x.ellipse(cx, hy - hr * .04, hr * .9, hr, 0, 0, TAU); x.fill();
+  x.fillStyle = skinD; x.beginPath(); x.ellipse(cx, hy - hr * .62, hr * .5, hr * .3, 0, 0, Math.PI, true); x.fill();   // the jaw's shadow
+  x.fillStyle = skin; x.beginPath(); x.ellipse(cx, hy - hr * .5, hr * .58, hr * .44, 0, 0, TAU); x.fill();
+  // hair over the head: a cap with a side fringe, and a bun when asked
+  if (hair) {
+    x.fillStyle = hair; x.beginPath(); x.ellipse(cx, hy + hr * .32, hr * .96, hr * .72, 0, -.05, Math.PI + .05); x.fill();
+    x.beginPath(); x.moveTo(cx - hr * .9, hy + hr * .32); x.quadraticCurveTo(cx - hr * .2, hy + hr * .05, cx + hr * .5, hy + hr * .42); x.lineTo(cx + hr * .9, hy + hr * .32); x.lineTo(cx - hr * .9, hy + hr * .4); x.fill();
+    if (hairStyle === 'long') for (const d of [-1, 1]) { x.beginPath(); x.ellipse(cx + d * hr * .86, hy - hr * .15, hr * .2, hr * .62, d * .1, 0, TAU); x.fill(); }
+    if (hairStyle === 'bun') { x.beginPath(); x.arc(cx, hy + hr * 1.08, hr * .32, 0, TAU); x.fill(); }
+  }
+  if (hat) {
+    x.fillStyle = hat; x.beginPath(); x.ellipse(cx, hy + hr * .5, hr * .98, hr * .72, 0, 0, Math.PI); x.fill();
+    x.fillStyle = shade(hat, .8); x.fillRect(cx - hr * 1.0, hy + hr * .42, hr * 2.0, hr * .22);
+  }
+  if (beard) { x.fillStyle = beard; x.beginPath(); x.moveTo(cx - hr * .82, hy - hr * .2); x.quadraticCurveTo(cx - hr * .7, hy - hr * 1.15, cx, hy - hr * 1.12);
+    x.quadraticCurveTo(cx + hr * .7, hy - hr * 1.15, cx + hr * .82, hy - hr * .2); x.quadraticCurveTo(cx + hr * .4, hy - hr * .5, cx, hy - hr * .42);
+    x.quadraticCurveTo(cx - hr * .4, hy - hr * .5, cx - hr * .82, hy - hr * .2); x.fill(); }
+  // the face (y up)
+  const ex = hr * .36, ey = hy + hr * .02, big = face === 'scared' || face === 'surprised';
+  x.fillStyle = 'rgba(214,92,82,.28)'; for (const d of [-1, 1]) { x.beginPath(); x.ellipse(cx + d * hr * .5, hy - hr * .3, hr * .16, hr * .1, 0, 0, TAU); x.fill(); }   // cheeks
+  x.strokeStyle = shade(hair || skin, .55); x.lineWidth = hr * .07;                        // eyebrows
+  for (const d of [-1, 1]) { const lift = big ? hr * .1 : 0, tilt = face === 'scared' ? hr * .08 : face === 'smile' ? -hr * .02 : 0;
+    x.beginPath(); x.moveTo(cx + d * ex * .5, ey + hr * .24 + lift + tilt); x.quadraticCurveTo(cx + d * ex, ey + hr * .31 + lift, cx + d * ex * 1.45, ey + hr * .22 + lift); x.stroke(); }
+  if (face === 'sleeping') {
+    x.strokeStyle = dark; x.lineWidth = hr * .06; for (const d of [-1, 1]) { x.beginPath(); x.arc(cx + d * ex, ey, hr * .12, Math.PI * 1.1, Math.PI * 1.9); x.stroke(); }
+  } else for (const d of [-1, 1]) {
+    x.fillStyle = '#f6efe4'; x.beginPath(); x.ellipse(cx + d * ex, ey, hr * (big ? .19 : .16), hr * (big ? .15 : .1), 0, 0, TAU); x.fill();
+    x.fillStyle = '#3a2418'; x.beginPath(); x.arc(cx + d * ex + (face === 'scared' ? -d * hr * .03 : 0), ey, hr * (big ? .085 : .075), 0, TAU); x.fill();
+    x.fillStyle = dark; x.beginPath(); x.arc(cx + d * ex + (face === 'scared' ? -d * hr * .03 : 0), ey, hr * .04, 0, TAU); x.fill();
+    x.fillStyle = '#fff'; x.beginPath(); x.arc(cx + d * ex + hr * .03, ey + hr * .03, hr * .022, 0, TAU); x.fill();
+  }
+  x.strokeStyle = skinD; x.lineWidth = hr * .06;                                            // the nose
+  x.beginPath(); x.moveTo(cx - hr * .02, ey - hr * .08); x.quadraticCurveTo(cx + hr * .09, ey - hr * .3, cx - hr * .07, ey - hr * .34); x.stroke();
+  const my = hy - hr * .52, lip = shade(skin, .62);
+  x.strokeStyle = lip; x.fillStyle = shade(skin, .45); x.lineWidth = hr * .065;
+  if (face === 'surprised') { x.beginPath(); x.ellipse(cx, my, hr * .1, hr * .13, 0, 0, TAU); x.fill(); }
+  else if (face === 'scared') { x.beginPath(); x.moveTo(cx - hr * .2, my); x.quadraticCurveTo(cx, my + hr * .08, cx + hr * .2, my); x.quadraticCurveTo(cx, my - hr * .06, cx - hr * .2, my); x.fill(); }
+  else if (face === 'smile') { x.beginPath(); x.arc(cx, my + hr * .14, hr * .24, Math.PI * 1.2, Math.PI * 1.8); x.stroke(); }
+  else { x.beginPath(); x.moveTo(cx - hr * .14, my); x.quadraticCurveTo(cx, my - hr * .03, cx + hr * .14, my); x.stroke(); }
   return { head: [cx, hy], r: hr };
 }
 
