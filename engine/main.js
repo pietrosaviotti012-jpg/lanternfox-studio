@@ -97,8 +97,43 @@ const joinTimes = ws => {
   }
   return out;
 };
+// what is written on screen is the script's own text ("12:08 PM", "to night"), never Whisper's spelling of it ("12,08PM",
+// "tonight"): Whisper only gives the times. Each script word takes the times of the heard word it matches (digits and
+// number words count as the same: "eight" = "8"); the words in between share the time left, by length.
+const NUM = Object.fromEntries('zero one two three four five six seven eight nine ten eleven twelve'.split(' ').map((w, i) => [w, String(i)]));
+const key = w => { const k = norm(w).replace(/'/g, ''); return NUM[k] ?? k; };
+const scriptWords = (L, heard, dur) => {
+  const toks = joinTimes(L.text.split(/\s+/).filter(Boolean).map(w => [w, 0, 0])).map(([w]) => w);
+  if (!heard?.length) return toks.map((w, k, a) => [w, dur * k / a.length, dur * (k + 1) / a.length]);
+  const hk = heard.map(([w]) => key(w)), at = new Array(toks.length).fill(null);
+  let j = 0;
+  toks.forEach((w, i) => {
+    const k = key(w);
+    for (let d = 0; d < 4 && j + d < heard.length; d++) {
+      if (hk[j + d] === k) { at[i] = [heard[j + d][1], heard[j + d][2]]; j += d + 1; return; }
+      // a word Whisper split ("12" + ",08PM" for "12:08 PM", "street" + "lamps"): join up to four heard pieces
+      let acc = '';
+      for (let n = 0; n < 4 && j + d + n < heard.length; n++) {
+        acc += hk[j + d + n];
+        if (n && acc === k) { at[i] = [heard[j + d][1], heard[j + d + n][2]]; j += d + n + 1; return; }
+        if (!k.startsWith(acc)) break;
+      }
+    }
+  });
+  // the words without a match share the gap between their matched neighbours, in proportion to their length
+  for (let i = 0; i < toks.length; i++) {
+    if (at[i]) continue;
+    let b = i; while (b < toks.length && !at[b]) b++;
+    const t0 = i ? at[i - 1][1] : (heard[0][1] ?? 0), t1 = b < toks.length ? at[b][0] : Math.max(t0, heard[heard.length - 1][2]);
+    const lens = toks.slice(i, b).map(w => w.length + 1), tot = lens.reduce((a, x) => a + x, 0);
+    let u = t0;
+    for (let q = i; q < b; q++) { const v = u + (t1 - t0) * lens[q - i] / tot; at[q] = [u, v]; u = v; }
+    i = b - 1;
+  }
+  return toks.map((w, i) => [w, at[i][0], at[i][1]]);
+};
 for (const L of script.lines) {
-  const c = C[L.id], ws = joinTimes(WORDS[L.id]?.length ? WORDS[L.id] : L.text.split(/\s+/).map((w, k, a) => [w, c.dur * k / a.length, c.dur * (k + 1) / a.length]));
+  const c = C[L.id], ws = scriptWords(L, WORDS[L.id], c.dur);
   const em = new Set((L.em || []).map(norm)), out = [];
   let cur = [];
   ws.forEach(([w, s, e], k) => {
