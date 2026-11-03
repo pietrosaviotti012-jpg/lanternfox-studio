@@ -1,2 +1,2 @@
-2026-11-03 16:42 UTC
-Redo: captions now show the script's own words, so times read 12:08 PM on one line (Whisper only gives the timing)
+2026-11-03 18:05 UTC
+Redo: times are now spoken as "twelve oh eight p.m." via "say", not read as a number

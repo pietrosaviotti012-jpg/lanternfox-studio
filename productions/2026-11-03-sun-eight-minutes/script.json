@@ -59,6 +59,7 @@
   {
    "id": "L03",
    "text": "Then, at 12:08 PM, noon turns to night.",
+   "say": "Then, at twelve oh eight p.m., noon turns to night.",
    "em": [
     "night"
    ],
@@ -179,6 +180,7 @@
   {
    "id": "L11",
    "text": "At 12:16 PM, the light comes back.",
+   "say": "At twelve sixteen p.m., the light comes back.",
    "em": [
     "light"
    ],
