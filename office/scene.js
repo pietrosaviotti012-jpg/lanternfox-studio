@@ -657,6 +657,14 @@ function readyAt(deps) {
   return new Date((p ? p.end.getTime() : Date.now()) + rest * 60000);
 }
 const videoBadge = (v) => v?.n ? `Video ${v.n} di oggi` : "";
+// the video a house is on: its own (from the event), or for the chain's houses at work the one announced last
+const VIDEO_HOUSES = ["soggetto", "copione", "regia", "voce", "animazione", "musica", "montaggio", "qualita", "revisione"];
+function houseVideo(id, info) {
+  const vid = info.video || (VIDEO_HOUSES.includes(id) && info.status !== "idle" ? state.video?.id : null);
+  if (!vid) return null;
+  const q = (state.queue || []).find((x) => x.id === vid), cur = state.video?.id === vid ? state.video : null;
+  return { title: cur?.title || q?.title || vid, badge: cur ? videoBadge(cur) : q?.n && q.day === state.today?.day ? `Video ${q.n} di oggi` : "", series: cur?.series || "" };
+}
 
 function render() {
   if (!state) return;
@@ -1055,6 +1063,9 @@ function fillSheet(id) {
   const pending = (state?.queue || []).filter((q) => q.status === "pending").length;
   $("sheetBody").innerHTML = `<header><img alt="" src="${ICONS[id]}"><div><h2 id="sheetTitle">${esc(d.name)}</h2><p>${esc(d.who)} · ${STATUS_TEXT[info.status] || info.status}</p></div>
       <button class="round" data-close aria-label="Chiudi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button></header>
+    ${(() => { const v = houseVideo(id, info), word = { working: "In lavorazione", waiting: "In attesa", error: "Fermo su", done: "Finito", idle: "Ultimo video" }[info.status] || "Video";
+      return v ? `<div class="now" style="margin-top:14px"><b>${word}</b><span style="font-size:1.05em;font-weight:600">${esc(v.title)}</span>${v.badge || v.series ? `<p class="note" style="margin-top:4px">${esc([v.badge, v.series && `Serie: ${v.series}`].filter(Boolean).join(" · "))}</p>` : ""}</div>`
+        : VIDEO_HOUSES.includes(id) ? `<div class="now" style="margin-top:14px"><b>Video</b><span class="note">Nessun video in lavorazione</span></div>` : ""; })()}
     <p style="margin:16px 0 0">${esc(d.does)}</p>
     <p class="note" style="margin:8px 0 0">Dentro: ${esc(INSIDE[id])}${info.status === "idle" ? " Adesso però dorme." : ""}</p>
     <div class="now"><b>${info.status === "idle" ? "Ultimo lavoro" : "Adesso"}</b>${info.task ? esc(info.task) : `<span class="note">Niente da fare, per ora.</span>`}

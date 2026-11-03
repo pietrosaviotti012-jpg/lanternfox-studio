@@ -281,7 +281,8 @@ async function applyEvent(env, event) {
     if (event.task !== undefined) dept.task = clip(event.task, 280);
     if (event.output !== undefined) dept.output = clip(event.output, 1200);
     dept.updated_at = now;
-    dept.video = event.video_id ? clip(event.video_id, 80) : null;   // two renders can run together: each house knows for which video it works
+    // two renders can run together: each house knows for which video it works; without a video_id, the chain's houses work on the video announced last
+    dept.video = event.video_id ? clip(event.video_id, 80) : VIDEO_DEPTS.includes(event.dept) ? state.video?.id || null : null;
     if (event.task || event.output) state.log.push({ at: now, dept: event.dept, status, text: clip(event.task || event.output, 280) });
   }
   if (event.queue) {
@@ -463,13 +464,16 @@ function planParts(state) {
 }
 
 // Il Generale, the fox who guards the chain: when the user calls him he walks the whole village and restarts what is broken.
-//   - a house that stopped (error), or one "at work" with no news for over two hours (stuck): restarted, the render only once;
+//   - a house that stopped (error), or one "at work" with no news for 90 minutes (stuck): restarted, the render only once;
 //   - a production slot of today that did not start 40 minutes after its time: a new video;
 //   - commands still waiting for GitHub: he wakes the watchman.
 // What he saw and did stays in state.guard for the Home card.
 const EVENING_DEPTS = ["pubblicazione", "community", "statistiche", "analisi"];
 const RENDER_DEPTS = ["voce", "animazione", "musica", "montaggio", "qualita"];
 const CHAIN_DEPTS = ["ricerca", "soggetto", "copione", "regia", ...RENDER_DEPTS];
+const VIDEO_DEPTS = [...CHAIN_DEPTS.slice(1), "revisione"];   // the houses that always work on one video (the Ricerca works for tomorrow)
+const STUCK_MS = 90 * 60e3;   // "at work" with no news for this long = stuck
+const AUTO_TRIES = 3;         // how many times a day the Generale restarts the same house on his own
 // the Office's own slips: a house still "at work" on a video that is already finished (it never said "done"),
 // and GitHub commands or examples "in progress" for hours. Returns what it put right.
 function tidy(state, now) {
@@ -495,15 +499,17 @@ function tidy(state, now) {
   }
   return fixed;
 }
-async function guardRound(env, state, now) {
+const stoppedDepts = (state, t) => Object.keys(RESTART).filter((id) => { const d = state.departments[id];
+  return d?.status === "error" || (d?.status === "working" && d.updated_at && t - Date.parse(d.updated_at) > STUCK_MS); });
+async function guardRound(env, state, now, skip = []) {
   const repaired = tidy(state, now);
   const seen = [], done = [], deps = state.departments, t = Date.parse(now);
   const label = (id) => id[0].toUpperCase() + id.slice(1);
-  const broken = Object.keys(RESTART).filter((id) => deps[id]?.status === "error");
-  const stuck = Object.keys(RESTART).filter((id) => deps[id]?.status === "working" && deps[id].updated_at && t - Date.parse(deps[id].updated_at) > 2 * 3600e3);
+  const stopped = stoppedDepts(state, t).filter((id) => !skip.includes(id));
+  const broken = stopped.filter((id) => deps[id].status === "error"), stuck = stopped.filter((id) => !broken.includes(id));
   let renderDone = false;
   for (const id of [...broken, ...stuck]) {
-    seen.push(`reparto ${label(id)} ${broken.includes(id) ? "fermo" : "bloccato da oltre due ore"}`);
+    seen.push(`reparto ${label(id)} ${broken.includes(id) ? "fermo" : "bloccato da oltre un'ora e mezza"}`);
     if (RENDER_DEPTS.includes(id)) { if (renderDone) continue; renderDone = true; }
     const r = await restart(env, state, "dept", id, now);
     done.push(r.how);
@@ -631,7 +637,7 @@ async function publishNow(env, state, item, why) {
 }
 
 // Every ten minutes, with nobody watching: houses left at work are put right, videos with a chosen time go out,
-// and a house really stuck for over two hours is restarted by the Generale, once a day for each house.
+// and every house that stops is restarted by the Generale (up to AUTO_TRIES times a day each).
 async function watch(env) {
   const state = await loadState(env), now = new Date().toISOString(), t = Date.now(), before = JSON.stringify(state);
   tidy(state, now);
@@ -642,12 +648,22 @@ async function watch(env) {
   if (utc >= "20:10" && state.stats_day !== day) { state.stats_day = day; await collectStats(env, state); }
   for (const q of state.queue) if (q.status === "approved" && q.publish_exact && t >= Date.parse(q.publish_after)
     && !(q.now_at && t - Date.parse(q.now_at) < RESERVE_MS) && PLATFORMS.some((p) => !sent(q.published?.[p]))) await publishNow(env, state, q, "All'orario che hai scelto esce");
-  const done = state.auto_guard?.day === romeDay(t) ? state.auto_guard.depts : [];
-  const stuck = Object.keys(RESTART).filter((id) => { const d = state.departments[id]; return d?.status === "working" && d.updated_at && t - Date.parse(d.updated_at) > 2 * 3600e3 && !done.includes(id); });
-  if (stuck.length) {
-    state.auto_guard = { day: romeDay(t), depts: [...done, ...stuck] };
-    const g = await guardRound(env, state, now);
+  // every house that stops (error, or stuck at work) is restarted by the Generale on the next round, up to AUTO_TRIES times a day each;
+  // after that he leaves it to the user and says so, once
+  if (state.auto_guard?.day !== day || !state.auto_guard.tries) state.auto_guard = { day, tries: {}, gave_up: [] };
+  const ag = state.auto_guard, stopped = stoppedDepts(state, t);
+  const tired = stopped.filter((id) => (ag.tries[id] || 0) >= AUTO_TRIES), due = stopped.filter((id) => !tired.includes(id));
+  if (due.length) {
+    for (const id of due) ag.tries[id] = (ag.tries[id] || 0) + 1;
+    const g = await guardRound(env, state, now, tired);
     await pushAll(env, { title: "Il Generale è intervenuto da solo", body: clip(g.text, 120), url: "/" });
+  }
+  const fresh = tired.filter((id) => !ag.gave_up.includes(id));
+  if (fresh.length) {
+    ag.gave_up.push(...fresh);
+    const names = fresh.map((id) => id[0].toUpperCase() + id.slice(1)).join(", ");
+    state.log.push({ at: now, dept: "regia", status: "error", text: `Il Generale ha provato ${AUTO_TRIES} volte a far ripartire ${names}: serve il tuo aiuto` });
+    await pushAll(env, { title: "Il Generale ha bisogno di te", body: `${names}: si è fermato ${AUTO_TRIES} volte oggi`, url: "/", urgent: true });
   }
   if (JSON.stringify(state) !== before) await saveState(env, state);
 }
