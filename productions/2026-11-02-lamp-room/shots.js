@@ -84,26 +84,51 @@ const bottomDoor = (name, z, cx, w, h, o = {}) => ({ name, z, trans: .05, glow: 
     if (o.feet) { g.fillStyle = '#000'; for (const d of [-1, 1]) g.fillRect(cx + d * w * .16 - w * .07, 0, w * .14, h * .025); } } });
 const sweep = (speed = .55, amp = .7, base = Math.PI * .92) => t => base + Math.sin(t * speed) * amp;
 
-// Screen fixes for this film (the Ufficio's "Rifai" note): the notifications (line.card) sit lower, clear of the series tag,
-// the clock and the resources bar at the top left; during the three rules the white ticker strip on the TV scrolls without
-// ever stopping or jumping back, and the TV stays up between one rule and the next. Styles are injected once from here and
-// driven by the shots' update(), which knows the film time.
+// Screen fixes for this film (the Ufficio's "Rifai" notes): the notifications (line.card) sit lower, clear of the series
+// tag, the clock and the resources bar at the top left; the TV stays up between one rule and the next. The white ticker
+// strip with the three rules is always on screen, from the first frame to the last, and always scrolling at the same
+// speed, looping seamlessly (it never stops, never jumps back). It is its own strip, full width, in the free band between
+// the pop captions (they end at 1260 px) and the platforms' buttons (bottom 30 %), so it never covers the TV, the end
+// choice or the "Night 2" card; the TV's own ticker is hidden so there is only one. Styles are injected once from here;
+// every shot's update() drives the strip and the TV with the film time.
+const CRAWL = 'COAST GUARD · CHANNEL 16 · RULE 1: THE LAMP NEVER GOES OUT · RULE 2: THE BOTTOM DOOR STAYS SHUT UNTIL SUNRISE · RULE 3: IF SOMEONE KNOCKS, LOOK UP FIRST · KEEP THE OIL CLOSE · WHATEVER YOU HEAR · ';
 if (typeof document !== 'undefined' && !document.getElementById('lamp-room-ui')) {
   const st = document.createElement('style'); st.id = 'lamp-room-ui';
   st.textContent = '#card { top: 440px !important; }'
-    + ' #ui .tv .ticker { transform: translateX(var(--tick, 0px)) !important; }'
-    + ' #ui.rules-on .tv { opacity: 1 !important; }';
+    + ' #ui .tv .ticker { display: none !important; }'
+    + ' #ui.rules-on .tv { opacity: 1 !important; }'
+    + ' #ui #lamp-crawl { position: absolute; left: 0; right: 0; top: 1266px; opacity: 1; overflow: hidden; padding: 10px 0;'
+    + ' background: #fbf3e4; color: #12080a; font-family: Anton; font-size: 30px; letter-spacing: .02em; white-space: nowrap;'
+    + ' box-shadow: 0 6px 22px rgba(0,0,0,.5); }'
+    + ' #ui #lamp-crawl .run { display: inline-block; will-change: transform; }'
+    + ' #ui #lamp-crawl .run span { display: inline-block; }';
   document.head.append(st);
 }
+const crawlSpeed = 150;   // px per second, constant for the whole film
+const crawl = g => {
+  const ui = document.getElementById('ui'); if (!ui) return;
+  let el = document.getElementById('lamp-crawl');
+  if (!el) {
+    el = document.createElement('div'); el.id = 'lamp-crawl';
+    el.innerHTML = `<div class="run">${Array.from({ length: 6 }, () => `<span>${CRAWL.replace(/ /g, '&nbsp;')}</span>`).join('')}</div>`;
+    ui.append(el);
+  }
+  const run = el.firstChild, w = run.firstChild.offsetWidth || 3600;   // one copy: the loop length
+  run.style.transform = `translateX(${(-((Math.max(0, g) * crawlSpeed) % w)).toFixed(1)}px)`;
+};
 const rulesUI = (C) => {
   const a = C.L04.at - .1, b = C.L07.at - .05;
   return start => t => {
     const ui = typeof document !== 'undefined' && document.getElementById('ui'); if (!ui) return;
     const g = start + t;
-    ui.style.setProperty('--tick', `${(-Math.max(0, g - a) * 150).toFixed(0)}px`);
     ui.classList.toggle('rules-on', g > a + .25 && g < b - .3);
   };
 };
+// every shot also drives the strip, with the film time (shot start + shot time)
+const withCrawl = shot => ({ ...shot, build: async E => {
+  const s = await shot.build(E), up = s.update?.bind(s);
+  return Object.assign(s, { update(t) { const r = up?.(t); if (typeof document !== 'undefined') crawl(shot.start + t); return r; } });
+} });
 
 export function SHOTS(C, DUR) {
   const at = id => C[id].at;
@@ -405,5 +430,5 @@ export function SHOTS(C, DUR) {
           focus: -.096, aper: 10, grade: { expo: 1.5, vig: .18 },
         });
       } },
-  ];
+  ].map(withCrawl);
 }
