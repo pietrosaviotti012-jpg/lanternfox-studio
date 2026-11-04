@@ -1,0 +1,44 @@
+# The skill videos made by the cloud routines (branch prove-skill, research/prove-skill/serie/<id>/):
+# each new one gets its public release and goes to Approva in the Office. It is published only after the user's ok.
+name: Skill videos to Approva
+on:
+  push:
+    branches: [prove-skill]
+    paths: ["research/prove-skill/serie/*/meta.json"]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency: serie
+env:
+  OFFICE_URL: ${{ secrets.OFFICE_URL }}
+  STUDIO_SECRET: ${{ secrets.STUDIO_SECRET }}
+jobs:
+  approva:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: prove-skill
+      - name: Release and Approva
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for m in research/prove-skill/serie/*/meta.json; do
+            D=$(dirname "$m"); ID=$(basename "$D"); V="$D/$ID.mp4"
+            [ -f "$V" ] || { echo "$ID: no video yet"; continue; }
+            gh release view "film-$ID" >/dev/null 2>&1 && { echo "$ID: already sent"; continue; }
+            COVER="$D/cover.jpg"; [ -f "$COVER" ] || ffmpeg -nostdin -v error -y -ss 2 -i "$V" -frames:v 1 -q:v 3 "$COVER"
+            cp "$V" film.mp4; cp "$COVER" cover.jpg
+            TITLE=$(node -e "console.log(require('./$m').title)")
+            gh release create "film-$ID" film.mp4 cover.jpg --title "$TITLE" --notes "Skill video · $ID"
+            BASE="https://github.com/${{ github.repository }}/releases/download/film-$ID"
+            node -e "
+              const m = require('./$m');
+              const caption = m.caption + (m.hashtags?.length ? '\n\n' + m.hashtags.map(h => h.startsWith('#') ? h : '#' + h).join(' ') : '');
+              console.log(JSON.stringify({ queue: { id: '$ID', title: m.title, caption, platforms: ['Instagram', 'YouTube', 'TikTok'],
+                preview_url: '$BASE/film.mp4', cover_url: '$BASE/cover.jpg' } }));
+            " > queue.json
+            VIDEO_ID="$ID" node tools/office.mjs "$(cat queue.json)" "{\"dept\":\"revisione\",\"status\":\"waiting\",\"task\":\"$TITLE è pronto: guardalo e scegli\"}"
+            rm -f film.mp4 cover.jpg queue.json
+          done
