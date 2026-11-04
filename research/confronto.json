@@ -263,6 +263,15 @@
    "cambi_10s": 2.6,
    "movimento": 2.9
   },
+  "2026-11-04-hush-harbor-2": {
+   "luce": 16,
+   "contrasto": 16,
+   "saturazione": 64,
+   "buio": 61,
+   "colori": 4,
+   "cambi_10s": 4.1,
+   "movimento": 4.7
+  },
   "strange-days-1": {
    "luce": 28,
    "contrasto": 22,
@@ -271,43 +280,79 @@
    "colori": 3,
    "cambi_10s": 6.2,
    "movimento": 11.4
+  },
+  "strange-days-2": {
+   "luce": 48,
+   "contrasto": 26,
+   "saturazione": 31,
+   "buio": 15,
+   "colori": 3,
+   "cambi_10s": 6.4,
+   "movimento": 12.7
+  },
+  "strange-days-3": {
+   "luce": 41,
+   "contrasto": 26,
+   "saturazione": 40,
+   "buio": 10,
+   "colori": 4,
+   "cambi_10s": 6.2,
+   "movimento": 11.6
+  },
+  "strange-days-4": {
+   "luce": 37,
+   "contrasto": 26,
+   "saturazione": 34,
+   "buio": 23,
+   "colori": 4,
+   "cambi_10s": 6.4,
+   "movimento": 14.8
+  },
+  "what-if-1": {
+   "luce": 52,
+   "contrasto": 25,
+   "saturazione": 31,
+   "buio": 14,
+   "colori": 3,
+   "cambi_10s": 6.4,
+   "movimento": 12.7
   }
  },
  "tabella": [
   {
    "misura": "Cambi d'immagine ogni 10 secondi",
    "virali": 4.7,
-   "nostri": 3.8
+   "nostri": 4.0
   },
   {
    "misura": "Quanto cambia l'immagine ogni 1,5 secondi",
    "virali": 5.4,
-   "nostri": 4.2
+   "nostri": 4.8
   },
   {
    "misura": "Luce media (0-100)",
    "virali": 16.0,
-   "nostri": 13.0
+   "nostri": 15.5
   },
   {
    "misura": "Contrasto",
    "virali": 16.0,
-   "nostri": 15.0
+   "nostri": 16.0
   },
   {
    "misura": "Saturazione",
    "virali": 23.0,
-   "nostri": 65.0
+   "nostri": 64.0
   },
   {
    "misura": "Parte quasi nera dell'immagine (%)",
    "virali": 47.0,
-   "nostri": 68.0
+   "nostri": 61.5
   },
   {
    "misura": "Colori forti diversi",
    "virali": 3.0,
-   "nostri": 2.0
+   "nostri": 3.0
   }
  ]
 }
