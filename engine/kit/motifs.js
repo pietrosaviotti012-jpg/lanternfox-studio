@@ -1252,3 +1252,58 @@ export function houseKey(x, o) {
   x.save(); x.globalCompositeOperation = 'destination-out'; x.beginPath(); x.arc(-s * .04, 0, s * .07, 0, TAU); x.fill(); x.restore();
   x.restore();
 }
+
+// —— Added for "Roanoke: One Word" (True Mysteries, case 3): a palisade of sharpened logs, a carved post, a big tree ——
+
+// A palisade: a row of tall logs with sharpened tops, standing on by. o.gap leaves an opening (the gate) [x0, x1].
+// o.seed varies heights a little, so the wall reads as cut by hand. Returns the x of every log.
+export function palisade(x, o) {
+  const { x0, x1, by, h, n = 16, col = '#1a1410', seed = 5, gap = null, bark = 'rgba(0,0,0,.22)' } = o, R = mulberry(seed);
+  const w = (x1 - x0) / n, xs = [];
+  for (let i = 0; i < n; i++) {
+    const cx = x0 + w * (i + .5);
+    if (gap && cx > gap[0] && cx < gap[1]) continue;
+    const ph = h * (.9 + R() * .14), pw = w * .92; xs.push(cx);
+    x.fillStyle = col; x.beginPath(); x.moveTo(cx - pw / 2, by - .01); x.lineTo(cx - pw / 2, by + ph); x.lineTo(cx, by + ph + pw * .9); x.lineTo(cx + pw / 2, by + ph);
+    x.lineTo(cx + pw / 2, by - .01); x.closePath(); x.fill();
+    x.fillStyle = bark; x.fillRect(cx + pw * .18, by, pw * .08, ph * .9); x.fillRect(cx - pw * .3, by + ph * .2, pw * .06, ph * .5);
+  }
+  return xs;
+}
+
+// A thick gate post, seen close: a log with bark lines and a pointed top. The carving is drawn by carving() on top of it.
+export function gatePost(x, o) {
+  const { cx, by, w, h, col = '#5a4630', dark = '#3a2c1c' } = o;
+  x.fillStyle = col; x.beginPath(); x.moveTo(cx - w / 2, by - .02); x.lineTo(cx - w / 2, by + h); x.lineTo(cx, by + h + w * .7); x.lineTo(cx + w / 2, by + h);
+  x.lineTo(cx + w / 2, by - .02); x.closePath(); x.fill();
+  x.fillStyle = dark; for (let i = 0; i < 7; i++) { const px = cx - w * .42 + i * w * .14; x.fillRect(px, by + h * (.05 + (i % 3) * .07), w * .018, h * (.55 + (i % 2) * .2)); }
+  x.fillStyle = 'rgba(0,0,0,.28)'; x.fillRect(cx + w * .3, by - .02, w * .2, h + .02);
+}
+
+// Carved capital letters: the cut wood is pale, the groove dark. Draw each letter on its own (o.only = index) to light them one by one.
+// cx, cy = centre of the word, size = letter height; vertical: true writes them top to bottom (on a post).
+export function carving(x, o, g) {
+  const { word, cx, cy, size, vertical = false, col = '#e8d2a4', groove = '#2a1c10', only = null } = o;
+  const ch = [...word], step = size * (vertical ? 1.08 : .72);
+  ch.forEach((c, i) => {
+    if (only != null && only !== i) return;
+    const px = vertical ? cx : cx + (i - (ch.length - 1) / 2) * step, py = vertical ? cy + ((ch.length - 1) / 2 - i) * step : cy;
+    const put = (ctx, fill, dx, dy) => { ctx.save(); ctx.translate(px + dx, py + dy); ctx.scale(.001, -.001); ctx.font = `${size * 1000}px Anton`;
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = fill; ctx.fillText(c, 0, 0); ctx.restore(); };
+    if (x) { put(x, groove, size * .03, -size * .03); put(x, col, 0, 0); }
+    if (g) put(g, '#fff', 0, 0);
+  });
+}
+
+// A big old tree: a trunk wide enough to carve, roots, two low branches and a canopy of round leaf masses.
+export function bigTree(x, o) {
+  const { cx, by, s, col = '#2a2014', leaf = '#1c2a20', seed = 8 } = o, R = mulberry(seed);
+  x.fillStyle = leaf;
+  for (let i = 0; i < 9; i++) { const a = i / 9 * Math.PI, r = s * (.2 + R() * .1); x.beginPath(); x.arc(cx + Math.cos(a) * s * .32, by + s * .78 + Math.sin(a) * s * .2, r, 0, TAU); x.fill(); }
+  x.fillStyle = col;
+  x.beginPath(); x.moveTo(cx - s * .16, by); x.quadraticCurveTo(cx - s * .09, by + s * .05, cx - s * .085, by + s * .3); x.lineTo(cx - s * .07, by + s * .8);
+  x.lineTo(cx + s * .07, by + s * .8); x.lineTo(cx + s * .085, by + s * .3); x.quadraticCurveTo(cx + s * .09, by + s * .05, cx + s * .16, by); x.closePath(); x.fill();
+  x.lineCap = 'round'; x.strokeStyle = col; x.lineWidth = s * .04;
+  for (const d of [-1, 1]) { x.beginPath(); x.moveTo(cx + d * s * .05, by + s * .55); x.quadraticCurveTo(cx + d * s * .2, by + s * .62, cx + d * s * .3, by + s * .74); x.stroke(); }
+  x.fillStyle = 'rgba(0,0,0,.25)'; for (let i = 0; i < 4; i++) x.fillRect(cx - s * .05 + i * s * .03, by + s * .05, s * .006, s * .5);
+}

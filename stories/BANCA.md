@@ -13,7 +13,7 @@ La Ricerca aggiunge ogni giorno 3-5 voci nuove (dalle mode del momento, da Reddi
 - ⭐ **La Mary Celeste (1872)**: "In 1872, a ship was found drifting in the Atlantic. The table was set. The crew was gone." (In realtà la tavola apparecchiata è una leggenda: dillo con eleganza.) → `productions/2026-10-31-mary-celeste`
 - **La Carroll A. Deering (1921)**: una goletta incagliata sulle secche di Diamond Shoals, il pranzo in cambusa, nessuno a bordo; il gatto di bordo era l'unico vivo. Fatto documentato (indagine dell'FBI del 1921). (dal 2026-10-31, sera)
 - ⭐ **I guardiani del faro delle Isole Flannan (1900)**: tre uomini spariti, una tavola rovesciata e un orologio fermo. Si lega alla nostra serie del faro. → `productions/2026-10-29-flannan-keepers`
-- ⭐ **Roanoke e "CROATOAN" (1590)**: una colonia intera sparita, una sola parola incisa su un palo.
+- ⭐ **Roanoke e "CROATOAN" (1590)**: una colonia intera sparita, una sola parola incisa su un palo. → `productions/2026-11-04-roanoke`
 - **La danza del 1518 a Strasburgo**: centinaia di persone ballano per giorni senza potersi fermare.
 - **I bambini verdi di Woolpit (XII secolo)**: due bambini dalla pelle verde escono da una buca e parlano una lingua sconosciuta.
 - **Il segnale "Wow!" (1977)**: 72 secondi da un punto del cielo, mai più ripetuti.
@@ -29,6 +29,10 @@ La Ricerca aggiunge ogni giorno 3-5 voci nuove (dalle mode del momento, da Reddi
 - **La grande bufala della Luna (1835)**: un giornale di New York racconta per sei giorni che un telescopio ha visto uomini-pipistrello sulla Luna, e la città ci crede. Fatto vero e documentato (The Sun, agosto 1835). (dal 2026-10-30, sera)
 
 - **Le "notti nere" del 1780 (New England)**: il 19 maggio 1780 a mezzogiorno il cielo diventa nero, nelle chiese si accendono le candele, i polli vanno a dormire. Fatto documentato (fumo di incendi nei boschi del Canada). Gancio: "At noon on May 19, 1780, the sky over New England turned black." (dal 2026-11-03, giro delle 11: seguito naturale del What if del Sole)
+
+- **Il dirigibile L-8 (1942)**: un dirigibile della Marina torna a terra sopra un paese della California, intatto, e dei due uomini a bordo non c'è traccia; i paracadute e il canotto sono al loro posto. Fatto documentato. Gancio: "In 1942, a Navy airship drifted down onto a California street. Its two-man crew was gone." (dal 2026-11-04, giro delle 11)
+- **Le campane del villaggio sommerso di Kitezh (leggenda russa)**: la città che sparì nel lago per non farsi trovare, e le campane che qualcuno giura di sentire sotto l'acqua. Dire che è leggenda. (dal 2026-11-04, giro delle 11)
+- **Il segnale dei numeri "UVB-76" (dal 1982)**: una radio russa che trasmette un ronzio giorno e notte, e ogni tanto una voce legge parole a caso. Fatto documentato, scopo mai spiegato. (dal 2026-11-04, giro delle 11)
 
 ## What if
 - ⭐ What if every star went out tonight? → `productions/2026-10-28-stars-go-out`
