@@ -100,6 +100,11 @@ La Ricerca aggiunge ogni giorno 3-5 voci nuove (dalle mode del momento, da Reddi
 - **Library Hours**: addormentato in biblioteca, alle 2:14 si accende il cartello "QUIET PLEASE. IT IS LISTENING." Finale: qualcuno sta per starnutire. HELP or HIDE.
 - ⭐ **Look Empty** (dal 2026-11-02, giro della sera): "The rule is simple: your house has to look abandoned. No light, no smoke, no footprints in the snow." Checklist in alto che si spunta. Finale: un bambino in strada ti saluta dalla finestra, come se ti vedesse. WAVE BACK or HIDE.
 - **After Closing · Night 1** (dal 2026-11-03, sera): "The shop closed at nine. You were still in the back, and the shutters came down." Una regola sola: se chiama il tuo nome, non rispondere. Il taccuino come HUD. WRITE IT DOWN or ANSWER.
+- **Quiet Car** (dal 2026-11-04): "The last train home has one quiet carriage. Tonight the sign above the door says: IT RIDES WITH US." Contatore NOISE, fermate che scorrono nell'HUD. Finale: il telefono di chi dorme squilla nella borsa. ANSWER or LET IT RING.
+- **Snow Day Silence** (dal 2026-11-04): "The school text says: snow day. Stay inside. Do not shovel." Il rumore della pala è la regola infranta dal vicino. Finale: il vicino ti fa segno di aiutarlo. HELP or STAY IN.
+
+## What if (personaggio con nome, dal 2026-11-04)
+- **No Sound Day**: "What if sound stopped working for one day?" Mara, 34, guardiana di un faro, si sveglia e il mare non fa rumore. Spiegato passo per passo (niente sirene, niente tuoni, i pipistrelli si perdono). Chiusa a indovinello: qual è l'unica cosa che sentiresti ancora?
 
 ## Il telefono sa qualcosa (formato `telefono.md`, dal 2026-11-03)
 - ⭐ **Find My** (dal 2026-11-03): "Your phone says your little sister's phone is in your room. She's been at Grandma's all week." Il puntino della mappa si avvicina stanza per stanza. CALL HER or CHECK THE CLOSET.
