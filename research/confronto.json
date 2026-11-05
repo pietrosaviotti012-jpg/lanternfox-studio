@@ -272,6 +272,15 @@
    "cambi_10s": 4.1,
    "movimento": 4.7
   },
+  "2026-11-05-wrong-transfer": {
+   "luce": 31,
+   "contrasto": 25,
+   "saturazione": 46,
+   "buio": 43,
+   "colori": 1,
+   "cambi_10s": 2.7,
+   "movimento": 3.1
+  },
   "strange-days-1": {
    "luce": 28,
    "contrasto": 22,
@@ -327,12 +336,12 @@
   {
    "misura": "Quanto cambia l'immagine ogni 1,5 secondi",
    "virali": 5.4,
-   "nostri": 4.8
+   "nostri": 4.7
   },
   {
    "misura": "Luce media (0-100)",
    "virali": 16.0,
-   "nostri": 15.5
+   "nostri": 16.0
   },
   {
    "misura": "Contrasto",
@@ -347,7 +356,7 @@
   {
    "misura": "Parte quasi nera dell'immagine (%)",
    "virali": 47.0,
-   "nostri": 61.5
+   "nostri": 61.0
   },
   {
    "misura": "Colori forti diversi",
