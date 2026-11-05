@@ -681,7 +681,8 @@ function render() {
   const waiting = DEPTS.filter((d) => (deps[d.id] || {}).status === "waiting");
   const head = $("headline"), ready = readyAt(deps);
   const which = state.video?.n ? `${videoBadge(state.video)}: ` : "";
-  if (waiting.length) head.textContent = `${waiting[0].name} aspetta te.`;
+  if (state.paused && !working.length) head.textContent = `${state.paused}.`;
+  else if (waiting.length) head.textContent = `${waiting[0].name} aspetta te.`;
   else if (working.length) head.textContent = `${which}${working.map((d) => d.who.split(",")[0]).join(" e ")} ${working.length > 1 ? "sono" : "è"} al lavoro${ready ? `, pronto verso le ${fmtTime(ready.toISOString())}` : ""}.`;
   else if (state.video) head.textContent = "Tutte le lanterne di oggi sono accese.";
   else head.textContent = "Il villaggio dorme: nessuna storia in lavorazione.";

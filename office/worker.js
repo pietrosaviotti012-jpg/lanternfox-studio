@@ -383,8 +383,14 @@ const RESTART = { ricerca: "RESEARCH", soggetto: "PRODUCE", copione: "PRODUCE", 
   musica: "RENDER", montaggio: "RENDER", qualita: "RENDER", pubblicazione: "PUBLISH", community: "COMMUNITY", statistiche: "ANALISI", analisi: "ANALISI" };
 const canRestart = (env) => Object.fromEntries(Object.entries(RESTART).map(([d, w]) =>
   [d, w === "RENDER" || Boolean(env[`ROUTINE_${w}_TOKEN`]) || (w === "PRODUCE" && Boolean(env.ROUTINE_REDO_TOKEN))]));
+// Production paused by the user until 7 November (Italian midnight): no new video starts, not from the schedule, the Generale,
+// "Rifai" or an idea. A "Rifai" or an idea sent meanwhile waits in state.after_pause and starts by itself when the pause ends.
+const PRODUCTION_PAUSED_UNTIL = "2026-11-06T23:00:00Z";
+const paused = () => Date.now() < Date.parse(PRODUCTION_PAUSED_UNTIL);
+const PAUSE_TEXT = "La produzione è in pausa fino al 7 novembre";
 async function restart(env, state, kind, target, now) {
   const fired = (s) => s >= 200 && s < 300;
+  if (paused() && (kind === "produce" || (kind === "dept" && RESTART[target] === "PRODUCE"))) return { ok: false, how: PAUSE_TEXT };
   const op = (o) => state.ops.push({ id: "op-" + now.replace(/\D/g, "").slice(0, 14), at: now, status: "waiting", ...o });
   if (kind === "rerender") {
     if (!/^[\w-]+$/.test(target || "")) return { error: "video non valido" };
@@ -500,6 +506,7 @@ function tidy(state, now) {
   return fixed;
 }
 const stoppedDepts = (state, t) => Object.keys(RESTART).filter((id) => { const d = state.departments[id];
+  if (paused() && RESTART[id] === "PRODUCE") return false;   // during the pause the production houses rest
   return d?.status === "error" || (d?.status === "working" && d.updated_at && t - Date.parse(d.updated_at) > STUCK_MS); });
 async function guardRound(env, state, now, skip = []) {
   const repaired = tidy(state, now);
@@ -516,7 +523,7 @@ async function guardRound(env, state, now, skip = []) {
   }
   const day = new Date(t + 3600e3).toISOString().slice(0, 10), started = state.today?.day === day ? state.today.ids.length : 0;
   const missed = SCHEDULE.filter((s) => s.slot && started < s.slot && t > Date.parse(`${now.slice(0, 10)}T${s.utc}:00Z`) + 40 * 60000);
-  if (missed.length && !broken.length && !stuck.length) {
+  if (missed.length && !broken.length && !stuck.length && !paused()) {
     seen.push(`il video ${missed[0].slot} di oggi non è partito`);
     done.push((await restart(env, state, "produce", "", now)).how);
   }
@@ -642,6 +649,14 @@ async function watch(env) {
   const state = await loadState(env), now = new Date().toISOString(), t = Date.now(), before = JSON.stringify(state);
   tidy(state, now);
   await tiktokCheck(env, state);
+  if (!paused() && state.after_pause?.length) {   // the pause is over: what the user asked meanwhile starts now
+    for (const a of state.after_pause.splice(0)) {
+      const s = await fireRoutine(env, "REDO", a.text), ok = s >= 200 && s < 300;
+      const idea = a.idea && state.ideas.find((i) => i.id === a.idea);
+      if (idea) idea.status = ok ? "making" : "error";
+      state.log.push({ at: now, dept: a.idea ? "soggetto" : "regia", status: ok ? "working" : "error", text: `${ok ? "Finita la pausa, parte" : "Finita la pausa, non riesco ad avviare"}: ${clip(a.label, 120)}` });
+    }
+  }
   // the evening: our films measured against the viral ones, then the Numeri, whatever the routines do
   const utc = now.slice(11, 16), day = romeDay(t);
   if (utc >= "20:00" && state.look_day !== day) { state.look_day = day; await wakeWatchman(env, "look.yml"); }
@@ -1111,7 +1126,7 @@ export default {
       state.devices = (await subscriptions(env)).length;
       state.publish_at_utc = String(env.PUBLISH_AT_UTC || "22").split(",").map(Number);   // the publishing slots (UTC hours)
       state.youtube = JSON.parse((await env.DATA.get("yt_channel")) || "null");
-      state.schedule = SCHEDULE; state.can_produce = Boolean(env.ROUTINE_PRODUCE_TOKEN); state.can_restart = canRestart(env); state.build = "__BUILD__";
+      state.schedule = SCHEDULE; state.can_produce = Boolean(env.ROUTINE_PRODUCE_TOKEN); state.can_restart = canRestart(env); state.build = "__BUILD__"; state.paused = paused() ? PAUSE_TEXT : null;
       state.links = { repo: REPO, routines: Object.fromEntries(["PRODUCE", "PUBLISH", "RESEARCH", "COMMUNITY", "ANALISI"].map((w) => [w, env[`ROUTINE_${w}_ID`] || null])) };
       return json(state);
     }
@@ -1156,11 +1171,14 @@ export default {
       if (decision === "approved") { if (when) item.publish_after = when; else delete item.publish_after; item.publish_exact = Boolean(when && exact); }
       if (decision === "approved") calendarPut(state, { date: outDate(env, item), title: item.title, status: "approved" });
       // approved videos wait for the publishing routine's slot (PUBLISH_AT_UTC); "redo" starts the Regia routine with the note
-      const started = decision === "redo" ? await fireRoutine(env, "REDO", `id: ${id}\nnote: ${item.note}`) : 0;
+      const hold = decision === "redo" && paused();
+      if (hold) (state.after_pause ||= []).push({ text: `id: ${id}\nnote: ${item.note}`, label: `rifare "${item.title}"` });
+      const started = decision === "redo" && !hold ? await fireRoutine(env, "REDO", `id: ${id}\nnote: ${item.note}`) : 0;
       const redoOk = started >= 200 && started < 300;
       state.departments.revisione = { status: "done", task: decision === "approved" ? `Approvato: ${item.title}` : `Da rifare: ${item.note || item.title}`,
         output: "", updated_at: item.decided_at };
-      if (decision === "redo") state.departments.regia = { video: id, status: redoOk ? "working" : "error",
+      if (hold) state.departments.regia = { video: id, status: "waiting", task: `${PAUSE_TEXT}: "${item.title}" si rifà dopo`, output: "", updated_at: item.decided_at };
+      else if (decision === "redo") state.departments.regia = { video: id, status: redoOk ? "working" : "error",
         task: redoOk ? `Rifaccio "${item.title}": ${clip(item.note, 160)}` : "Non riesco ad avviare il rifacimento: controlla la routine Regia", output: "", updated_at: item.decided_at };
       state.log.push({ at: item.decided_at, dept: "revisione", status: "done",
         text: decision === "approved" ? `Hai approvato "${item.title}": esce all'orario di pubblicazione` : `Hai chiesto di rifare "${item.title}"` });
@@ -1269,6 +1287,13 @@ export default {
       const state = await loadState(env);
       const now = new Date().toISOString();
       const idea = { id: "idea-" + now.replace(/\D/g, "").slice(0, 14), text, at: now, status: "sent" };
+      if (paused()) {
+        (state.after_pause ||= []).push({ text: `idea: ${text}\nrequest: ${idea.id}`, idea: idea.id, label: `la tua idea "${clip(text, 80)}"` });
+        state.ideas.push(idea);
+        state.log.push({ at: now, dept: "soggetto", status: "waiting", text: `${PAUSE_TEXT}: la tua idea parte dopo` });
+        await saveState(env, state);
+        return json({ ok: true, idea, paused: PAUSE_TEXT });
+      }
       const started = await fireRoutine(env, "REDO", `idea: ${text}\nrequest: ${idea.id}`);
       const ok = started >= 200 && started < 300;
       idea.status = ok ? "making" : "error";
