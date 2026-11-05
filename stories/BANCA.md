@@ -98,6 +98,7 @@ La Ricerca aggiunge ogni giorno 3-5 voci nuove (dalle mode del momento, da Reddi
 - **6:13** (dal 2026-11-02, giro della sera, formato misteri a puntate): ogni mattina alle 6:13 la vecchia radio del faro trasmette dieci secondi di statico. Oggi dentro c'è una voce che conta alla rovescia. TURN IT OFF or LISTEN.
 - ⭐ **The Gate · Day 1/30** (dal 2026-11-03, sera, formato regole a puntate, "un luogo e un ordine"): "Your whole job is one gate on the harbor road. One order: after dark, nobody comes through." Finale: un bambino con una lanterna chiede di passare, ma il suo fiato non fa vapore nel freddo. OPEN or HOLD. Ogni Parte salta di dieci giorni.
 - ⭐ **Chairlift · Day 1** (dal 2026-11-04, sera, formato regole a puntate, regola + fatto vero): "The chairlift stopped at 4:50 pm. Then the resort lights went off, one by one. You're 30 meters up." HUD con giorno, ora e batteria; ogni Parte una scheda-fatto sul freddo. Finale: la seggiola davanti alla tua adesso è vuota. JUMP or WAIT.
+- ⭐ **Ice Road · Day 1** (dal 2026-11-05, sera, regole a puntate, regola + fatto vero): "The only road out of town is a frozen lake. The ice is 22 centimeters thick. A car needs 20." Fatto vero (Minnesota DNR): circa 10 cm di ghiaccio nuovo per camminare, 20-30 cm per un'auto. RULE #1 NEVER STOP ON THE ICE. Finale: un'auto ferma davanti a te con le luci accese, qualcuno fa segno. STOP or DRIVE PAST.
 
 ## Non fare rumore (formato `silenzio.md`, dal 2026-10-31)
 - ⭐ **Hush Harbor**: "It's 3:12 am on the night ferry. The engines cut out, and the captain whispers into the radio: from now on, nobody makes a sound." Misuratore NOISE in alto, tre regole su tre oggetti (telefono, scarpe sul ponte di metallo, il parapetto). Finale: il carillon di una bambina comincia a suonare. STOP IT or THROW IT. → `productions/2026-11-02-hush-harbor` (STOP or THROW)
@@ -109,17 +110,20 @@ La Ricerca aggiunge ogni giorno 3-5 voci nuove (dalle mode del momento, da Reddi
 - **Snow Day Silence** (dal 2026-11-04): "The school text says: snow day. Stay inside. Do not shovel." Il rumore della pala è la regola infranta dal vicino. Finale: il vicino ti fa segno di aiutarlo. HELP or STAY IN.
 
 ## What if (personaggio con nome, dal 2026-11-04)
+- **No Moon** (dal 2026-11-05, sera): "What if the Moon disappeared tonight?" Ivo, 58, pescatore al molo del faro. Fatti veri: restano solo le maree del Sole, circa un terzo di oggi; notti molto più buie. Indovinello: quale animale se ne accorgerebbe per primo?
 - **Offline 30 Days** (dal 2026-11-04, sera): "What if the internet went down for 30 days?" Lina, 16, fatti veri passo per passo. Chiusa a indovinello: cosa smetterebbe di funzionare per primo in casa tua?
 - **Reset to Zero** (dal 2026-11-05): "What if every bank account reset to $0 at midnight?" Noor, 41, cassiera, alle 0:01. Fatto vero: quasi tutto il denaro esiste solo come numeri nei computer. Indovinello: cosa si comprerebbe ancora con i contanti?
 - **No Sound Day**: "What if sound stopped working for one day?" Mara, 34, guardiana di un faro, si sveglia e il mare non fa rumore. Spiegato passo per passo (niente sirene, niente tuoni, i pipistrelli si perdono). Chiusa a indovinello: qual è l'unica cosa che sentiresti ancora?
 
 ## Il telefono sa qualcosa (formato `telefono.md`, dal 2026-11-03)
+- **Low Power Mode** (dal 2026-11-05, sera): alle 11:58 il telefono attiva il risparmio energetico da solo: "Saving battery for later. You'll need it at 3:40." CHARGE IT or SWITCH IT OFF.
 - **Emergency SOS** (dal 2026-11-04, sera): alle 3:01 il telefono chiama da solo il numero d'emergenza. L'operatore risponde: "We know. We're already outside." HANG UP or OPEN THE DOOR.
 - ⭐ **Find My** (dal 2026-11-03): "Your phone says your little sister's phone is in your room. She's been at Grandma's all week." Il puntino della mappa si avvicina stanza per stanza. CALL HER or CHECK THE CLOSET.
 - **Screen Time** (dal 2026-11-03): il rapporto settimanale dice che hai usato il telefono 3 ore stanotte, tra le 2 e le 5, mentre dormivi. App più usata: Camera, 214 foto. OPEN THE GALLERY or DELETE THEM.
 - **Battery 1%** (dal 2026-11-03): il telefono si è caricato da solo fino al 100% durante il blackout. Nessuno l'ha attaccato alla presa. Poi arriva un messaggio: "you're welcome". REPLY or UNPLUG.
 
 ## I soldi che scottano (formato `soldi.md`, dal 2026-10-30)
+- ⭐ **The Wrong Transfer · Part 2** (dal 2026-11-05, sera, per sabato 7): "MOST OF YOU SAID: WAIT. At 9:14 the doorbell rings. He says he's from the bank." Fatto vero: le banche non mandano nessuno a casa e non chiedono mai PIN o codici. SUSPICION dall'85%. OPEN or CALL THE BANK.
 - ⭐ **The Wrong Transfer**: "At 2:14 AM, your bank app says you have $4,800,000. Yesterday you had $212." Fatti veri su schede crema (un bonifico sbagliato si può riprendere, spenderlo è reato). Contatore SUSPICION. TELL THE BANK or WAIT. → `productions/2026-11-05-wrong-transfer` (BANK or WAIT)
 - **The Lottery Ticket** (dal 2026-11-05): "You found a winning ticket on the bus floor. $2,000,000. The name on the back isn't yours." Fatti veri: un biglietto firmato è di chi l'ha firmato, i premi grandi si ritirano di persona. CASH IT or FIND HER.
 - **The Lantern Bag**: sulla spiaggia del faro trovi una borsa con una lanterna e $1,000,000. Un messaggio: "Keep the money. Bring back the lantern." KEEP or RETURN.
