@@ -57,7 +57,7 @@ export const THEMES = {
 };
 
 // Format names as they appear in meta.json ("your-call", "what-if", "mystery", "legend", "rules", "silence", "phone", "countdown", "fable")
-const ALIAS = { mystery: 'misteri', legend: 'misteri', rules: 'regole', silence: 'regole', phone: 'telefono', countdown: 'conto-alla-rovescia', fable: 'fiaba' };
+const ALIAS = { mystery: 'misteri', legend: 'misteri', rules: 'regole', silence: 'regole', phone: 'telefono', money: 'telefono', countdown: 'conto-alla-rovescia', fable: 'fiaba' };
 
 export function theme(format = 'fiaba', mood = 'notte') {
   const set = THEMES[format] || THEMES[ALIAS[format]] || THEMES.fiaba;

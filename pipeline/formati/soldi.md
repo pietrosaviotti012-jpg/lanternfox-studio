@@ -7,6 +7,8 @@
 
 Da noi la fortuna non nasce da un reato commesso da te: trovata, lasciata da qualcuno, arrivata per errore sul conto. Niente istruzioni pratiche per nascondere soldi o ingannare banche e polizia: il messaggio è sempre "ogni scelta lascia una traccia", e i fatti spiegano perché chi ci prova viene scoperto.
 
+`meta.format`: `money` (narratore `pov`, pacchetto di suoni `phone`, tema `telefono`). Primo video: `productions/2026-11-05-wrong-transfer`.
+
 ## Come apre
 Una cifra enorme e un luogo misero nella stessa frase: "You just found $3 million. It's in a gym bag, in your car, in a supermarket parking lot." Il contatore in alto corre da $0 alla cifra nei primi 2 secondi.
 

@@ -24,6 +24,7 @@ sfx: [{ t: .4, type: 'knock', v: .9 }, { t: 1.6, type: 'door-creak', v: .8 }, { 
 | `mystery` | `m-mystery` | `waves`, `cave`, `wind` | `foghorn` `raven` `wolf` `door-metal` `horses` `fire` `water` `bell` `clock` |
 | `rules` | `m-dread`, `m-tense` | `radio`, `room` | `knock` `door-creak` `elevator` `breath` `whisper` `siren` `clock` `phone-dead` |
 | `phone` | `m-tense`, `m-suspense` | `static`, `room` | `phone-ring` `typing` `monitor` `car` `steps` `knock` `breath` `modem` |
+| `money` | come `phone` | `static`, `room` | `phone-ring` `typing` `page` `car` `boom` |
 | `countdown` | `m-urgent` | `static`, `cave` | `alarm` `alarm-home` `siren` `radio` `morse` `clock` `train` `crowd` `rumble` |
 | `fable` | carillon | `forest`, `water` | `raven` `cat` `horses` `bell` `foghorn` `chimes` |
 

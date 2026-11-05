@@ -1,0 +1,389 @@
+{
+ "title": "The Wrong Transfer · Part 1",
+ "series": "The Wrong Transfer",
+ "format": "money",
+ "theme": "telefono/notte",
+ "voice": {
+  "preset": "pov"
+ },
+ "captions": "pop",
+ "hud": {
+  "tag": "THE WRONG TRANSFER",
+  "part": "PART 1",
+  "clock": "2:14 AM · CHECKING"
+ },
+ "fx": "dust",
+ "lead": 0.3,
+ "tail": 3.8,
+ "choice": {
+  "question": "The bank opens. He's outside.",
+  "a": {
+   "word": "BANK",
+   "sub": "call before he knocks"
+  },
+  "b": {
+   "word": "WAIT",
+   "sub": "hear what he wants"
+  },
+  "note": "THE MAJORITY WRITES PART 2"
+ },
+ "next": {
+  "title": "PART 2",
+  "sub": "Follow for part 2"
+ },
+ "lines": [
+  {
+   "id": "L01",
+   "text": "Your bank app says you have $4,800,000.",
+   "say": "Your bank app says you have four million, eight hundred thousand dollars.",
+   "em": [
+    "$4,800,000"
+   ],
+   "clock": "2:14 AM · CHECKING",
+   "gap": 0.25,
+   "phone": {
+    "app": "lock",
+    "date": "Thursday, November 5",
+    "time": "2:14",
+    "notes": [
+     {
+      "app": "Bank · Incoming transfer",
+      "text": "+$4,799,788.00 · From: UNKNOWN"
+     }
+    ]
+   },
+   "act": {
+    "intensity": 0.55,
+    "pace": 0.36,
+    "speed": 0.94,
+    "gain_db": 1.5
+   }
+  },
+  {
+   "id": "L02",
+   "text": "Yesterday, you had $212.",
+   "say": "Yesterday, you had two hundred and twelve dollars.",
+   "em": [
+    "$212"
+   ],
+   "gap": 0.35,
+   "phone": {
+    "app": "Checking · yesterday",
+    "value": "$212",
+    "sub": "Today: $4,800,000.00"
+   },
+   "act": {
+    "intensity": 0.45,
+    "pace": 0.36,
+    "speed": 0.92,
+    "gain_db": 0.5
+   }
+  },
+  {
+   "id": "L03",
+   "text": "Then a text, from a number you don't know.",
+   "em": [
+    "text"
+   ],
+   "gap": 0.2,
+   "phone": {
+    "app": "messages",
+    "from": "Unknown number",
+    "thread": [
+     {
+      "me": false,
+      "text": "Don't call the bank."
+     }
+    ]
+   },
+   "act": {
+    "intensity": 0.5,
+    "pace": 0.38,
+    "speed": 0.92,
+    "gain_db": 0
+   }
+  },
+  {
+   "id": "L04",
+   "text": "“Don't call the bank. I'm coming for it.”",
+   "say": "Don't call the bank. I'm coming for it.",
+   "quote": true,
+   "vfx": "phone",
+   "em": [
+    "coming"
+   ],
+   "hit": true,
+   "gap": 0.8,
+   "phone": {
+    "app": "messages",
+    "from": "Unknown number",
+    "thread": [
+     {
+      "me": false,
+      "text": "Don't call the bank."
+     },
+     {
+      "me": false,
+      "text": "I'm coming for it."
+     }
+    ]
+   },
+   "act": {
+    "intensity": 0.65,
+    "pace": 0.36,
+    "speed": 0.9,
+    "gain_db": 1
+   }
+  },
+  {
+   "id": "L05",
+   "text": "Problem one: it isn't yours. A bank can take back a wrong transfer.",
+   "em": [
+    "isn't",
+    "back"
+   ],
+   "gap": 0.3,
+   "act": {
+    "intensity": 0.45,
+    "pace": 0.4,
+    "speed": 0.93,
+    "gain_db": 0
+   }
+  },
+  {
+   "id": "L06",
+   "text": "In 2019, a couple in Pennsylvania spent a mistake like this. $120,000.",
+   "say": "In twenty nineteen, a couple in Pennsylvania spent a mistake like this. A hundred and twenty thousand dollars.",
+   "em": [
+    "spent",
+    "$120,000"
+   ],
+   "gap": 0.3,
+   "act": {
+    "intensity": 0.5,
+    "pace": 0.4,
+    "speed": 0.93,
+    "gain_db": 0.5
+   }
+  },
+  {
+   "id": "L07",
+   "text": "The bank took it all back. Then they were charged with theft.",
+   "em": [
+    "back",
+    "theft"
+   ],
+   "gap": 0.6,
+   "act": {
+    "intensity": 0.55,
+    "pace": 0.38,
+    "speed": 0.92,
+    "gain_db": 1
+   }
+  },
+  {
+   "id": "L08",
+   "text": "Problem two: every tap leaves a trail. You've opened the app nine times tonight.",
+   "em": [
+    "trail",
+    "nine"
+   ],
+   "gap": 0.25,
+   "phone": {
+    "app": "lock",
+    "date": "Bank · sign-ins tonight",
+    "time": "9×",
+    "notes": [
+     {
+      "app": "2:14 AM",
+      "text": "Signed in · Face ID"
+     },
+     {
+      "app": "2:31 AM",
+      "text": "Signed in · Face ID"
+     },
+     {
+      "app": "3:47 AM",
+      "text": "Signed in · Face ID"
+     }
+    ]
+   },
+   "act": {
+    "intensity": 0.45,
+    "pace": 0.4,
+    "speed": 0.93,
+    "gain_db": 0
+   }
+  },
+  {
+   "id": "L09",
+   "text": "And you just searched: “can I keep it?”",
+   "say": "And you just searched: can I keep it?",
+   "em": [
+    "keep"
+   ],
+   "gap": 0.6,
+   "phone": {
+    "app": "Search",
+    "value": "?",
+    "sub": "can I keep money sent by mistake"
+   },
+   "act": {
+    "intensity": 0.5,
+    "pace": 0.38,
+    "speed": 0.92,
+    "gain_db": 0.5
+   }
+  },
+  {
+   "id": "L10",
+   "text": "Even banks make this mistake. In 2020, one sent $900 million by accident.",
+   "say": "Even banks make this mistake. In twenty twenty, one sent nine hundred million dollars by accident.",
+   "em": [
+    "$900",
+    "million"
+   ],
+   "gap": 0.3,
+   "act": {
+    "intensity": 0.5,
+    "pace": 0.4,
+    "speed": 0.93,
+    "gain_db": 0.5
+   }
+  },
+  {
+   "id": "L11",
+   "text": "It fought two years in court to get it back.",
+   "em": [
+    "two",
+    "years"
+   ],
+   "gap": 0.7,
+   "act": {
+    "intensity": 0.45,
+    "pace": 0.38,
+    "speed": 0.92,
+    "gain_db": 0
+   }
+  },
+  {
+   "id": "L12",
+   "text": "8:59 AM. The bank opens in one minute.",
+   "say": "Eight fifty-nine a.m. The bank opens in one minute.",
+   "em": [
+    "one",
+    "minute"
+   ],
+   "clock": "8:59 AM · YOU HAVEN'T CALLED",
+   "gap": 0.4,
+   "timer": {
+    "from": "00:01:00",
+    "label": "BANK OPENS"
+   },
+   "act": {
+    "intensity": 0.55,
+    "pace": 0.38,
+    "speed": 0.92,
+    "gain_db": 0.5
+   }
+  },
+  {
+   "id": "L13",
+   "text": "Your phone buzzes again: “I'm outside.”",
+   "say": "Your phone buzzes again. I'm outside.",
+   "em": [
+    "outside"
+   ],
+   "hit": true,
+   "tint": true,
+   "quote": true,
+   "gap": 0.6,
+   "phone": {
+    "app": "messages",
+    "from": "Unknown number",
+    "thread": [
+     {
+      "me": false,
+      "text": "I'm coming for it."
+     },
+     {
+      "me": false,
+      "text": "I'm outside."
+     }
+    ]
+   },
+   "act": {
+    "intensity": 0.7,
+    "pace": 0.36,
+    "speed": 0.9,
+    "gain_db": 1.5
+   }
+  },
+  {
+   "id": "L14",
+   "text": "A grey car, engine running, right under your window.",
+   "em": [
+    "car",
+    "window"
+   ],
+   "gap": 0.5,
+   "act": {
+    "intensity": 0.55,
+    "pace": 0.36,
+    "speed": 0.9,
+    "gain_db": 0.5
+   }
+  },
+  {
+   "id": "L15",
+   "text": "Call the bank, or wait for him? Comment BANK or WAIT.",
+   "em": [
+    "BANK",
+    "WAIT"
+   ],
+   "gap": 0.2,
+   "act": {
+    "intensity": 0.55,
+    "pace": 0.38,
+    "speed": 0.94,
+    "gain_db": 1.5
+   }
+  }
+ ],
+ "bpm": 60,
+ "seed": 51,
+ "music": [
+  {
+   "at": "S1",
+   "mood": "hush"
+  },
+  {
+   "at": "S4",
+   "mood": "rise"
+  },
+  {
+   "at": "S5",
+   "mood": "calm"
+  },
+  {
+   "at": "S8",
+   "mood": "hush"
+  },
+  {
+   "at": "S10",
+   "mood": "calm"
+  },
+  {
+   "at": "S12",
+   "mood": "rise"
+  },
+  {
+   "at": "S13",
+   "mood": "storm"
+  },
+  {
+   "at": "S15",
+   "mood": "end"
+  }
+ ]
+}

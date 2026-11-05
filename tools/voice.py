@@ -23,7 +23,7 @@ voice = dict(script.get("voice", {}))
 # the narrator's timbre: a ~9 s reference clip in voices/ (synthetic Kokoro voices, see voices/make_refs.py).
 # script.voice.preset picks one (cupo, professore, fiaba, pov); without it the format in meta.json decides.
 VOICES = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "voices")
-BY_FORMAT = {"your-call": "pov", "what-if": "professore", "mystery": "cupo", "legend": "cupo", "fable": "fiaba", "tale": "fiaba"}
+BY_FORMAT = {"your-call": "pov", "money": "pov", "what-if": "professore", "mystery": "cupo", "legend": "cupo", "fable": "fiaba", "tale": "fiaba"}
 if not voice.get("prompt"):
     meta_path = os.path.join(prod, "meta.json")
     fmt = json.load(open(meta_path, encoding="utf-8")).get("format", "") if os.path.exists(meta_path) else ""

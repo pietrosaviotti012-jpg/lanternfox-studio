@@ -110,6 +110,7 @@ La Ricerca aggiunge ogni giorno 3-5 voci nuove (dalle mode del momento, da Reddi
 
 ## What if (personaggio con nome, dal 2026-11-04)
 - **Offline 30 Days** (dal 2026-11-04, sera): "What if the internet went down for 30 days?" Lina, 16, fatti veri passo per passo. Chiusa a indovinello: cosa smetterebbe di funzionare per primo in casa tua?
+- **Reset to Zero** (dal 2026-11-05): "What if every bank account reset to $0 at midnight?" Noor, 41, cassiera, alle 0:01. Fatto vero: quasi tutto il denaro esiste solo come numeri nei computer. Indovinello: cosa si comprerebbe ancora con i contanti?
 - **No Sound Day**: "What if sound stopped working for one day?" Mara, 34, guardiana di un faro, si sveglia e il mare non fa rumore. Spiegato passo per passo (niente sirene, niente tuoni, i pipistrelli si perdono). Chiusa a indovinello: qual è l'unica cosa che sentiresti ancora?
 
 ## Il telefono sa qualcosa (formato `telefono.md`, dal 2026-11-03)
@@ -119,7 +120,8 @@ La Ricerca aggiunge ogni giorno 3-5 voci nuove (dalle mode del momento, da Reddi
 - **Battery 1%** (dal 2026-11-03): il telefono si è caricato da solo fino al 100% durante il blackout. Nessuno l'ha attaccato alla presa. Poi arriva un messaggio: "you're welcome". REPLY or UNPLUG.
 
 ## I soldi che scottano (formato `soldi.md`, dal 2026-10-30)
-- ⭐ **The Wrong Transfer**: "At 2:14 AM, your bank app says you have $4,800,000. Yesterday you had $212." Fatti veri su schede crema (un bonifico sbagliato si può riprendere, spenderlo è reato). Contatore SUSPICION. TELL THE BANK or WAIT.
+- ⭐ **The Wrong Transfer**: "At 2:14 AM, your bank app says you have $4,800,000. Yesterday you had $212." Fatti veri su schede crema (un bonifico sbagliato si può riprendere, spenderlo è reato). Contatore SUSPICION. TELL THE BANK or WAIT. → `productions/2026-11-05-wrong-transfer` (BANK or WAIT)
+- **The Lottery Ticket** (dal 2026-11-05): "You found a winning ticket on the bus floor. $2,000,000. The name on the back isn't yours." Fatti veri: un biglietto firmato è di chi l'ha firmato, i premi grandi si ritirano di persona. CASH IT or FIND HER.
 - **The Lantern Bag**: sulla spiaggia del faro trovi una borsa con una lanterna e $1,000,000. Un messaggio: "Keep the money. Bring back the lantern." KEEP or RETURN.
 
 ## Gialli e storie con colpo di scena
