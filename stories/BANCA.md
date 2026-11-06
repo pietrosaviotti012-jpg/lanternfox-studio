@@ -139,3 +139,4 @@ La Ricerca aggiunge ogni giorno 3-5 voci nuove (dalle mode del momento, da Reddi
 - ⭐ "I work the night shift at a lighthouse museum. Last night, the light turned on by itself, and it was pointing at my house."
 - "Our town has a lantern festival every year. This year I noticed nobody comes back from the forest."
 - "AITA for refusing to give my neighbor back the lantern he left on my porch?" (dilemma: commenta YTA o NTA)
+- 2026-11-06 (Ricerca): ⭐ **Regole · *The Safe Door***: "Two doors. One is safe. The safe one has a rule you must never break." Scelta tra due porte, contatore che sale quando rompi la regola; la porta sicura non è sicura. Idea da un formato "Pick a Door" visto solo in una descrizione, non verificato: usare la struttura, non i testi.
