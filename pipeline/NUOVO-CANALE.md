@@ -186,7 +186,25 @@ Da spegnere quando parte il nuovo canale (lo si fa da claude.ai/code/routines o 
 
 **Mascotte e coerenza.** Le guide sui canali faceless dicono tutte la stessa cosa: un personaggio fisso, una "scheda del personaggio" scritta prima di tutto e usata in ogni video, e un ritmo costante. YouTube **non paga contenuti "inautentici"**, cioè prodotti in serie e tutti uguali. Ogni video deve avere una storia vera, curata e diversa, con il controllo umano in Approva.
 
-**Instagram e TikTok:** da fare quando l'utente ha fatto l'accesso nel pannello browser. Si cercano profili di stickman e "what if" 3D con milioni di visualizzazioni, la loro mascotte, la frequenza, la lunghezza, i ganci e le copertine, e come dicono di automatizzare.
+**TikTok, ricerca "stickman history animation":**
+- **Profili dedicati con follower:** StickTory Animations (3.514 follower), stickmanstorytime10 (15.300), stickmanstorys22 (41.800).
+- **Video con molte visualizzazioni:**
+  - "Born to Suffer": #Animation #StickFigure #History, **1,2 milioni**;
+  - "Would you trust the phone... or the door?" (Inkwell Dilemmas): **812.000**;
+  - una storia stickman sulla bomba atomica: **270.000**;
+  - The Badd Lad, stick figure di storia: **184.000**.
+- **I formati che tornano:** dilemmi a due scelte ("THE SERGEANT or THE DYING SOLDIER? 👇"), sopravvivenza a puntate ("PART 1 SURVIVING THE APOCALYPSE…"), storia vera in una frase-gancio ("In 1945, Poland was picked up and moved west").
+- **Automazione:** il video "This AI Tool Can Create 8 Minute Stickman Video With 1 Click" conferma che molti creator lo fanno con strumenti automatici.
+
+**TikTok, ricerca "what if 3D animation":**
+- Il riferimento è **Zack D. Films**: 8,1 milioni di follower, 335,8 milioni di mi piace.
+- Intorno ci sono tanti canali "in stile ZDF" (nexus.explained, Bad Idea Universe, Informer 3D, ZekD Creator, Zack D. Markour) e tutorial "How to make 3D animation like Zack D Films".
+- **Lezione:** la nicchia è enorme ma piena di copie. Dobbiamo avere **una faccia nostra**: mascotte, colori, nome e un modo nostro di chiudere. Nome, titoli e hashtag non devono richiamare Zack D. Films, altrimenti sembriamo "un'altra copia" e rischiamo problemi di marchio.
+
+**Instagram, ricerca "stickman history":**
+- La griglia è piena di stickman storici con candele, navi, piramidi e "what did ancient humans actually do all day". **In cima c'era una miniatura del nostro "1780"**: Strange Days #1 compare già nella ricerca.
+- Molti post sono **tutorial "stickman history viral AI video"**. Usano il trucco "commenta una parola e ti mando la guida": un post ha 747 mi piace e **677 commenti**. È una tattica per crescere con i commenti, da valutare con prudenza.
+- La ricerca "claude code video automation" su Instagram non dà risultati: se ne parla soprattutto su YouTube.
 
 Fonti:
 - [youtube-agent-skill](https://github.com/Jakeschincariol/youtube-agent-skill)
@@ -194,6 +212,35 @@ Fonti:
 - [Virality Predictor](https://coderlegion.com/18543/virality-predictor)
 - [Faceless shorts automation guide 2026](https://fluxnote.io/guides/faceless-youtube-shorts-automation-guide-2026)
 - [Faceless YouTube videos, Higgsfield](https://higgsfield.ai/blog/faceless-youtube-videos-faceless-studio)
+
+## 8b. Meno Claude dove non serve (domanda dell'utente, 6 novembre)
+
+Il limite di 5 ore si consuma solo con **Claude**: chat e routine. Ogni passo che non richiede di pensare o di scrivere va fatto **con il codice, senza Claude**, e la qualità non cambia, perché quei passi sono sempre uguali.
+
+| Passo | Serve Claude? | Dove farlo nel nuovo canale |
+|---|---|---|
+| Render delle scene, voce Kokoro, tempi delle parole, mix, foglio dei provini | **No** | GitHub Actions (come il render di oggi) |
+| Controllo qualità automatico (volume, gancio, didascalie, figure a terra) | **No** | GitHub Actions (`quality.py`) |
+| Pubblicazione su YouTube e TikTok | **No** | L'Ufficio lo fa già da solo (API YouTube, Zernio) |
+| Pubblicazione su Instagram | **Oggi sì** (routine con Composio) | Con **Zernio**, che supporta anche Instagram (da verificare sul piano gratuito), o con l'API di Instagram. Così non serve più una routine |
+| Numeri di YouTube e TikTok | **No** | L'Ufficio, ogni sera |
+| Numeri di Instagram | Oggi sì (Analisi con Composio) | Con Zernio o con l'API di Instagram, poi senza Claude |
+| Confronto con i virali, misure dai provini | No per le misure (`look.py`), sì per il giudizio | Misure su GitHub; il giudizio con un modello leggero |
+| Idee, fatti, copione | **Sì** | Una routine al giorno che prepara le idee per tutti i video del giorno |
+| Scrivere le scene (`shots.js`) seguendo la skill | **Sì**, ed è la parte più difficile | Claude Opus, una routine per video, senza render dentro |
+| Risposte ai commenti | Sì, ma sono semplici | Modello leggero |
+
+**Modelli per tipo di lavoro.** Le routine usano meno limite con un modello più leggero.
+
+| Modello | Lavori |
+|---|---|
+| **Opus** (`claude-opus-5-5`) | Solo copione + scene, cioè la parte creativa e il codice 3D |
+| **Sonnet** (`claude-sonnet-5-5`) | Ricerca, Analisi, Community, Pubblicazione finché serve, virality predictor |
+| **Haiku** (`claude-haiku-5-5`) | Passaggi meccanici rimasti a Claude: per esempio "leggi questo JSON e manda questi eventi" |
+
+**Fatto il 6 novembre:** Pubblicazione, Community, Ricerca e Analisi di Lantern Fox sono passate da Opus a **Sonnet 5.5**. Produzione e Regia restano su Opus.
+
+**Attenzione:** per cambiare il modello di una routine va mandato il `job_config` **completo** (prompt, repository, strumenti). Un aggiornamento con solo il modello cancella prompt e repository. È successo su una routine di prova già spenta.
 
 ## 9. La pausa di adesso
 
