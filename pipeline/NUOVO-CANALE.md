@@ -9,6 +9,10 @@ Scritta il 2026-11-06, ultimo giorno della prima sessione. La prossima sessione,
 - Dal 27 ottobre al 5 novembre 2026 abbiamo costruito **Lantern Fox Tales**, uno studio automatico e a costo zero. Ha prodotto, controllato e pubblicato **17 video** (con i numeri nell'Ufficio, più alcuni ancora da approvare) verticali animati in inglese su YouTube, Instagram e TikTok, gestiti da un **Ufficio** web dal telefono.
 - Il 3 novembre abbiamo provato le **skill di animazione** di artemnovitckii (MIT). Con **stick-figure** e **zach-d-films** i numeri su YouTube sono saliti subito: sopra le 1.000 visualizzazioni per ogni video di storia vera.
 - **Decisione:** il canale cambia nome e faccia e si basa su queste due skill. Si parte da un **repository nuovo e pulito**. Gli account social restano gli stessi, rinominati, così follower e numeri non si perdono.
+- **L'ordine dei lavori** (§10):
+  - **A.** Si prepara tutto quello che si può fare senza toccare il canale.
+  - **B.** Si cambia il canale completamente e si spegne Lantern Fox con tutto il resto.
+  - **C.** Si riparte da questa guida.
 - La produzione di Lantern Fox è **in pausa fino al 7 novembre** (vedi §9).
 
 ## 2. Le decisioni dell'utente (6 novembre)
@@ -253,10 +257,27 @@ Il limite di 5 ore si consuma solo con **Claude**: chat e routine. Ogni passo ch
 
 ## 10. Il piano per la nuova sessione
 
+**L'ordine lo ha deciso l'utente, ed è in tre tempi:**
+
+| Tempo | Cosa | Il canale di oggi |
+|---|---|---|
+| **A. Preparare** | Tutto quello che si può fare **senza toccare il canale**: fasi 1-5 qui sotto | Non si cambia niente: profili, nome e foto restano quelli di Lantern Fox |
+| **B. Il cambio** | Si **cambia il canale completamente** (fase 6) e si **spegne Lantern Fox con tutto il resto** (vecchie routine, workflow, Ufficio di prima) | Da Lantern Fox al nuovo canale, in un giorno solo |
+| **C. Ripartire** | Si **riparte da questa guida** con il nuovo sistema (fase 7) | Solo il nuovo canale |
+
+Il tempo B comincia solo quando il tempo A è finito e approvato.
+
+**Le regole del tempo A:**
+- Niente che si veda da fuori: nessun cambio di nome, foto, bio o @, nessun video archiviato, nessun post del nuovo stile pubblicato.
+- I video di prova della nuova catena restano **privati**: si guardano dal nuovo Ufficio o da un link, e non vanno in Approva di Lantern Fox.
+- I nomi si **controllano** (che siano liberi) ma non si registrano. Se l'utente vuole bloccare un @ prima, lo fa lui.
+- Si costruisce nel **repository nuovo** e su un **Worker nuovo**, senza toccare `lanternfox-studio` né l'Ufficio di oggi. Dal vecchio si copia soltanto.
+
 Ogni fase si chiude con l'approvazione dell'utente. Si procede **una fase alla volta**, come nei progetti precedenti.
 
 ### Fase 0: partire
-- Leggere questa guida. Allungare la pausa di Lantern Fox se serve (§9).
+- Leggere questa guida.
+- Chiedere all'utente se, durante la preparazione, Lantern Fox deve **continuare a fare video** oppure restare **in pausa** (§9: la pausa finisce il 7 novembre).
 - Confermare con l'utente l'ordine delle fasi.
 
 ### Fase 1: identità
@@ -314,13 +335,27 @@ Ritmo: 2 video al giorno, poi 3. Al massimo 2 routine pesanti insieme (§7.1).
 - **Novità:** la casa del predictor, il formato di ogni video (stickman o 3D) e il numero della serie in Approva, il confronto tra formati nei Numeri.
 - Dal vecchio Ufficio si riprendono login, Durable Object, Web Push, YouTube OAuth (con il refresh token nella KV), Zernio e statistiche. Si può fare un Worker nuovo o rinominare quello di oggi: le chiavi restano uguali.
 
-### Fase 6: i profili (li cambia l'utente)
-- Si preparano nome, foto e bio per ognuna delle 3 piattaforme, e i passi da seguire. **TikTok permette di cambiare l'@ solo una volta ogni 30 giorni.**
-- Si archiviano i video di Lantern Fox: su Instagram archiviati, su YouTube non in elenco, su TikTok privati.
-- Dopo il cambio si ricontrolla il collegamento di Zernio con TikTok, di Composio con Instagram e della nostra OAuth con YouTube.
+### Fase 6 (tempo B): il cambio completo
+Si fa in un giorno solo, con l'utente, in quest'ordine:
 
-### Fase 7: partenza e crescita
-- Si spengono le routine di Lantern Fox (§6) e si accendono le nuove.
+1. **Si spegne Lantern Fox, tutto:**
+   - le routine Produzione, Regia, Pubblicazione, Community, Ricerca e Analisi (§6): `enabled: false`;
+   - nel vecchio repository si disattivano i workflow `render.yml`, `office.yml`, `look.yml`, `serie.yml`, `voices.yml` e `probe.yml`, con `gh workflow disable`;
+   - il vecchio Ufficio smette di pubblicare e di fare ripartire i reparti: pausa senza fine (`PRODUCTION_PAUSED_UNTIL`) e niente pubblicazioni. Resta online in sola lettura finché il nuovo Ufficio non ha preso i numeri;
+   - i video ancora in Approva di Lantern Fox non escono più.
+   - **Non si toccano mai:** "Revisione settimanale trading bot", il repository `lanternfox-studio` (resta come archivio) e il repository privato `lanternfox-skills`, finché le skill non sono copiate nel nuovo.
+2. **Si cambia il canale (lo fa l'utente, con i testi pronti):**
+   - nome, @, foto e bio su YouTube, Instagram e TikTok. **TikTok permette di cambiare l'@ solo una volta ogni 30 giorni**;
+   - i video di Lantern Fox si archiviano: su Instagram archiviati, su YouTube non in elenco, su TikTok privati.
+3. **Si ricollega tutto:**
+   - Zernio con TikTok;
+   - Composio (o Zernio) con Instagram;
+   - la nostra OAuth con YouTube, nel nuovo Ufficio;
+   - le notifiche sul telefono, dal nuovo Ufficio.
+
+### Fase 7 (tempo C): ripartire dalla guida
+- Si riparte da questa guida: §2 (le decisioni), §7 (gli errori da non ripetere), §8b (meno Claude, i modelli giusti).
+- Si accendono le nuove routine e i nuovi workflow: al massimo 2 routine pesanti insieme, Opus solo per copione e scene.
 - Si parte con 3 video di prova in Approva, poi 2 al giorno. Ogni settimana l'Analisi confronta i formati e corregge la catena.
 - Si passa a 3 video al giorno quando la catena gira per una settimana senza errori.
 - Quando TikTok si avvicina ai 10.000 follower, si fanno versioni da 61-75 s delle storie migliori.
